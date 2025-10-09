@@ -61,27 +61,53 @@ body{
 .hr{height:1px;background:var(--line);margin:8px 0}
 
 /* Grid de campos */
-.row{display:grid;grid-template-columns:repeat(12,1fr);gap:8px}
+.row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
 .col-12{grid-column:span 12}
 .col-6{grid-column:span 6}
 .col-4{grid-column:span 4}
 .col-3{grid-column:span 3}
 
 /* Inputs */
-.label{font-weight:600;font-size:12px;color:var(--muted)}
-input,select,textarea{
-  width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff
+.label{
+  display:block;
+  font-weight:600;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:4px;
 }
-textarea{min-height:88px}
-.switch{display:flex;align-items:center;gap:6px}
+input,select,textarea{
+  width:100%;
+  padding:8px 10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+  vertical-align:middle;
+}
+input,select{height:36px;line-height:36px}
+textarea{min-height:92px}
+.switch{display:flex;align-items:center;gap:8px}
+.switch input[type="checkbox"]{margin:0}
 
 /* Chips */
-.chip{border:1px solid var(--line);border-radius:999px;padding:6px 8px;cursor:pointer;background:#fff}
+.chip{border:1px solid var(--line);border-radius:999px;padding:8px 10px;cursor:pointer;background:#fff}
 .chip.active{border-color:var(--primary);color:var(--primary);background:#eef2ff}
 
-/* Documento anexo */
-.field-anexo{display:flex;align-items:center;gap:8px;margin-top:4px}
-.field-anexo small{color:var(--muted)}
+/* Documento anexo — alinhado */
+.field-anexo{
+  display:grid;
+  grid-template-columns:auto auto 1fr;
+  align-items:center;
+  column-gap:8px;
+  margin-top:6px;
+}
+.field-anexo input[type="checkbox"]{margin:0}
+.field-anexo label{margin:0;white-space:nowrap}
+.field-anexo small{
+  color:var(--muted);
+  font-size:12px;
+  justify-self:end;
+  text-align:right;
+}
 
 /* Preview */
 .preview{
@@ -109,4 +135,7 @@ textarea{min-height:88px}
 @media (max-width:960px){
   .container{grid-template-columns:1fr}
   .sidebar{position:static;height:auto}
+  .row{gap:8px}
+  .field-anexo{grid-template-columns:auto 1fr;row-gap:4px}
+  .field-anexo small{justify-self:start;text-align:left}
 }
