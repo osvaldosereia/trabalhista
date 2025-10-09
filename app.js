@@ -723,7 +723,16 @@ ${header}
 ### Fundamentos
 ${FORM.blocos.vinculo?'- **Vínculo/CTPS**: reconhecimento/retificação conforme CLT arts. 2º-3º.\n':''}
 ${FORM.blocos.jornada?'- **Jornada/Horas**: '+(F.jornada.descricao||'')+'; HX '+(F.jornada.hx.percentuais||'')+'; Intervalos '+(F.jornada.intervalos||'')+'.\n':''}
-${FORM.blocos.adicionais?'- **Adicionais**: Noturno '+(F.adicionais.noturno.justificativa||'')+'; Insalubridade '+(F.adicionais.insal.ativo?('grau '+(F.adicionais.insal.grau||'')+' EPI '+(F.adicionais.insal.epi.status||'')):'não');+'; Periculosidade '+(F.adicionais.peric.ativo?(F.adicionais.peric.agente||''):'não')+'.\n':''}
+${FORM.blocos.adicionais
+  ? '- **Adicionais**: Noturno ' + (F.adicionais.noturno.justificativa || '') +
+    '; Insalubridade ' + (F.adicionais.insal.ativo
+      ? ('grau ' + (F.adicionais.insal.grau || '') + ' EPI ' + (F.adicionais.insal.epi.status || ''))
+      : 'não'
+    ) +
+    '; Periculosidade ' + (F.adicionais.peric.ativo ? (F.adicionais.peric.agente || '') : 'não') +
+    '.\n'
+  : ''
+}
 ${FORM.blocos.rescisao?'- **Rescisão/Multas**: Aviso '+(F.rescisao.aviso.tipo||'')+'; 13º '+(F.rescisao.decimo.status||'')+'; Férias '+(F.rescisao.ferias.status||'')+' + 1/3; Multas 477/467 se cabíveis.\n':''}
 ${FORM.blocos.fgts?'- **FGTS**: diferenças mensais, multa 40%, liberação/chave.\n':''}
 ${FORM.blocos.estabilidades?'- **Estabilidade**: '+(F.estabilidades.tipo||'')+'; fatos '+(F.estabilidades.fatos||'')+'; pretensão '+(F.estabilidades.pretensao||'')+'.\n':''}
