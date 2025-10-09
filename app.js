@@ -657,11 +657,10 @@ function templatePrompt(F){
   const supridos = camposSupridosPorDocs();
 
   const header = F.estilo.centered_header
-    ? `<div align="center">
-<strong>JUSTIÇA DO TRABALHO</strong><br>
-<strong>VARA DO TRABALHO DE ${F.metadados.comarca||''}/${F.metadados.UF||''}</strong>
-</div>`
-    : `**JUSTIÇA DO TRABALHO — VARA DO TRABALHO DE ${F.metadados.comarca||''}/${F.metadados.UF||''}**`;
+    ? '<div align="center">\n<strong>JUSTIÇA DO TRABALHO</strong><br>\n<strong>VARA DO TRABALHO DE ' +
+      (F.metadados.comarca||'') + '/' + (F.metadados.UF||'') + '</strong>\n</div>'
+    : '**JUSTIÇA DO TRABALHO — VARA DO TRABALHO DE ' +
+      (F.metadados.comarca||'') + '/' + (F.metadados.UF||'') + '**';
 
   const citArt = F.estilo.citacao_artigos==='texto_completo'
     ? 'Transcreva os dispositivos estritamente necessários (caput, §§, incisos).'
@@ -692,13 +691,10 @@ function templatePrompt(F){
   const camposAnexo = Object.keys(supridos).filter(k=>supridos[k]).sort();
   const persona = 'Atue como advogado trabalhista brasileiro altamente experiente. Fundamente em CLT, CF/88, CPC, Súmulas/OJs TST, precedentes STF/STJ, normas coletivas. Cite Planalto/LexML/TST/CNJ/INSS/portais TRTs e Jusbrasil com links.';
 
-  // FUNDAMENTOS – construir por partes, sem backticks aninhados
   const fundamentos = [];
-  if(FORM.blocos.vinculo){
-    fundamentos.push('- **Vínculo/CTPS**: reconhecimento/retificação conforme CLT arts. 2º-3º.');
-  }
+  if(FORM.blocos.vinculo){ fundamentos.push('- **Vínculo/CTPS**: reconhecimento/retificação conforme CLT arts. 2º-3º.'); }
   if(FORM.blocos.jornada){
-    fundamentos.push(`- **Jornada/Horas**: ${F.jornada.descricao||''}; HX ${F.jornada.hx.percentuais||''}; Intervalos ${F.jornada.intervalos||''}.`);
+    fundamentos.push('- **Jornada/Horas**: '+(F.jornada.descricao||'')+'; HX '+(F.jornada.hx.percentuais||'')+'; Intervalos '+(F.jornada.intervalos||'')+'.');
   }
   if(FORM.blocos.adicionais){
     const noturno = 'Noturno ' + (F.adicionais.noturno.justificativa || '');
@@ -706,29 +702,26 @@ function templatePrompt(F){
                     ? ('grau ' + (F.adicionais.insal.grau||'') + ' EPI ' + (F.adicionais.insal.epi.status||''))
                     : 'não');
     const peric   = 'Periculosidade ' + (F.adicionais.peric.ativo ? (F.adicionais.peric.agente||'') : 'não');
-    fundamentos.push(`- **Adicionais**: ${noturno}; ${insal}; ${peric}.`);
+    fundamentos.push('- **Adicionais**: '+noturno+'; '+insal+'; '+peric+'.');
   }
   if(FORM.blocos.rescisao){
-    fundamentos.push(`- **Rescisão/Multas**: Aviso ${F.rescisao.aviso.tipo||''}; 13º ${F.rescisao.decimo.status||''}; Férias ${F.rescisao.ferias.status||''} + 1/3; Multas 477/467 se cabíveis.`);
+    fundamentos.push('- **Rescisão/Multas**: Aviso '+(F.rescisao.aviso.tipo||'')+'; 13º '+(F.rescisao.decimo.status||'')+'; Férias '+(F.rescisao.ferias.status||'')+' + 1/3; Multas 477/467 se cabíveis.');
   }
-  if(FORM.blocos.fgts){
-    fundamentos.push('- **FGTS**: diferenças mensais, multa 40%, liberação/chave.');
-  }
+  if(FORM.blocos.fgts){ fundamentos.push('- **FGTS**: diferenças mensais, multa 40%, liberação/chave.'); }
   if(FORM.blocos.estabilidades){
-    fundamentos.push(`- **Estabilidade**: ${F.estabilidades.tipo||''}; fatos ${F.estabilidades.fatos||''}; pretensão ${F.estabilidades.pretensao||''}.`);
+    fundamentos.push('- **Estabilidade**: '+(F.estabilidades.tipo||'')+'; fatos '+(F.estabilidades.fatos||'')+'; pretensão '+(F.estabilidades.pretensao||'')+'.');
   }
   if(FORM.blocos.indenizacoes){
-    fundamentos.push(`- **Indenizações**: morais ${F.indenizacoes.morais.ativo?(F.indenizacoes.morais.fatos||''):'não'}; materiais ${F.indenizacoes.materiais.ativo?(F.indenizacoes.materiais.itens||''):'não'}; existenciais ${F.indenizacoes.existenciais.ativo?(F.indenizacoes.existenciais.fatos||''):'não'}.`);
+    fundamentos.push('- **Indenizações**: morais '+(F.indenizacoes.morais.ativo?(F.indenizacoes.morais.fatos||''):'não')+'; materiais '+(F.indenizacoes.materiais.ativo?(F.indenizacoes.materiais.itens||''):'não')+'; existenciais '+(F.indenizacoes.existenciais.ativo?(F.indenizacoes.existenciais.fatos||''):'não')+'.');
   }
   if(FORM.blocos.normas){
-    fundamentos.push(`- **Normas coletivas**: ${F.normas.tipo||''} ${F.normas.id||''}, vigência ${F.normas.vigencia||''}; cláusulas ${F.normas.clausulas||''}.`);
+    fundamentos.push('- **Normas coletivas**: '+(F.normas.tipo||'')+' '+(F.normas.id||'')+', vigência '+(F.normas.vigencia||'')+'; cláusulas '+(F.normas.clausulas||'')+'.');
   }
   if(FORM.blocos.tutela){
-    fundamentos.push(`- **Tutela de urgência**: ${F.tutela.tipos||''}; fundamentos ${F.tutela.fundamentos||''}.`);
+    fundamentos.push('- **Tutela de urgência**: '+(F.tutela.tipos||'')+'; fundamentos '+(F.tutela.fundamentos||'')+'.');
   }
 
-  // Cálculos e Pedidos
-  let calcSec = '- Critérios resumidos por rubrica com bases e reflexos.';
+  var calcSec = '- Critérios resumidos por rubrica com bases e reflexos.';
   if(F.estilo.calculos==='detalhado_por_rubrica'){
     calcSec = '- Para cada rubrica: fórmula, base, quantidade, reflexos e subtotal.';
   } else if(F.estilo.calculos==='tabelado'){
@@ -736,11 +729,11 @@ function templatePrompt(F){
       '| Rubrica | Período | Base de Cálculo | Quantidade/Fator | Reflexos | Valor (R$) |',
       '|---|---|---:|---:|---|---:|',
       '| Exemplo | 01/2023–12/2023 | R$ 2.500,00 | 50h x 50% | Férias/13º/FGTS | 1.234,56 |',
-      `**Total estimado**: R$ ${fmt(F.valor_causa.total)}`
+      '**Total estimado**: R$ ' + fmt(F.valor_causa.total)
     ].join('\n');
   }
 
-  let pedidosSec = [
+  var pedidosSec = [
     '1. Reconhecimento/retificação de vínculo e anotação em CTPS.',
     '2. Pagamento das verbas descritas (jornada, adicionais, rescisórias, FGTS, indenizações).',
     '3. Multas dos arts. 477 §8º e 467 da CLT, quando cabíveis.',
@@ -765,61 +758,62 @@ function templatePrompt(F){
   }
 
   return [
-`# PROMPT-MESTRE · PEÇA TRABALHISTA (Brasil)
-
-## PERSONA
-${persona}
-
-${docsIntroLines}
-
-## OPÇÕES DE ESTILO
-- Cabeçalho centralizado: ${F.estilo.centered_header?'sim':'não'}
-- Citações: artigos=${F.estilo.citacao_artigos}; súmulas/OJs=${F.estilo.citacao_sumulas_oj}; jurisprudência=${F.estilo.jurisprudencia}
-- Cálculos: ${F.estilo.calculos}; fórmulas ${F.estilo.mostrar_formulas?'sim':'não'}
-- Pedidos: ${F.estilo.pedidos_formato}; separar fazer/pagar ${F.estilo.separar_fazer_pagar?'sim':'não'}
-- Campos marcados como **Documento anexo**: ${camposAnexo.length?camposAnexo.join(', '):'(nenhum)'}
-- Política de citação: ${citArt} ${citOJ} ${jurOpts}
-
-## SAÍDA EXIGIDA (somente a peça em Markdown)
-${header}
-
-**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DA ${F.metadados.vara||''} VARA DO TRABALHO DE ${F.metadados.comarca||''}/${F.metadados.UF||''}**
-
-**${F.partes.reclamante.nome||'[nome]'}**, ${F.partes.reclamante.qualificacao||'[qualificação]'}, CPF ${F.partes.reclamante.cpf||'[cpf]'}, endereço ${F.partes.reclamante.endereco||'[endereço]'}, por seu advogado, vem propor **${(PIECES.find(p=>p[0]===F.peca)||[])[1]||F.peca}** em face de **${(F.partes.reclamadas||[]).map(r=>r.razao).filter(Boolean).join('; ')||'[reclamada]'}**.
-
-### Dos Fatos e do Contrato
-- Admissão: ${F.contrato.admissao||'(doc anexo se marcado)'}; Dispensa: ${F.contrato.dispensa||'(doc anexo se marcado)'}; Aviso ${F.contrato.aviso.tipo||''} com projeção até ${F.contrato.aviso.projecao||''}.
-- Função/CBO: ${F.contrato.funcao||''} (${F.contrato.cbo||''}); Salário-base: R$ ${fmt(F.contrato.salario)}; Variáveis: ${F.contrato.variaveis||''}.
-- Local/Modo: ${F.contrato.local||''} (${F.contrato.modo||''}).
-- CTPS: ${F.contrato.ctps.status||''} ${F.contrato.ctps.retificacoes?('- '+F.contrato.ctps.retificacoes):''}.
-
-### Fundamentos
-${fundamentos.join('\n')}
-
-### Dos Cálculos e Critérios
-${calcSec}
-
-### Dos Pedidos
-${pedidosSec}
-
-### Do Valor da Causa
-- ${F.valor_causa.modo}: R$ **${fmt(F.valor_causa.total)}**. Estimativa não limita a condenação (IN 41/2018).
-
-### Provas
-- Documental: ${F.provas.docs_exibir||'conforme anexos [[ANEXO]]'}
-- Testemunhal: ${F.provas.n_testemunhas||0}
-- Perícias: ${F.provas.pericias||''}
-- Ofícios: ${F.provas.oficios||''}
-
-### Referências e Links
-- **CLT/CF/Leis**: https://www.planalto.gov.br ; https://www.lexml.gov.br
-- **TST**: https://www.tst.jus.br
-- **TRTs**: Portais regionais
-- **Jusbrasil**: pesquisa de jurisprudência
-
-> Política de citação: ${citArt} ${citOJ} ${jurOpts}
-`].join('\n');
+    '# PROMPT-MESTRE · PEÇA TRABALHISTA (Brasil)',
+    '',
+    '## PERSONA',
+    persona,
+    '',
+    docsIntroLines,
+    '',
+    '## OPÇÕES DE ESTILO',
+    '- Cabeçalho centralizado: ' + (F.estilo.centered_header?'sim':'não'),
+    '- Citações: artigos=' + F.estilo.citacao_artigos + '; súmulas/OJs=' + F.estilo.citacao_sumulas_oj + '; jurisprudência=' + F.estilo.jurisprudencia,
+    '- Cálculos: ' + F.estilo.calculos + '; fórmulas ' + (F.estilo.mostrar_formulas?'sim':'não'),
+    '- Pedidos: ' + F.estilo.pedidos_formato + '; separar fazer/pagar ' + (F.estilo.separar_fazer_pagar?'sim':'não'),
+    '- Campos marcados como **Documento anexo**: ' + (camposAnexo.length?camposAnexo.join(', '):'(nenhum)'),
+    '- Política de citação: ' + citArt + ' ' + citOJ + ' ' + jurOpts,
+    '',
+    '## SAÍDA EXIGIDA (somente a peça em Markdown)',
+    header,
+    '',
+    '**EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DA ' + (F.metadados.vara||'') + ' VARA DO TRABALHO DE ' + (F.metadados.comarca||'') + '/' + (F.metadados.UF||'') + '**',
+    '',
+    '**' + (F.partes.reclamante.nome||'[nome]') + '**, ' + (F.partes.reclamante.qualificacao||'[qualificação]') + ', CPF ' + (F.partes.reclamante.cpf||'[cpf]') + ', endereço ' + (F.partes.reclamante.endereco||'[endereço]') + ', por seu advogado, vem propor **' + ((PIECES.find(p=>p[0]===F.peca)||[])[1]||F.peca) + '** em face de **' + ((F.partes.reclamadas||[]).map(r=>r.razao).filter(Boolean).join('; ')||'[reclamada]') + '**.',
+    '',
+    '### Dos Fatos e do Contrato',
+    '- Admissão: ' + (F.contrato.admissao||'(doc anexo se marcado)') + '; Dispensa: ' + (F.contrato.dispensa||'(doc anexo se marcado)') + '; Aviso ' + (F.contrato.aviso.tipo||'') + ' com projeção até ' + (F.contrato.aviso.projecao||'') + '.',
+    '- Função/CBO: ' + (F.contrato.funcao||'') + ' (' + (F.contrato.cbo||'') + '); Salário-base: R$ ' + fmt(F.contrato.salario) + '; Variáveis: ' + (F.contrato.variaveis||'') + '.',
+    '- Local/Modo: ' + (F.contrato.local||'') + ' (' + (F.contrato.modo||'') + ').',
+    '- CTPS: ' + (F.contrato.ctps.status||'') + (F.contrato.ctps.retificacoes?(' - '+F.contrato.ctps.retificacoes):'') + '.',
+    '',
+    '### Fundamentos',
+    fundamentos.join('\n'),
+    '',
+    '### Dos Cálculos e Critérios',
+    calcSec,
+    '',
+    '### Dos Pedidos',
+    pedidosSec,
+    '',
+    '### Do Valor da Causa',
+    '- ' + F.valor_causa.modo + ': R$ **' + fmt(F.valor_causa.total) + '**. Estimativa não limita a condenação (IN 41/2018).',
+    '',
+    '### Provas',
+    '- Documental: ' + (F.provas.docs_exibir||'conforme anexos [[ANEXO]]'),
+    '- Testemunhal: ' + (F.provas.n_testemunhas||0),
+    '- Perícias: ' + (F.provas.pericias||''),
+    '- Ofícios: ' + (F.provas.oficios||''),
+    '',
+    '### Referências e Links',
+    '- **CLT/CF/Leis**: https://www.planalto.gov.br ; https://www.lexml.gov.br',
+    '- **TST**: https://www.tst.jus.br',
+    '- **TRTs**: Portais regionais',
+    '- **Jusbrasil**: pesquisa de jurisprudência',
+    '',
+    '> Política de citação: ' + citArt + ' ' + citOJ + ' ' + jurOpts
+  ].join('\n');
 }
+
 
 
 /*************************
