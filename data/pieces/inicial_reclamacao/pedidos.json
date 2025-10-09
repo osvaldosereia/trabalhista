@@ -1,0 +1,21 @@
+{
+  "profile": "inicial",
+  "items": [
+    {"id":"ctps", "label":"Reconhecimento/retificação do vínculo e anotações na CTPS", "enableIf":"blocos.vinculo==true"},
+    {"id":"horas_extras", "label":"Horas extras com reflexos (DSR, férias+1/3, 13º, FGTS)", "enableIf":"blocos.jornada==true"},
+    {"id":"intervalo", "label":"Horas intervalares suprimidas com adicional legal", "enableIf":"blocos.jornada==true"},
+    {"id":"adicional_noturno", "label":"Adicional noturno e reflexos", "enableIf":"blocos.adicionais==true"},
+    {"id":"insalubridade", "label":"Adicional de insalubridade conforme grau apurado", "enableIf":"adicionais.insal.ativo==true"},
+    {"id":"periculosidade", "label":"Adicional de periculosidade", "enableIf":"adicionais.peric.ativo==true"},
+    {"id":"verbas_rescisorias", "label":"Verbas rescisórias devidas (aviso, 13º, férias)", "enableIf":"blocos.rescisao==true"},
+    {"id":"multas_477_467", "label":"Multas dos arts. 477 §8º e 467 da CLT", "enableIf":"blocos.rescisao==true"},
+    {"id":"fgts", "label":"Diferenças de FGTS + multa de 40%", "enableIf":"blocos.fgts==true"},
+    {"id":"entrega_guias", "label":"Entrega de TRCT, chave do FGTS e guias do seguro-desemprego, sob pena de indenização"},
+    {"id":"estabilidade", "label":"Reintegração ou indenização substitutiva por estabilidade", "enableIf":"blocos.estabilidades==true"},
+    {"id":"indenizacao_moral", "label":"Indenização por danos morais", "enableIf":"indenizacoes.morais.ativo==true"},
+    {"id":"indenizacao_material", "label":"Indenização por danos materiais", "enableIf":"indenizacoes.materiais.ativo==true"},
+    {"id":"tutela", "label":"Concessão de tutela de urgência", "enableIf":"blocos.tutela==true"},
+    {"id":"honorarios", "label":"Honorários sucumbenciais (art. 791-A da CLT)"},
+    {"id":"correcao_juros", "label":"Atualização monetária e juros legais"}
+  ]
+}
