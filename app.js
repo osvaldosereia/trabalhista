@@ -651,7 +651,9 @@ function bindSelect(el, path){
  * Prompt
  *************************/
 function templatePrompt(F){
-  const docsLabels = docsDisponiveisDaPeca().filter(d=>F.docsSelecionados.includes(d.key)).map(d=>d.label);
+  const docsLabels = docsDisponiveisDaPeca()
+    .filter(d=>F.docsSelecionados.includes(d.key))
+    .map(d=>d.label);
   const supridos = camposSupridosPorDocs();
 
   const header = F.estilo.centered_header
@@ -667,37 +669,108 @@ function templatePrompt(F){
   const citOJ  = F.estilo.citacao_sumulas_oj==='texto_completo'
     ? 'Reproduza a súmula/ementa quando essencial.'
     : 'Mencione número/órgão com link.';
-  const jurOpts = {
+  const jurOptsMap = {
     links_e_identificacao:'Indique tribunal, classe, nº, relator, data e link.',
     ementa_resumida_com_link:'Traga ementa resumida com referência e link.',
     ementa_completa:'Traga ementa completa com referência e link.'
-  }[F.estilo.jurisprudencia] || '';
+  };
+  const jurOpts = jurOptsMap[F.estilo.jurisprudencia] || '';
 
-  // Instruções de extração
-  const anexoList = (F.anexos||[]).map(a=>`  - ${a}`).join('\n');
-  const docsIntro =
-`### INSTRUÇÕES DE EXTRAÇÃO AOS MODELOS
-- Você deve **extrair dados de todos os documentos anexados** (PDF/Imagem) citados abaixo **sempre que o campo estiver marcado como “Documento anexo”**.
-- **Priorize o anexo** quando houver conflito entre valor digitado e marcado como anexo.
-- Para campos marcados como anexo mas **sem documento correspondente**, sinalize “DADO PENDENTE” e prossiga.
-- Realize OCR robusto e normalize datas (AAAA-MM-DD), valores (pt-BR), CNPJs/CPFs, CBO, cargos e rubricas.
+  const anexoList = (F.anexos||[]).map(a=>'  - '+a).join('\n');
+  const docsIntroLines = [
+    '### INSTRUÇÕES DE EXTRAÇÃO AOS MODELOS',
+    '- Você deve **extrair dados de todos os documentos anexados** (PDF/Imagem) citados abaixo **sempre que o campo estiver marcado como “Documento anexo”**.',
+    '- **Priorize o anexo** quando houver conflito entre valor digitado e marcado como anexo.',
+    '- Para campos marcados como anexo mas **sem documento correspondente**, sinalize “DADO PENDENTE” e prossiga.',
+    '- Realize OCR robusto e normalize datas (AAAA-MM-DD), valores (pt-BR), CNPJs/CPFs, CBO, cargos e rubricas.',
+    '',
+    '**Documentos informados para esta peça**:',
+    (docsLabels.length? ('- '+docsLabels.join('\n- ')) : '(nenhum marcado)'),
+    (anexoList? ['','**Tags adicionais**:', anexoList].join('\n') : '')
+  ].join('\n');
 
-**Documentos informados para esta peça**:
-- ${docsLabels.join('\n- ') || '(nenhum marcado)'}
-${anexoList?('\n**Tags adicionais**:\n'+anexoList):''}
-`;
-
-  // Campos com marca anexo (lista para o modelo saber)
   const camposAnexo = Object.keys(supridos).filter(k=>supridos[k]).sort();
+  const persona = 'Atue como advogado trabalhista brasileiro altamente experiente. Fundamente em CLT, CF/88, CPC, Súmulas/OJs TST, precedentes STF/STJ, normas coletivas. Cite Planalto/LexML/TST/CNJ/INSS/portais TRTs e Jusbrasil com links.';
 
-  const persona = `Atue como advogado trabalhista brasileiro altamente experiente. Fundamente em CLT, CF/88, CPC, Súmulas/OJs TST, precedentes STF/STJ, normas coletivas. Cite Planalto/LexML/TST/CNJ/INSS/portais TRTs e Jusbrasil com links.`;
+  // FUNDAMENTOS – construir por partes, sem backticks aninhados
+  const fundamentos = [];
+  if(FORM.blocos.vinculo){
+    fundamentos.push('- **Vínculo/CTPS**: reconhecimento/retificação conforme CLT arts. 2º-3º.');
+  }
+  if(FORM.blocos.jornada){
+    fundamentos.push(`- **Jornada/Horas**: ${F.jornada.descricao||''}; HX ${F.jornada.hx.percentuais||''}; Intervalos ${F.jornada.intervalos||''}.`);
+  }
+  if(FORM.blocos.adicionais){
+    const noturno = 'Noturno ' + (F.adicionais.noturno.justificativa || '');
+    const insal   = 'Insalubridade ' + (F.adicionais.insal.ativo
+                    ? ('grau ' + (F.adicionais.insal.grau||'') + ' EPI ' + (F.adicionais.insal.epi.status||''))
+                    : 'não');
+    const peric   = 'Periculosidade ' + (F.adicionais.peric.ativo ? (F.adicionais.peric.agente||'') : 'não');
+    fundamentos.push(`- **Adicionais**: ${noturno}; ${insal}; ${peric}.`);
+  }
+  if(FORM.blocos.rescisao){
+    fundamentos.push(`- **Rescisão/Multas**: Aviso ${F.rescisao.aviso.tipo||''}; 13º ${F.rescisao.decimo.status||''}; Férias ${F.rescisao.ferias.status||''} + 1/3; Multas 477/467 se cabíveis.`);
+  }
+  if(FORM.blocos.fgts){
+    fundamentos.push('- **FGTS**: diferenças mensais, multa 40%, liberação/chave.');
+  }
+  if(FORM.blocos.estabilidades){
+    fundamentos.push(`- **Estabilidade**: ${F.estabilidades.tipo||''}; fatos ${F.estabilidades.fatos||''}; pretensão ${F.estabilidades.pretensao||''}.`);
+  }
+  if(FORM.blocos.indenizacoes){
+    fundamentos.push(`- **Indenizações**: morais ${F.indenizacoes.morais.ativo?(F.indenizacoes.morais.fatos||''):'não'}; materiais ${F.indenizacoes.materiais.ativo?(F.indenizacoes.materiais.itens||''):'não'}; existenciais ${F.indenizacoes.existenciais.ativo?(F.indenizacoes.existenciais.fatos||''):'não'}.`);
+  }
+  if(FORM.blocos.normas){
+    fundamentos.push(`- **Normas coletivas**: ${F.normas.tipo||''} ${F.normas.id||''}, vigência ${F.normas.vigencia||''}; cláusulas ${F.normas.clausulas||''}.`);
+  }
+  if(FORM.blocos.tutela){
+    fundamentos.push(`- **Tutela de urgência**: ${F.tutela.tipos||''}; fundamentos ${F.tutela.fundamentos||''}.`);
+  }
 
-  return `# PROMPT-MESTRE · PEÇA TRABALHISTA (Brasil)
+  // Cálculos e Pedidos
+  let calcSec = '- Critérios resumidos por rubrica com bases e reflexos.';
+  if(F.estilo.calculos==='detalhado_por_rubrica'){
+    calcSec = '- Para cada rubrica: fórmula, base, quantidade, reflexos e subtotal.';
+  } else if(F.estilo.calculos==='tabelado'){
+    calcSec = [
+      '| Rubrica | Período | Base de Cálculo | Quantidade/Fator | Reflexos | Valor (R$) |',
+      '|---|---|---:|---:|---|---:|',
+      '| Exemplo | 01/2023–12/2023 | R$ 2.500,00 | 50h x 50% | Férias/13º/FGTS | 1.234,56 |',
+      `**Total estimado**: R$ ${fmt(F.valor_causa.total)}`
+    ].join('\n');
+  }
+
+  let pedidosSec = [
+    '1. Reconhecimento/retificação de vínculo e anotação em CTPS.',
+    '2. Pagamento das verbas descritas (jornada, adicionais, rescisórias, FGTS, indenizações).',
+    '3. Multas dos arts. 477 §8º e 467 da CLT, quando cabíveis.',
+    '4. Entrega de TRCT, chave FGTS e guias do seguro-desemprego ou indenização substitutiva.',
+    '5. Tutela de urgência, se requerida.',
+    '6. Honorários sucumbenciais (art. 791-A CLT).',
+    '7. Correção monetária e juros.',
+    '8. Expedição de ofícios (MPT/SRTE/INSS/CEF), se cabíveis.'
+  ].join('\n');
+  if(F.estilo.pedidos_formato==='tabelado_com_reflexos'){
+    pedidosSec = [
+      '| Nº | Pedido | Fundamento | Reflexos | Valor Estimado |',
+      '|---:|---|---|---|---:|',
+      '| 1 | Vínculo/CTPS | CLT arts. 2º-3º | — | — |',
+      '| 2 | Verbas (jornada/adicionais/rescisórias/FGTS/ind.) | CLT/CF/Normas | conforme | — |',
+      '| 3 | Multas 477/467 | CLT | — | — |',
+      '| 4 | Guias/indenização | CLT | — | — |',
+      '| 5 | Tutela (CPC 300) | CPC | — | — |',
+      '| 6 | Honorários (791-A) | CLT | — | — |',
+      '| 7 | Correção/Juros | Súmulas/precedentes | — | — |'
+    ].join('\n');
+  }
+
+  return [
+`# PROMPT-MESTRE · PEÇA TRABALHISTA (Brasil)
 
 ## PERSONA
 ${persona}
 
-${docsIntro}
+${docsIntroLines}
 
 ## OPÇÕES DE ESTILO
 - Cabeçalho centralizado: ${F.estilo.centered_header?'sim':'não'}
@@ -721,54 +794,13 @@ ${header}
 - CTPS: ${F.contrato.ctps.status||''} ${F.contrato.ctps.retificacoes?('- '+F.contrato.ctps.retificacoes):''}.
 
 ### Fundamentos
-${FORM.blocos.vinculo?'- **Vínculo/CTPS**: reconhecimento/retificação conforme CLT arts. 2º-3º.\n':''}
-${FORM.blocos.jornada?'- **Jornada/Horas**: '+(F.jornada.descricao||'')+'; HX '+(F.jornada.hx.percentuais||'')+'; Intervalos '+(F.jornada.intervalos||'')+'.\n':''}
-${FORM.blocos.adicionais
-  ? '- **Adicionais**: Noturno ' + (F.adicionais.noturno.justificativa || '') +
-    '; Insalubridade ' + (F.adicionais.insal.ativo
-      ? ('grau ' + (F.adicionais.insal.grau || '') + ' EPI ' + (F.adicionais.insal.epi.status || ''))
-      : 'não'
-    ) +
-    '; Periculosidade ' + (F.adicionais.peric.ativo ? (F.adicionais.peric.agente || '') : 'não') +
-    '.\n'
-  : ''
-}
-${FORM.blocos.rescisao?'- **Rescisão/Multas**: Aviso '+(F.rescisao.aviso.tipo||'')+'; 13º '+(F.rescisao.decimo.status||'')+'; Férias '+(F.rescisao.ferias.status||'')+' + 1/3; Multas 477/467 se cabíveis.\n':''}
-${FORM.blocos.fgts?'- **FGTS**: diferenças mensais, multa 40%, liberação/chave.\n':''}
-${FORM.blocos.estabilidades?'- **Estabilidade**: '+(F.estabilidades.tipo||'')+'; fatos '+(F.estabilidades.fatos||'')+'; pretensão '+(F.estabilidades.pretensao||'')+'.\n':''}
-${FORM.blocos.indenizacoes?'- **Indenizações**: morais '+(F.indenizacoes.morais.ativo?(F.indenizacoes.morais.fatos||''):'não')+'; materiais '+(F.indenizacoes.materiais.ativo?(F.indenizacoes.materiais.itens||''):'não')+'; existenciais '+(F.indenizacoes.existenciais.ativo?(F.indenizacoes.existenciais.fatos||''):'não')+'.\n':''}
-${FORM.blocos.normas?'- **Normas coletivas**: '+(F.normas.tipo||'')+' '+(F.normas.id||'')+', vigência '+(F.normas.vigencia||'')+'; cláusulas '+(F.normas.clausulas||'')+'.\n':''}
-${FORM.blocos.tutela?'- **Tutela de urgência**: '+(F.tutela.tipos||'')+'; fundamentos '+(F.tutela.fundamentos||'')+'.\n':''}
+${fundamentos.join('\n')}
 
 ### Dos Cálculos e Critérios
-${F.estilo.calculos==='tabelado'
-? `| Rubrica | Período | Base de Cálculo | Quantidade/Fator | Reflexos | Valor (R$) |
-|---|---|---:|---:|---|---:|
-| Exemplo | 01/2023–12/2023 | R$ 2.500,00 | 50h x 50% | Férias/13º/FGTS | 1.234,56 |
-**Total estimado**: R$ ${fmt(F.valor_causa.total)}`
-: (F.estilo.calculos==='detalhado_por_rubrica'
-  ? '- Para cada rubrica: fórmula, base, quantidade, reflexos e subtotal.'
-  : '- Critérios resumidos por rubrica com bases e reflexos.')}
+${calcSec}
 
 ### Dos Pedidos
-${F.estilo.pedidos_formato==='tabelado_com_reflexos'
-? `| Nº | Pedido | Fundamento | Reflexos | Valor Estimado |
-|---:|---|---|---|---:|
-| 1 | Vínculo/CTPS | CLT arts. 2º-3º | — | — |
-| 2 | Verbas (jornada/adicionais/rescisórias/FGTS/ind.) | CLT/CF/Normas | conforme | — |
-| 3 | Multas 477/467 | CLT | — | — |
-| 4 | Guias/indenização | CLT | — | — |
-| 5 | Tutela (CPC 300) | CPC | — | — |
-| 6 | Honorários (791-A) | CLT | — | — |
-| 7 | Correção/Juros | Súmulas/precedentes | — | — |`
-: `1. Reconhecimento/retificação de vínculo e anotação em CTPS.
-2. Pagamento das verbas descritas (jornada, adicionais, rescisórias, FGTS, indenizações).
-3. Multas dos arts. 477 §8º e 467 da CLT, quando cabíveis.
-4. Entrega de TRCT, chave FGTS e guias do seguro-desemprego ou indenização substitutiva.
-5. Tutela de urgência, se requerida.
-6. Honorários sucumbenciais (art. 791-A CLT).
-7. Correção monetária e juros.
-8. Expedição de ofícios (MPT/SRTE/INSS/CEF), se cabíveis.`}
+${pedidosSec}
 
 ### Do Valor da Causa
 - ${F.valor_causa.modo}: R$ **${fmt(F.valor_causa.total)}**. Estimativa não limita a condenação (IN 41/2018).
@@ -786,8 +818,9 @@ ${F.estilo.pedidos_formato==='tabelado_com_reflexos'
 - **Jusbrasil**: pesquisa de jurisprudência
 
 > Política de citação: ${citArt} ${citOJ} ${jurOpts}
-`;
+`].join('\n');
 }
+
 
 /*************************
  * Preview + ações
