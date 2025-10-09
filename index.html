@@ -295,8 +295,9 @@
             <button class="secondary" id="btnCopiar">Copiar</button>
             <button class="secondary" id="btnBaixar">Baixar .txt</button>
           </div>
-          <div class="small">Anexe ao chat com a IA: (i) este prompt, (ii) o <b>modelo base</b> de reclamatória e (iii) os <b>documentos marcados</b> abaixo. O modelo pode ser o arquivo do seu acervo interno equivalente a “Reclamação Trabalhista – modelo base”.</div>
-          <textarea id="saida" class="out" placeholder="Clique em Gerar prompt"></textarea>
+          <div class="small">Anexe ao chat com a IA: (i) este prompt, (ii) o <b>modelo base</b> de reclamatória e (iii) os <b>documentos marcados</b> abaixo.</div>
+          <!-- ID corrigido para evitar conflito com input de data de saída -->
+          <textarea id="saida_prompt" class="out" placeholder="Clique em Gerar prompt"></textarea>
         </div>
       </section>
     </main>
@@ -449,19 +450,19 @@ IMPORTANTE: Considere o MODELO BASE anexado como referência estrutural e de est
 
     // Ações
     $('#btnGerar').addEventListener('click', () => {
-      $('#saida').value = buildPrompt()
-      $('#saida').focus()
-      $('#saida').select()
+      $('#saida_prompt').value = buildPrompt()
+      $('#saida_prompt').focus()
+      $('#saida_prompt').select()
     })
 
     $('#btnCopiar').addEventListener('click', async () => {
-      const txt = $('#saida').value.trim()
+      const txt = $('#saida_prompt').value.trim()
       if (!txt) return
       try { await navigator.clipboard.writeText(txt) } catch {}
     })
 
     $('#btnBaixar').addEventListener('click', () => {
-      const blob = new Blob([($('#saida').value||'').trim()], {type:'text/plain;charset=utf-8'})
+      const blob = new Blob([($('#saida_prompt').value||'').trim()], {type:'text/plain;charset=utf-8'})
       const a = document.createElement('a')
       a.href = URL.createObjectURL(blob)
       a.download = 'prompt-reclamacao-trabalhista.txt'
