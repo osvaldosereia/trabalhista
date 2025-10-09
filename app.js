@@ -32,8 +32,7 @@ const STEPS = [
 ];
 
 /**
- * Mapa de documentos por peça e campos que eles podem suprir.
- * docKey -> humana label + camposAtingidos
+ * Documentos por peça e campos que podem suprir
  */
 const DOC_TEMPLATES = {
   inicial_reclamacao: [
@@ -67,7 +66,7 @@ const DEFAULT_FORM = {
   peca:"inicial_reclamacao",
   rito:"ordinario",
   metadados:{vara:"",comarca:"",UF:""},
-  docsSelecionados:[], // [{key:'ctps'}, ...]
+  docsSelecionados:[],
   partes:{
     reclamante:{nome:"",cpf:"",qualificacao:"",endereco:"",contatos:""},
     reclamadas:[{razao:"",cnpj:"",endereco:"",contatos:""}]
@@ -97,48 +96,50 @@ const DEFAULT_FORM = {
     pedidos_formato:"numerados_extenso", separar_fazer_pagar:true,
     tutela_destaque:"capitulo_padrao", caixas_titulo:true, linhas_separadoras:true
   },
-  anexos:[] // lista textual de tags [[ANEXO: ...]]
+  anexos:[]
 };
 
 let FORM = loadLocal() || clone(DEFAULT_FORM);
 let currentStep = 'docs';
 
-const piecesNav = qs('#piecesNav');
-const stepsNav  = qs('#stepsNav');
-const main      = qs('#main');
+let piecesNav, stepsNav, main; // populados no init
 
 function qs(s,root=document){return root.querySelector(s)}
 function qsa(s,root=document){return Array.from(root.querySelectorAll(s))}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function saveLocal(){localStorage.setItem('gpw:form', JSON.stringify(FORM))}
 function loadLocal(){try{return JSON.parse(localStorage.getItem('gpw:form'))}catch{return null}}
-function fmt(n){if(n===null||n===undefined||n==='')return ''; const x=Number(String(n).replace(/\./g,'').replace(',','.')); return isFinite(x)?x.toLocaleString('pt-BR',{minimumFractionDigits:2}):n}
-function dl(name, text){const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'})); a.download=name; a.click(); URL.revokeObjectURL(a.href)}
-function copy(text){navigator.clipboard.writeText(text)}
+function fmt(n){
+  if(n===null||n===undefined||n==='')return '';
+  const x=Number(String(n).replace(/\./g,'').replace(',','.'));
+  return isFinite(x)?x.toLocaleString('pt-BR',{minimumFractionDigits:2}):n;
+}
+function dl(name, text){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));
+  a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+function copy(text){navigator.clipboard && navigator.clipboard.writeText(text)}
 
 /*************************
  * Lógica de documentos
  *************************/
 function docsDisponiveisDaPeca(){
   const base = DOC_TEMPLATES[FORM.peca] || DOC_TEMPLATES.inicial_reclamacao;
-  // Sempre permitir genéricos
   const genericos = [
     {key:'cpf_rg',label:'Documentos pessoais (RG/CPF)',fields:[]},
     {key:'comprov_endereco',label:'Comprovante de endereço',fields:[]}
   ];
-  // Unificar por key
   const byKey={}; [...base,...genericos].forEach(d=>byKey[d.key]=d);
   return Object.values(byKey);
 }
-function hasDoc(key){return FORM.docsSelecionados.some(k=>k===key)}
+function hasDoc(key){return FORM.docsSelecionados.includes(key)}
 function camposSupridosPorDocs(){
   const map = {};
   docsDisponiveisDaPeca().forEach(d=>{
-    if(hasDoc(d.key)){
-      (d.fields||[]).forEach(f=>map[f]=true)
-    }
+    if(hasDoc(d.key)){ (d.fields||[]).forEach(f=>map[f]=true) }
   });
-  return map; // { 'contrato.admissao': true, ... }
+  return map;
 }
 
 /*************************
@@ -150,8 +151,10 @@ function renderNav(){
     const b=document.createElement('button');
     b.className='btn chip'+(FORM.peca===val?' active':'');
     b.textContent=label;
-    b.onclick=()=>{FORM.peca=val; // reset docs ao trocar peça
-      FORM.docsSelecionados=[]; saveLocal(); render();
+    b.onclick=()=>{
+      FORM.peca=val;
+      FORM.docsSelecionados=[];
+      saveLocal(); render();
     };
     piecesNav.appendChild(b);
   });
@@ -170,14 +173,12 @@ function renderNav(){
  * Helpers de campo com ( ) Documento anexo
  *************************/
 function fieldWithAnexo({label,path, type='text', placeholder='' , col='col-6'}){
-  // marcado automaticamente se campo coberto por doc
   const supridos = camposSupridosPorDocs();
   const id = 'i_'+path.replace(/[^a-z0-9]/gi,'_');
   const idAnexo = id+'_anexo';
   const checked = !!supridos[path];
   const value = getAt(FORM,path) ?? '';
-  const disabled = checked; // se doc fornece, bloqueia digitação
-  const anexoTagExample = `[[ANEXO: AUTO, CAMPO=${path}]]`;
+  const disabled = checked;
 
   return `
   <div class="${col}">
@@ -197,30 +198,37 @@ function bindFieldWithAnexo(root,path){
   const check = qs(idAnexo,root);
 
   if(input){
-    input.addEventListener('input',()=>{setAt(FORM,path, input.type==='number'?Number(input.value):input.value); saveLocal(); debouncePreview()});
-    // set valor atual
+    input.addEventListener('input',()=>{
+      setAt(FORM,path, input.type==='number'?Number(input.value):input.value);
+      saveLocal(); debouncePreview();
+    });
     const val = getAt(FORM,path); if(val!=null) input.value = val;
   }
   if(check){
     check.addEventListener('change',()=>{
-      // quando marcar manualmente, só desabilita input; o prompt lidará com extração
-      input.disabled = check.checked;
-      if(check.checked){
-        // Opcional: limpar valor manual
-        // setAt(FORM,path,'');
-      }
+      if(input) input.disabled = check.checked;
       saveLocal(); debouncePreview();
     });
   }
 }
 function getAt(obj,path){return path.split('.').reduce((o,k)=>o&&o[k],obj)}
-function setAt(obj,path,val){const ks=path.split('.'); const last=ks.pop(); const tgt=ks.reduce((o,k)=>(o[k]??(o[k]={})),obj); tgt[last]=val}
-function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function setAt(obj,path,val){
+  const ks=path.split('.'); const last=ks.pop();
+  const tgt=ks.reduce((o,k)=>(o[k]??(o[k]={})),obj);
+  tgt[last]=val;
+}
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g,m=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
 
 /*************************
  * Renders por passo
  *************************/
-function render(){ renderNav(); main.innerHTML='';
+function render(){
+  renderNav();
+  main.innerHTML='';
   if(currentStep==='docs') renderDocs();
   if(currentStep==='config') renderConfig();
   if(currentStep==='partes') renderPartes();
@@ -231,7 +239,6 @@ function render(){ renderNav(); main.innerHTML='';
   if(currentStep==='preview') renderPreview();
 }
 
-// SUBSTITUA a função renderDocs inteira por esta
 function renderDocs(){
   const card=document.createElement('div'); card.className='card section';
   const docs = docsDisponiveisDaPeca();
@@ -259,11 +266,10 @@ function renderDocs(){
       const key = ch.getAttribute('data-doc');
       if(ch.checked){ if(!hasDoc(key)) FORM.docsSelecionados.push(key) }
       else { FORM.docsSelecionados = FORM.docsSelecionados.filter(k=>k!==key) }
-      saveLocal(); render(); // re-render para refletir campos supridos
+      saveLocal(); render();
     });
   });
 }
-
 
 function renderConfig(){
   const c=document.createElement('div'); c.className='card section';
@@ -282,8 +288,9 @@ function renderConfig(){
     </div>
   `;
   main.appendChild(c);
-  qs('#i_rito',c).value=FORM.rito;
-  qs('#i_rito',c).addEventListener('change',e=>{FORM.rito=e.target.value; saveLocal(); debouncePreview()});
+  const ritoSel = qs('#i_rito',c);
+  ritoSel.value=FORM.rito;
+  ritoSel.addEventListener('change',e=>{FORM.rito=e.target.value; saveLocal(); debouncePreview()});
   ['metadados.vara','metadados.comarca','metadados.UF'].forEach(p=>bindFieldWithAnexo(c,p));
 }
 
@@ -323,7 +330,10 @@ function renderPartes(){
       saveLocal(); render();
     };
   });
-  qs('#addRec',c).onclick=()=>{FORM.partes.reclamadas.push({razao:"",cnpj:"",endereco:"",contatos:""}); saveLocal(); render();}
+  qs('#addRec',c).onclick=()=>{
+    FORM.partes.reclamadas.push({razao:"",cnpj:"",endereco:"",contatos:""});
+    saveLocal(); render();
+  };
 }
 
 function renderContrato(){
@@ -583,10 +593,12 @@ function renderProvas(){
     </div>
   `;
   main.appendChild(c);
-  // sincronizar anexos
   const ta = qs('#i_anexosText',c);
   ta.value=(FORM.anexos||[]).join('\n');
-  ta.addEventListener('input',()=>{FORM.anexos=ta.value.split(/\n+/).map(s=>s.trim()).filter(Boolean); saveLocal(); debouncePreview()});
+  ta.addEventListener('input',()=>{
+    FORM.anexos=ta.value.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+    saveLocal(); debouncePreview();
+  });
   ['provas.n_testemunhas','provas.pericias','provas.docs_exibir','provas.oficios'].forEach(p=>bindFieldWithAnexo(c,p));
 }
 
@@ -640,17 +652,20 @@ function checkRow(label, path){
 }
 function bindCheck(el, path){
   if(!el) return; el.checked=!!getAt(FORM,path);
-  el.addEventListener('change',()=>{setAt(FORM,path, el.checked); saveLocal(); render(); debouncePreview()});
+  el.addEventListener('change',()=>{
+    setAt(FORM,path, el.checked); saveLocal(); render(); debouncePreview();
+  });
 }
 function selectRow(label, path, options){
   const id='i_'+path.replace(/[^a-z0-9]/gi,'_');
   const opts = options.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('');
-  const val = getAt(FORM,path) ?? '';
   return `<div class="col-6"><div class="label">${label}</div><select id="${id}">${opts}</select></div>`;
 }
 function bindSelect(el, path){
   if(!el) return; el.value=getAt(FORM,path) ?? '';
-  el.addEventListener('change',()=>{setAt(FORM,path, el.value); saveLocal(); render(); debouncePreview()});
+  el.addEventListener('change',()=>{
+    setAt(FORM,path, el.value); saveLocal(); render(); debouncePreview();
+  });
 }
 
 /*************************
@@ -681,7 +696,6 @@ function templatePrompt(F){
   };
   const jurOpts = jurOptsMap[F.estilo.jurisprudencia] || '';
 
-  // Instruções de extração
   const anexoList = (F.anexos||[]).map(a=>'  - '+a).join('\n');
   const docsIntroLines = [
     '### INSTRUÇÕES DE EXTRAÇÃO AOS MODELOS',
@@ -695,12 +709,10 @@ function templatePrompt(F){
     (anexoList? ['','**Tags adicionais**:', anexoList].join('\n') : '')
   ].join('\n');
 
-  // Campos cobertos por “Documento anexo”
   const camposAnexo = Object.keys(supridos).filter(k=>supridos[k]).sort();
 
   const persona = 'Atue como advogado trabalhista brasileiro altamente experiente. Fundamente em CLT, CF/88, CPC, Súmulas/OJs TST, precedentes STF/STJ, normas coletivas. Cite Planalto/LexML/TST/CNJ/INSS/portais TRTs e Jusbrasil com links.';
 
-  // FUNDAMENTOS
   const fundamentos = [];
   if(FORM.blocos.vinculo){
     fundamentos.push('- **Vínculo/CTPS**: reconhecimento/retificação conforme CLT arts. 2º-3º.');
@@ -735,8 +747,7 @@ function templatePrompt(F){
     fundamentos.push('- **Tutela de urgência**: '+(F.tutela.tipos||'')+'; fundamentos '+(F.tutela.fundamentos||'')+'.');
   }
 
-  // Cálculos
-  var calcSec = '- Critérios resumidos por rubrica com bases e reflexos.';
+  let calcSec = '- Critérios resumidos por rubrica com bases e reflexos.';
   if(F.estilo.calculos==='detalhado_por_rubrica'){
     calcSec = '- Para cada rubrica: fórmula, base, quantidade, reflexos e subtotal.';
   } else if(F.estilo.calculos==='tabelado'){
@@ -748,8 +759,7 @@ function templatePrompt(F){
     ].join('\n');
   }
 
-  // Pedidos
-  var pedidosSec = [
+  let pedidosSec = [
     '1. Reconhecimento/retificação de vínculo e anotação em CTPS.',
     '2. Pagamento das verbas descritas (jornada, adicionais, rescisórias, FGTS, indenizações).',
     '3. Multas dos arts. 477 §8º e 467 da CLT, quando cabíveis.',
@@ -841,7 +851,7 @@ let _deb;
 function debouncePreview(){ clearTimeout(_deb); _deb=setTimeout(updatePreview, 200) }
 
 /*************************
- * Header actions  (reorganizado)
+ * Header actions
  *************************/
 function bindHeaderActions(){
   const btnCopy = qs('#btnCopy');
@@ -853,24 +863,40 @@ function bindHeaderActions(){
   if(btnCopy) btnCopy.onclick = ()=>copy(templatePrompt(FORM));
   if(btnTxt)  btnTxt.onclick  = ()=>dl('prompt_trabalhista.txt', templatePrompt(FORM));
   if(btnSave) btnSave.onclick = ()=>dl('dados_gerador.json', JSON.stringify(FORM,null,2));
-  if(btnReset)btnReset.onclick= ()=>{ if(confirm('Limpar formulário e recomeçar?')){ FORM=clone(DEFAULT_FORM); saveLocal(); render(); updatePreview(); } };
+  if(btnReset)btnReset.onclick= ()=>{
+    if(confirm('Limpar formulário e recomeçar?')){
+      FORM=clone(DEFAULT_FORM); saveLocal(); render(); updatePreview();
+    }
+  };
   if(btnLoad) btnLoad.onclick = ()=>{
     const i=document.createElement('input'); i.type='file'; i.accept='application/json';
-    i.onchange=()=>{const f=i.files[0]; if(!f) return; const r=new FileReader();
-      r.onload=()=>{ try{FORM=JSON.parse(r.result); saveLocal(); render(); updatePreview();}catch(e){alert('JSON inválido')} };
+    i.onchange=()=>{
+      const f=i.files[0]; if(!f) return;
+      const r=new FileReader();
+      r.onload=()=>{
+        try{ FORM=JSON.parse(r.result); saveLocal(); render(); updatePreview(); }
+        catch(e){ alert('JSON inválido'); }
+      };
       r.readAsText(f);
-    }; i.click();
+    };
+    i.click();
   };
 }
 
 /*************************
- * Boot  (proteção anti-duplo)
+ * Boot (proteção anti-duplo)
  *************************/
 if (!window.__APP_BOOTED__) window.__APP_BOOTED__ = false;
 
 function init(){
   if (window.__APP_BOOTED__) return;
   window.__APP_BOOTED__ = true;
+
+  // Seletores só após DOM pronto
+  piecesNav = qs('#piecesNav');
+  stepsNav  = qs('#stepsNav');
+  main      = qs('#main');
+
   renderNav(); render(); updatePreview();
   bindHeaderActions();
 }
