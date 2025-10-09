@@ -231,6 +231,7 @@ function render(){ renderNav(); main.innerHTML='';
   if(currentStep==='preview') renderPreview();
 }
 
+// SUBSTITUA a função renderDocs inteira por esta
 function renderDocs(){
   const card=document.createElement('div'); card.className='card section';
   const docs = docsDisponiveisDaPeca();
@@ -238,26 +239,31 @@ function renderDocs(){
     <div class="label">1) Selecione os documentos que serão anexados junto do prompt</div>
     <div class="row">
       <div class="col-12">
-        ${docs.map(d=>`
-          <label class="switch" style="margin:4px 0">
-            <input type="checkbox" data-doc="${d.key}" ${hasDoc(d.key)?'checked':''}>
-            <span>${d.label}</span>
-          </label>`).join('')}
+        <div class="doc-list">
+          ${docs.map(d=>`
+            <label class="doc-item">
+              <span class="doc-label">${d.label}</span>
+              <input type="checkbox" data-doc="${d.key}" ${hasDoc(d.key)?'checked':''}>
+            </label>
+          `).join('')}
+        </div>
       </div>
     </div>
     <div class="hr"></div>
     <div class="small">Os campos cobertos pelos documentos acima aparecerão com <span class="kbd">( ) Documento anexo</span> já marcado.</div>
   `;
   main.appendChild(card);
+
   qsa('[data-doc]',card).forEach(ch=>{
     ch.addEventListener('change',()=>{
       const key = ch.getAttribute('data-doc');
       if(ch.checked){ if(!hasDoc(key)) FORM.docsSelecionados.push(key) }
       else { FORM.docsSelecionados = FORM.docsSelecionados.filter(k=>k!==key) }
-      saveLocal(); render(); // re-render para marcar campos
+      saveLocal(); render(); // re-render para refletir campos supridos
     });
   });
 }
+
 
 function renderConfig(){
   const c=document.createElement('div'); c.className='card section';
