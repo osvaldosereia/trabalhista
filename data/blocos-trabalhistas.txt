@@ -1,0 +1,67 @@
+=== BLOCO: fatos|Fatos – Contrato, Função e Condições de Trabalho
+# Objetivo:
+Instruir a IA a redigir o capítulo “Dos Fatos”, descrevendo o histórico contratual e as condições de trabalho.
+# Orientação:
+Redija um texto narrativo, técnico e claro, com base nos documentos anexados (CTPS, holerites, comunicações, laudos, mensagens e etc.), contendo:
+- Data de admissão, função, salário-base, média remuneratória e data de dispensa.
+- Falta de anotação da CTPS e demais irregularidades.
+- Descrição de atividades e ambientes insalubres.
+- Tentativas administrativas infrutíferas.
+Mantenha tom formal, impessoal e linguagem forense padronizada.
+///
+
+=== BLOCO: fundamentos|Fundamentos Jurídicos – Reconhecimento de Vínculo e Verbas
+# Objetivo:
+Orientar a IA a fundamentar juridicamente os pedidos, aplicando normas pertinentes à CLT e à CF/88.
+# Orientação:
+Fundamente com base:
+- Nos arts. 2º e 3º da CLT (requisitos do vínculo de emprego).
+- Nos arts. 29, 137, 192, 467, 477 e 840 da CLT, conforme o caso.
+- No art. 5º, XXXV e LXXIV da CF/88 e art. 98 do CPC.
+- Em súmulas e precedentes do TST sobre vínculo, insalubridade e verbas rescisórias.
+Estruture o texto em tópicos coesos (reconhecimento de vínculo, insalubridade, FGTS, verbas rescisórias etc.).
+Evite repetições dos fatos, mas mantenha correlação direta entre fundamentos e pedidos.
+///
+
+=== BLOCO: jurisprudencia|Pesquisa de Jurisprudência – Temas Correlatos
+# Objetivo:
+Instruir a IA a pesquisar jurisprudências reais e válidas que reforcem os pedidos da peça.
+# Orientação:
+Busque jurisprudências em fontes oficiais (stf.jus.br, stj.jus.br, tst.jus.br, trt*.jus.br) e portais reconhecidos (jusbrasil.com.br, migalhas.com.br, conjur.com.br).
+Liste até 3 decisões recentes (últimos 2 anos) sobre:
+- Vínculo de emprego com ausência de CTPS.
+- Adicional de insalubridade.
+- Multas dos arts. 467 e 477 da CLT.
+- FGTS não recolhido.
+Cada jurisprudência deve incluir: Tribunal, número, data, relator, ementa resumida e link direto à fonte.
+Garanta que sejam decisões atuais e não superadas.
+///
+
+=== BLOCO: artigos|Pesquisa de Doutrina e Artigos Jurídicos
+# Objetivo:
+Instruir a IA a buscar artigos doutrinários, notícias e textos acadêmicos sobre temas centrais da ação.
+# Orientação:
+Solicite textos atuais e relevantes sobre:
+- Responsabilidade solidária e sócio de fato.
+- Justiça gratuita e acesso ao Judiciário.
+- Adicional de insalubridade e meio ambiente do trabalho.
+- Multas e reflexos trabalhistas.
+Fontes sugeridas: JusBrasil, Migalhas, ConJur, Revista LTr, Consultor Jurídico.
+Para cada artigo, inclua autor, título, resumo e link.
+///
+
+=== BLOCO: pedidos|Pedidos – Condenação e Obrigações
+# Objetivo:
+Instruir a IA a redigir o capítulo “Dos Pedidos” com formatação numérica e estrutura lógica.
+# Orientação:
+Monte lista de pedidos conforme o caso analisado, incluindo:
+1. Reconhecimento de vínculo de emprego (datas, função, salário).
+2. Anotação da CTPS e entrega de documentos (TRCT, guias FGTS, seguro-desemprego).
+3. Pagamento de verbas rescisórias, adicionais e reflexos.
+4. Multas dos arts. 467 e 477 da CLT.
+5. FGTS e multa de 40%.
+6. Indenização substitutiva do seguro-desemprego.
+7. Honorários advocatícios (15% sobre o valor da condenação).
+8. Custas processuais.
+Padronize o formato de lista numerada e mantenha linguagem típica de petição inicial.
+///
