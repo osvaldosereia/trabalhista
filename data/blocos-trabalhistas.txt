@@ -1,79 +1,137 @@
 === BLOCO: inicial|Preâmbulo – Endereçamento, Qualificação e Objeto
 # Objetivo:
-Instruir a IA a redigir a parte inicial da petição, com endereçamento, qualificação das partes e objeto da ação.
+Gerar a introdução da Reclamação Trabalhista conforme o padrão da Justiça do Trabalho.
 # Orientação:
-1. Enderece a peça ao juízo competente (ex: “Excelentíssimo(a) Senhor(a) Doutor(a) Juiz(a) da ___ Vara do Trabalho de ___”).
-2. Redija a qualificação completa das partes com base nos documentos anexados (nome, nacionalidade, estado civil, profissão, CPF, endereço completo).
-3. Identifique a reclamada (razão social, CNPJ, endereço, ramo de atividade).
-4. Indique o tipo de ação (“Reclamação Trabalhista”) e o fundamento legal (art. 840 da CLT).
-5. Finalize esta seção com a frase introdutória que inicia os fatos: “Passa o Reclamante a expor os fatos e fundamentos a seguir.”
-Use linguagem formal e adequada ao padrão forense.
+- A IA deve extrair dos documentos anexados (RG, CPF, CTPS, comprovantes de residência, contrato social, procuração, etc.) todos os dados para qualificação completa das partes.
+- Redigir o endereçamento à Vara do Trabalho competente, conforme a localidade identificada nos anexos.
+- Elaborar a qualificação detalhada do reclamante e dos reclamados (nome, estado civil, profissão, CPF/CNPJ, endereço, e-mails e telefones).
+- Finalizar o bloco com a abertura “vazado nos fáticos e jurídicos fundamentos a seguir deduzidos.”
+A resposta deve conter apenas o texto jurídico, formatado como petição.
+///
+
+=== BLOCO: preliminar|Preliminar – Justiça Gratuita
+# Objetivo:
+Instruir a IA a redigir o tópico preliminar sobre gratuidade de justiça.
+# Orientação:
+- Analisar documentos anexados (holerites, comprovantes de desemprego ou declaração de hipossuficiência).
+- Fundamentar conforme art. 790 §§3º e 4º da CLT, arts. 98 e 99 do CPC e art. 5º, LXXIV da CF.
+- Citar o precedente RR-10867-60.2018.5.18.0013 (TST).
+- Manter estilo forense e citação jurisprudencial fiel ao formato da peça original.
 ///
 
 === BLOCO: fatos|Fatos – Contrato, Função e Condições de Trabalho
 # Objetivo:
-Instruir a IA a redigir o capítulo “Dos Fatos”, descrevendo o histórico contratual e as condições de trabalho.
+Descrever os fatos que embasam a ação.
 # Orientação:
-Redija um texto narrativo, técnico e claro, com base nos documentos anexados (CTPS, holerites, comunicações, laudos, mensagens e etc.), contendo:
-- Data de admissão, função, salário-base, média remuneratória e data de dispensa.
-- Falta de anotação da CTPS e demais irregularidades.
-- Descrição de atividades e ambientes insalubres.
-- Tentativas administrativas infrutíferas.
-Mantenha tom formal, impessoal e linguagem forense padronizada.
+- A IA deve identificar nos anexos (CTPS, holerites, e-mails, laudos, comunicações) as seguintes informações:
+  • datas de admissão e dispensa;
+  • função exercida e atividades desempenhadas;
+  • salário-base e remuneração média;
+  • ausência de registro na CTPS;
+  • jornada de trabalho, ambiente insalubre e ausência de EPIs;
+  • tentativas administrativas frustradas.
+- Redigir narrativa impessoal, mantendo o padrão de linguagem jurídica observado na peça original.
 ///
 
-=== BLOCO: fundamentos|Fundamentos Jurídicos – Reconhecimento de Vínculo e Verbas
+=== BLOCO: legitimidade|Legitimidade Passiva e Responsabilidade Solidária
 # Objetivo:
-Orientar a IA a fundamentar juridicamente os pedidos, aplicando normas pertinentes à CLT e à CF/88.
+Instruir a IA a redigir o trecho sobre legitimidade do sócio de fato e responsabilidade solidária.
 # Orientação:
-Fundamente com base:
-- Nos arts. 2º e 3º da CLT (requisitos do vínculo de emprego).
-- Nos arts. 29, 137, 192, 467, 477 e 840 da CLT, conforme o caso.
-- No art. 5º, XXXV e LXXIV da CF/88 e art. 98 do CPC.
-- Em súmulas e precedentes do TST sobre vínculo, insalubridade e verbas rescisórias.
-Estruture o texto em tópicos coesos (reconhecimento de vínculo, insalubridade, FGTS, verbas rescisórias etc.).
-Evite repetições dos fatos, mas mantenha correlação direta entre fundamentos e pedidos.
+- Extrair de documentos anexados (contrato social, recibos, comprovantes de pagamento, laudos) as provas da atuação do sócio de fato.
+- Demonstrar comunhão de interesses, administração efetiva e correspondência de telefone/e-mail entre o sócio de fato e a empresa.
+- Concluir pedindo o reconhecimento da legitimidade e da responsabilidade solidária dos reclamados.
 ///
 
-=== BLOCO: jurisprudencia|Pesquisa de Jurisprudência – Temas Correlatos
+=== BLOCO: vinculo|Vínculo Empregatício
 # Objetivo:
-Instruir a IA a pesquisar jurisprudências reais e válidas que reforcem os pedidos da peça.
+Instruir a IA a redigir a parte da petição sobre o reconhecimento do vínculo de emprego.
 # Orientação:
-Busque jurisprudências em fontes oficiais (stf.jus.br, stj.jus.br, tst.jus.br, trt*.jus.br) e portais reconhecidos (jusbrasil.com.br, migalhas.com.br, conjur.com.br).
-Liste até 3 decisões recentes (últimos 2 anos) sobre:
-- Vínculo de emprego com ausência de CTPS.
-- Adicional de insalubridade.
-- Multas dos arts. 467 e 477 da CLT.
-- FGTS não recolhido.
-Cada jurisprudência deve incluir: Tribunal, número, data, relator, ementa resumida e link direto à fonte.
-Garanta que sejam decisões atuais e não superadas.
+- Fundamentar nos arts. 2º e 3º da CLT.
+- Analisar documentos anexados para identificar pessoalidade, subordinação, habitualidade e onerosidade.
+- Descrever as funções e forma de subordinação direta ao empregador.
+- Concluir pedindo o reconhecimento do vínculo, função, salário e anotação da CTPS.
 ///
 
-=== BLOCO: artigos|Pesquisa de Doutrina e Artigos Jurídicos
+=== BLOCO: verbas|Décimo Terceiro, Férias e Verbas Rescisórias
 # Objetivo:
-Instruir a IA a buscar artigos doutrinários, notícias e textos acadêmicos sobre temas centrais da ação.
+Instruir a IA a descrever as verbas sonegadas e elaborar os cálculos.
 # Orientação:
-Solicite textos atuais e relevantes sobre:
-- Responsabilidade solidária e sócio de fato.
-- Justiça gratuita e acesso ao Judiciário.
-- Adicional de insalubridade e meio ambiente do trabalho.
-- Multas e reflexos trabalhistas.
-Fontes sugeridas: JusBrasil, Migalhas, ConJur, Revista LTr, Consultor Jurídico.
-Para cada artigo, inclua autor, título, resumo e link.
+- Identificar nos anexos (recibos, comprovantes, e-mails, extratos de FGTS) os períodos de trabalho e parcelas não pagas.
+- Calcular valores de férias vencidas, férias em dobro, 13º salários e demais verbas.
+- Corrigir monetariamente (Lei 8.177/91 e Decretos correlatos).
+- Organizar resultados em formato de **tabela**, conforme a peça original:
+  Colunas: “Descrição da verba” | “Valor”.
+- A resposta deve conter apenas o texto e a tabela formatada.
 ///
 
-=== BLOCO: pedidos|Pedidos – Condenação e Obrigações
+=== BLOCO: insalubridade|Adicional de Insalubridade
 # Objetivo:
-Instruir a IA a redigir o capítulo “Dos Pedidos” com formatação numérica e estrutura lógica.
+Gerar a fundamentação e o pedido do adicional de insalubridade.
 # Orientação:
-Monte lista de pedidos conforme o caso analisado, incluindo:
-1. Reconhecimento de vínculo de emprego (datas, função, salário).
-2. Anotação da CTPS e entrega de documentos (TRCT, guias FGTS, seguro-desemprego).
-3. Pagamento de verbas rescisórias, adicionais e reflexos.
-4. Multas dos arts. 467 e 477 da CLT.
-5. FGTS e multa de 40%.
-6. Indenização substitutiva do seguro-desemprego.
-7. Honorários advocatícios (15% sobre o valor da condenação).
-8. Custas processuais.
-Padronize o formato de lista numerada e mantenha linguagem típica de petição inicial.
+- Analisar documentos anexados (laudos técnicos, ASOs, PPRA, LTCAT, comunicações de risco).
+- Demonstrar exposição habitual a agentes químicos e biológicos.
+- Citar o art. 192 da CLT e a NR-15 da Portaria 3.214/78.
+- Indicar necessidade de perícia técnica.
+- Solicitar cálculo do adicional de 40% sobre o salário, com reflexos em férias, 13º, FGTS, DSR, aviso e rescisão.
+///
+
+=== BLOCO: fgts|FGTS e Multa de 40%
+# Objetivo:
+Instruir a IA a redigir o trecho sobre recolhimento do FGTS.
+# Orientação:
+- Analisar extratos e comprovantes anexados.
+- Aplicar arts. 15 e 17 da Lei 8.036/90 e art. 9º §1º do Decreto 99.684/90.
+- Calcular depósitos mensais de 8% sobre a remuneração e multa de 40%.
+- Solicitar condenação solidária ao pagamento ou depósito judicial.
+///
+
+=== BLOCO: multas|Multas dos Arts. 467 e 477 da CLT
+# Objetivo:
+Instruir a IA a elaborar o texto das multas aplicáveis.
+# Orientação:
+- Aplicar art. 467 da CLT (pagamento das verbas incontroversas com acréscimo de 50%) e art. 477 §8º (mora rescisória).
+- Citar fundamentos e formato conforme o texto original.
+///
+
+=== BLOCO: seguro|Seguro-Desemprego
+# Objetivo:
+Instruir a IA a redigir o pedido de fornecimento ou indenização do seguro-desemprego.
+# Orientação:
+- Analisar anexos para verificar ausência de entrega de guias.
+- Aplicar art. 7º, II, da CF e art. 12 da CLT.
+- Prever indenização substitutiva caso não haja fornecimento das guias.
+///
+
+=== BLOCO: honorarios|Honorários Advocatícios e Sucumbência
+# Objetivo:
+Gerar o trecho referente aos honorários advocatícios.
+# Orientação:
+- Aplicar art. 791-A da CLT e jurisprudência do TRT23.
+- Explicar hipótese de sucumbência recíproca e base de cálculo (15%).
+- Citar precedentes conforme modelo do documento.
+///
+
+=== BLOCO: congruencia|Princípio da Congruência
+# Objetivo:
+Gerar o trecho sobre estimativa de valores e liquidação de sentença.
+# Orientação:
+- Fundamentar com base na IN 41/2018 do TST e art. 840 §1º e §2º da CLT.
+- Instruir a IA a citar precedentes RR-153-84.2020.5.12.0030 e ARR-1000987-73.2018.5.02.0271.
+- Explicar que o valor dos pedidos é estimativo.
+///
+
+=== BLOCO: pedidos|Pedidos e Conclusão
+# Objetivo:
+Gerar o capítulo final “Dos Pedidos”.
+# Orientação:
+- Estruturar lista numerada conforme a peça:
+  1. Reconhecimento do vínculo;
+  2. Pagamento das verbas e adicionais;
+  3. Multas CLT;
+  4. FGTS e seguro-desemprego;
+  5. Honorários e custas;
+  6. Ofícios e providências administrativas.
+- Calcular o valor da causa conforme tabela final.
+- Encerrar com: “Termos em que, pede deferimento.”
+- Instruir a IA a retornar **somente o texto da petição**, com diagramação e valores formatados.
 ///
