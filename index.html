@@ -30,32 +30,47 @@ Todos os blocos abaixo representam partes integradas da mesma petição.
 
 <script>
 async function carregar() {
-  const txt = await fetch("data/blocos-trabalhistas.txt").then(r=>r.text());
-  const blocos = txt.split("=== BLOCO:").slice(1).map(b=>{
-    const [cabeca, ...resto] = b.split("///");
-    const [id,titulo] = cabeca.split("|")[0].trim().split(/\s*\|\s*/);
-    return {id,titulo,texto:resto.join("///").trim()};
-  });
-  const lista = document.getElementById("lista");
-  lista.innerHTML='';
-  blocos.forEach(b=>{
-    const bt=document.createElement("button");
-    bt.textContent=b.titulo;
-    bt.onclick=()=>adicionar(b);
-    lista.appendChild(bt);
-    lista.appendChild(document.createElement("br"));
-  });
+  try {
+    const txt = await fetch("data/blocos-trabalhistas.txt").then(r => r.text());
+    const blocosBrutos = txt.split("=== BLOCO:").slice(1);
+    const blocos = blocosBrutos.map(b => {
+      const primeiraLinha = b.split("\n")[0].trim(); // ex: "fatos|Fatos – Contrato..."
+      const partes = primeiraLinha.split("|");
+      const id = partes[0]?.trim() || "sem_id";
+      const titulo = partes[1]?.trim() || "Sem título";
+      const texto = b.split("///")[0].split("\n").slice(1).join("\n").trim();
+      return { id, titulo, texto };
+    });
+
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+    blocos.forEach(b => {
+      const bt = document.createElement("button");
+      bt.textContent = b.titulo;
+      bt.style.display = "block";
+      bt.style.margin = "4px 0";
+      bt.onclick = () => adicionar(b);
+      lista.appendChild(bt);
+    });
+  } catch (e) {
+    console.error(e);
+    document.getElementById("lista").innerHTML = "Erro ao carregar blocos.";
+  }
 }
-function adicionar(b){
-  const final=document.getElementById("final");
-  final.value += `\n\n[Bloco: ${b.titulo}]\n${b.texto}`;
+
+function adicionar(b) {
+  const final = document.getElementById("final");
+  final.value += `\n\n[${b.titulo}]\n${b.texto}`;
 }
-function copiar(){
-  const instrucao=document.getElementById("instrucao").value;
-  const final=document.getElementById("final").value;
-  navigator.clipboard.writeText(instrucao+"\n\n"+final);
+
+function copiar() {
+  const instrucao = document.getElementById("instrucao").value;
+  const final = document.getElementById("final").value;
+  navigator.clipboard.writeText(instrucao + "\n\n" + final);
   alert("Prompt copiado!");
 }
+
 carregar();
 </script>
+
 </html>
