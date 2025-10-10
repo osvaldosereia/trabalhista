@@ -1,3 +1,15 @@
+=== BLOCO: inicial|Preâmbulo – Endereçamento, Qualificação e Objeto
+# Objetivo:
+Instruir a IA a redigir a parte inicial da petição, com endereçamento, qualificação das partes e objeto da ação.
+# Orientação:
+1. Enderece a peça ao juízo competente (ex: “Excelentíssimo(a) Senhor(a) Doutor(a) Juiz(a) da ___ Vara do Trabalho de ___”).
+2. Redija a qualificação completa das partes com base nos documentos anexados (nome, nacionalidade, estado civil, profissão, CPF, endereço completo).
+3. Identifique a reclamada (razão social, CNPJ, endereço, ramo de atividade).
+4. Indique o tipo de ação (“Reclamação Trabalhista”) e o fundamento legal (art. 840 da CLT).
+5. Finalize esta seção com a frase introdutória que inicia os fatos: “Passa o Reclamante a expor os fatos e fundamentos a seguir.”
+Use linguagem formal e adequada ao padrão forense.
+///
+
 === BLOCO: fatos|Fatos – Contrato, Função e Condições de Trabalho
 # Objetivo:
 Instruir a IA a redigir o capítulo “Dos Fatos”, descrevendo o histórico contratual e as condições de trabalho.
