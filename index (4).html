@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Gerador de Petições Trabalhistas · Clara</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="appbar">
+  <div class="brand">
+    <span class="dot"></span>
+    <strong>Clara</strong>
+    <span class="muted">· Petições Trabalhistas</span>
+  </div>
+  <nav class="actions">
+    <button id="btnTheme" class="ghost">Tema: Claro</button>
+    <button id="btnConfig" class="ghost">Configurar IA</button>
+    <button id="btnEquipe" class="ghost">Equipe</button>
+    <button id="btnAudit" class="ghost">Auditoria</button>
+    <button id="btnHistory" class="ghost">Histórico</button>
+  </nav>
+</header>
+
+<main class="container">
+
+  <section id="intro" class="card big">
+    <h1>Construa petições iniciais com padrão forense</h1>
+    <p class="lead">Fluxo guiado para coletar informações, gerar o prompt completo e exportar texto, PDF e DOCX.</p>
+    <div class="row gap">
+      <button id="btnIniciar" class="primary">Começar novo caso</button>
+      <button id="btnLoadDraft" class="secondary">Abrir rascunho</button>
+      <button id="btnReset" class="ghost">Resetar app</button>
+    </div>
+  </section>
+
+  <section id="wizard" class="hidden">
+    <div class="wizard-head">
+      <ol id="stepsList" class="steps">
+        <li class="active">Juízo</li>
+        <li>Partes</li>
+        <li>Contrato</li>
+        <li>Fatos</li>
+        <li>Pedidos</li>
+        <li>Fundamentos & Provas</li>
+        <li>Blocos & Template</li>
+        <li>Valores</li>
+        <li>Revisão</li>
+      </ol>
+      <div id="progress" class="progress"><span style="width:0%"></span></div>
+    </div>
+
+    <form id="formPeticao" class="stack">
+
+      <fieldset class="step card">
+        <legend>Juízo</legend>
+        <div class="grid">
+          <label>Nº da Vara (opcional)
+            <input type="text" id="juizoNum" placeholder="Ex.: 5ª"/>
+          </label>
+          <label>Cidade
+            <input type="text" id="cidade" placeholder="Ex.: São Paulo" required/>
+          </label>
+          <label>UF
+            <input type="text" id="uf" maxlength="2" placeholder="SP" required/>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="step card hidden">
+        <legend>Partes</legend>
+        <h3>Reclamante</h3>
+        <div class="grid">
+          <label>Nome <input id="reclamante_nome" required></label>
+          <label>Estado civil <input id="reclamante_estado_civil"></label>
+          <label>Profissão <input id="reclamante_prof"></label>
+          <label>CPF <input id="reclamante_cpf"></label>
+          <label>RG <input id="reclamante_rg"></label>
+          <label>E-mail <input id="reclamante_email" type="email"></label>
+          <label>Telefone <input id="reclamante_tel"></label>
+          <label>CEP <input id="reclamante_cep"></label>
+          <label>Endereço <input id="reclamante_end"></label>
+        </div>
+
+        <div class="row between">
+          <h3>Reclamada(s)</h3>
+          <button id="addReclamada" type="button" class="mini">+ adicionar reclamada</button>
+        </div>
+        <div id="reclamadasWrap" class="stack">
+          <div class="card subtle reclamada">
+            <div class="grid">
+              <label>Razão social / Nome <input name="reclamada_nome" required></label>
+              <label>CNPJ/CPF <input name="reclamada_doc"></label>
+              <label>E-mail <input name="reclamada_email" type="email"></label>
+              <label>Telefone <input name="reclamada_tel"></label>
+              <label>CEP <input name="reclamada_cep"></label>
+              <label>Endereço <input name="reclamada_end"></label>
+            </div>
+            <div class="row end"><button type="button" class="mini danger btnRemoveReclamada">remover</button></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="step card hidden">
+        <legend>Contrato</legend>
+        <div class="grid">
+          <label>Admissão <input type="date" id="adm"></label>
+          <label>Saída <input type="date" id="saida"></label>
+          <label>Função <input id="funcao"></label>
+          <label>Salário (R$) <input id="salario" placeholder="0,00"></label>
+          <label>Jornada <input id="jornada" placeholder="Ex.: 8h/d, 44h/sem"></label>
+          <label>Controle de ponto <input id="controlePonto" placeholder="Ex.: manual/eletrônico/none"></label>
+          <label>Desligamento <input id="desligamento" placeholder="Ex.: sem justa causa, pedido de demissão"></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="step card hidden">
+        <legend>Fatos</legend>
+        <div class="grid">
+          <label>Tema
+            <select id="fatosTema"></select>
+          </label>
+          <label>Sugestões
+            <select id="fatosSug" multiple size="8"></select>
+          </label>
+          <label>Narrativa
+            <textarea id="fatos" rows="10" placeholder="Descreva a narrativa fática..."></textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="step card hidden">
+        <legend>Pedidos</legend>
+        <div class="row gap">
+          <label>Tema
+            <select id="pedidoTema"></select>
+          </label>
+        </div>
+        <div class="chips" id="pedidoChips"></div>
+        <div class="row end"><button id="addPedido" type="button" class="mini">+ pedido</button></div>
+        <div id="pedidosWrap" class="stack"></div>
+      </fieldset>
+
+      <fieldset class="step card hidden">
+        <legend>Fundamentos & Provas</legend>
+        <div class="grid-2">
+          <div>
+            <div class="grid">
+              <label>Tema
+                <select id="fundTema"></select>
+              </label>
+              <label>Fundamentos sugeridos
+                <select id="fundSelect" multiple size="12"></select>
+              </label>
+            </div>
+            <label>Fundamentos (um por linha)
+              <textarea id="fundamentos" rows="10" placeholder="Ex.: CLT art. 58..."></textarea>
+            </label>
+          </div>
+          <div>
+            <div class="row between">
+              <label>Provas</label>
+              <div class="row gap">
+                <button id="addProva" type="button" class="mini">+ prova</button>
+                <input type="file" id="docUpload" multiple accept=".pdf,.txt"/>
+              </div>
+            </div>
+            <div id="provasWrap" class="stack"></div>
+            <div class="muted">Anexe holerites, pontos e PDFs para extração de texto.</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="step card hidden">
+        <legend>Blocos Inteligentes & Template</legend>
+        <div class="grid">
+          <label>Tipo de Ação
+            <select id="tipoAcao">
+              <option value="">— selecione —</option>
+              <option value="horas_extras">Horas Extras</option>
+              <option value="intervalo">Intervalo Intrajornada</option>
+              <option value="adicional_noturno">Adicional Noturno</option>
+              <option value="rescisao_indireta">Rescisão Indireta</option>
+              <option value="equiparacao">Equiparação Salarial</option>
+              <option value="insalubridade">Insalubridade</option>
+              <option value="periculosidade">Periculosidade</option>
+            </select>
+          </label>
+          <label>Modelo (PDF) para a IA se basear
+            <input type="file" id="tplPdf" accept=".pdf"/>
+          </label>
+        </div>
+        <div class="row gap">
+          <button id="aplicarTemplate" type="button" class="secondary">Aplicar Template</button>
+          <button id="limparTemplate" type="button" class="ghost">Limpar Itens de Template</button>
+        </div>
+        <div class="stack">
+          <label class="check"><input type="checkbox" class="blk" value="reflexos" checked> Reflexos (DSR, 13º, férias + 1/3, FGTS + 40%)</label>
+          <label class="check"><input type="checkbox" class="blk" value="multa_477"> Multa 477 CLT</label>
+          <label class="check"><input type="checkbox" class="blk" value="fgts40"> FGTS + 40%</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="step card hidden">
+        <legend>Valores</legend>
+        <div class="row between">
+          <div class="muted">Preencha valores estimados por pedido.</div>
+          <button id="btnCalc" type="button" class="mini">Abrir calculadora</button>
+        </div>
+        <div id="valoresWrap" class="stack"></div>
+        <div class="total">Valor da Causa: <strong id="valorCausa">R$ 0,00</strong></div>
+        <div class="row gap">
+          <label class="check"><input type="checkbox" id="justicaGratuita"> Requer justiça gratuita</label>
+          <label class="check"><input type="checkbox" id="honorarios"> Requer honorários (art. 791-A)</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="step card hidden">
+        <legend>Revisão</legend>
+        <pre id="review" class="review"></pre>
+        <ul id="lintList" class="lint"></ul>
+        <div class="row gap">
+          <button id="btnSalvar" type="button" class="ghost">Salvar rascunho</button>
+          <button id="btnForense" type="button" class="ghost">Prévia forense</button>
+          <button id="btnPericia" type="button" class="ghost">Perícia</button>
+          <button id="btnDossie" type="button" class="ghost">Dossiê</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <div class="wizard-foot row between">
+      <div class="row gap">
+        <button id="btnPrev" class="secondary">Voltar</button>
+        <button id="btnNext" class="primary">Avançar</button>
+      </div>
+      <div class="row gap">
+        <button id="btnGerar" class="ghost">Gerar Prompt</button>
+        <button id="btnGerarIA" class="primary">Gerar com ChatGPT</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="resultado" class="hidden">
+    <div class="toolbar row between">
+      <div class="row gap">
+        <button id="voltar" class="secondary">← Voltar</button>
+        <button id="exportPdf" class="ghost">Exportar PDF</button>
+        <button id="exportDocx" class="ghost">Exportar DOCX</button>
+        <button id="btnExportJson" class="ghost">Exportar JSON do caso</button>
+        <button id="btnImportJson" class="ghost">Importar JSON</button>
+      </div>
+      <div class="row gap">
+        <span id="tokenInfo" class="muted">~0t prompt / ~0t resp.</span>
+      </div>
+    </div>
+
+    <div class="grid-2-tall">
+      <div class="panel">
+        <h3>Prompt completo</h3>
+        <textarea id="saida" rows="26" class="mono"></textarea>
+        <div class="row end gap">
+          <button id="copiar" class="secondary">Copiar prompt</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Texto gerado pela IA</h3>
+        <textarea id="saidaIa" rows="26" class="mono"></textarea>
+        <div class="row end gap">
+          <button id="refinarIa" class="ghost">Refinar</button>
+          <button id="copiarIa" class="secondary">Copiar texto</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Prévia forense</h3>
+      <div id="previewDoc" class="preview"></div>
+      <div class="row end gap">
+        <button id="copyHtml" class="ghost">Copiar HTML</button>
+        <button id="printDoc" class="secondary">Imprimir</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<div id="loading" class="loading hidden"><div class="spinner"></div><span>Gerando com ChatGPT…</span></div>
+
+<div id="modal" class="modal hidden">
+  <div class="dialog">
+    <div class="row between"><h3>Configurar IA</h3><button id="closeConfig" class="icon">✕</button></div>
+    <div class="grid">
+      <label>API Key <input id="apiKey" placeholder="sk-..." autocomplete="off"></label>
+      <label>Modelo <input id="model" value="gpt-4o-mini"></label>
+      <label>Temperature <input id="temperature" type="number" step="0.1" value="0.2"></label>
+      <label>Max tokens <input id="maxTokens" type="number" value="1600"></label>
+      <label>Usuário (para auditoria) <input id="currentUser" placeholder="Ex.: Osvaldo"></label>
+    </div>
+    <div class="row end"><button id="saveConfig" class="primary">Salvar</button></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
