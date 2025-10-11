@@ -2,20 +2,23 @@
    Editor de Peças Trabalhistas – app.js
    ========================================================== */
 
-// 🔹 Import no topo do arquivo (fora da função principal)
+// 🔹 Importa a base de fatos, fundamentos e pedidos
 import { FFP } from './data/fatos-fundamentos-pedidos.js';
 
 (() => {
   'use strict';
 
-  /* ===== Seletores rápidos ===== */
+  /* ===== Utilitários ===== */
   const $ = (q, el = document) => el.querySelector(q);
   const $$ = (q, el = document) => Array.from(el.querySelectorAll(q));
+  const capitalizar = str => str.charAt(0).toUpperCase() + str.slice(1);
 
   /* ===== Estado ===== */
   const trechos = {};
 
-  /* ===== Controle de abas ===== */
+  /* ==========================================================
+     Controle de abas
+     ========================================================== */
   const tabs = $$('.tabs button');
   const sections = $$('.tab-content');
 
@@ -44,7 +47,6 @@ import { FFP } from './data/fatos-fundamentos-pedidos.js';
     const sel = $('#select-fato');
     if (!sel || !FFP.length) return;
 
-    // Limpa e repovoa a lista de fatos
     sel.innerHTML = '<option value="">Selecione um fato</option>';
     FFP.filter(f => f.fato).forEach(f => {
       const opt = document.createElement('option');
@@ -76,9 +78,7 @@ import { FFP } from './data/fatos-fundamentos-pedidos.js';
     });
   }
 
-  carregarFFP(); // 🚀 Inicializa a base ao carregar a página
-
-})();
+  carregarFFP(); // 🚀 Inicializa base FFP
 
   /* ==========================================================
      Botão "Abrir no Google Modo IA"
@@ -86,7 +86,7 @@ import { FFP } from './data/fatos-fundamentos-pedidos.js';
   $$('.btn-ia').forEach(btn => {
     btn.addEventListener('click', () => {
       const parent = btn.closest('.tab-content');
-      const viewer = parent.querySelector('.viewer');
+      const viewer = parent.querySelector('.viewer, .editor-mini');
       const texto = viewer?.textContent?.trim() || '';
 
       const inputs = parent.querySelectorAll('input, textarea');
@@ -111,6 +111,7 @@ Use linguagem técnica e padrão forense.`;
   $$('.viewer').forEach(view => {
     const wrapper = document.createElement('div');
     wrapper.className = 'editor-area';
+
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     toolbar.innerHTML = `
@@ -119,6 +120,7 @@ Use linguagem técnica e padrão forense.`;
       <button data-cmd="insertUnorderedList">• Lista</button>
       <button data-cmd="removeFormat">🧹 Limpar</button>
     `;
+
     const editor = document.createElement('div');
     editor.className = 'editor-mini';
     editor.contentEditable = true;
@@ -154,7 +156,9 @@ Use linguagem técnica e padrão forense.`;
     editorFinal.innerHTML = partes || '<p>Nenhum trecho adicionado ainda.</p>';
   }
 
-  /* ===== Gerar prompt final ===== */
+  /* ==========================================================
+     Geração do Prompt Final
+     ========================================================== */
   $('#btn-gerar-final').addEventListener('click', () => {
     const editor = $('#editor-final');
     const ordem = [
@@ -172,14 +176,15 @@ Use linguagem técnica e padrão forense.`;
     editor.textContent = prompt || 'Nenhum trecho salvo ainda.';
   });
 
-  /* ===== Copiar texto ===== */
+  /* ==========================================================
+     Ações: copiar, baixar e limpar
+     ========================================================== */
   $('#btn-copiar').addEventListener('click', () => {
     const text = $('#editor-final').textContent;
     navigator.clipboard.writeText(text);
-    alert('Prompt copiado!');
+    alert('✅ Prompt copiado!');
   });
 
-  /* ===== Baixar .txt ===== */
   $('#btn-baixar').addEventListener('click', () => {
     const text = $('#editor-final').textContent;
     const blob = new Blob([text], { type: 'text/plain' });
@@ -190,11 +195,6 @@ Use linguagem técnica e padrão forense.`;
     a.click();
     URL.revokeObjectURL(url);
   });
-
-  /* ===== Utilitário ===== */
-  function capitalizar(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
 
   /* ==========================================================
      Salvamento automático (localStorage)
@@ -221,7 +221,7 @@ Use linguagem técnica e padrão forense.`;
       localStorage.removeItem(STORAGE_KEY);
       Object.keys(trechos).forEach(k => delete trechos[k]);
       $('#editor-final').textContent = '';
-      alert('Dados limpos.');
+      alert('🧾 Dados limpos com sucesso.');
     }
   });
   finalSection.appendChild(btnClear);
@@ -250,8 +250,6 @@ Use linguagem técnica e padrão forense.`;
     doc.setFontSize(14);
     doc.text('RECLAMAÇÃO TRABALHISTA', 70, 80);
 
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.3);
     doc.line(20, 85, 190, 85);
 
     const content = $('#editor-final').innerHTML;
@@ -286,8 +284,6 @@ Use linguagem técnica e padrão forense.`;
     doc.text('Gerado pelo Editor de Peças Trabalhistas', 70, 290);
 
     doc.save('peticao_trabalhista.pdf');
-
-     carregarFFP();
-
   });
-})();
+
+})(); // 🔚 Fim da função principal
