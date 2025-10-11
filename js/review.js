@@ -1,8 +1,8 @@
-/* review.js — revisão, lint e prévia forense
+/* review.js — revisão, lint e prévia forense (fluxo 100% manual)
    - buildPrompt(data): monta o prompt completo e exibe em #review
    - lint(data): checagens básicas e recomendações → #lintList
    - renderPreviewDoc(data): prévia forense em #previewDoc
-   - loadDraftToForm(d): proxy para form.loadDraftToForm (compat. com ingestor)
+   - loadDraftToForm(d): proxy para form.loadDraftToForm
 */
 (function () {
   const { $, $$, toast } = window.Clara;
@@ -53,8 +53,6 @@
 
     const valores = (d.valores||[]).map(v=>`- ${v.titulo}: R$ ${Number(v.valor||0).toFixed(2)}`).join('\n');
 
-    const juris = ($('#jurisBox')?.value || '').trim();
-
     return [
       `# CONTEXTO DO CASO`,
       head,
@@ -87,7 +85,6 @@
       `Justiça gratuita: ${d.justicaGratuita ? 'SIM' : 'NÃO'}`,
       `Honorários (art. 791-A): ${d.honorarios ? 'SIM' : 'NÃO'}`,
       '',
-      juris ? `## JURISPRUDÊNCIA (sugerida)\n${juris}\n` : '',
       `## INSTRUÇÕES AO MODELO`,
       `- Redija a PETIÇÃO INICIAL TRABALHISTA completa, com linguagem forense clara.`,
       `- Mantenha cabeçalho, qualificação, dos fatos, do direito (com base legal), dos pedidos e valor da causa.`,
@@ -101,11 +98,6 @@
     const prompt = buildPrompt(data);
     const pre = $('#review');
     if (pre) pre.textContent = prompt;
-
-    // tokens (estimativa)
-    const tPrompt = window.Clara.ia?.estimateTokens?.(prompt) || 0;
-    const slot = $('#tokenInfo');
-    if (slot) slot.textContent = `~${tPrompt}t prompt / ~0t resp.`;
 
     renderPreviewDoc(data);
     paintLint(data);
@@ -125,13 +117,10 @@
     if (!d.contrato?.salario) issues.push('Salário não preenchido (impacta cálculos).');
     if (!d.fatos?.trim()) issues.push('Narrativa de fatos está vazia.');
     if (!(d.pedidos||[]).length) issues.push('Nenhum pedido adicionado.');
-    // Consistências simples
+    if ((d.valores||[]).length === 0) issues.push('Valores não estimados — preencha a aba Valores.');
     if (d.contrato?.saida && d.contrato?.adm && d.contrato.saida < d.contrato.adm) {
       issues.push('Saída é anterior à admissão (verificar).');
     }
-    // Avisos úteis
-    if (!$('#jurisBox')?.value?.trim()) issues.push('Sem jurisprudência sugerida — considere buscar.');
-    if ((d.valores||[]).length === 0) issues.push('Valores não estimados — utilize a Calculadora / IA.');
 
     issues.forEach(msg=>{
       const li = document.createElement('li'); li.textContent = msg; ul.appendChild(li);
@@ -173,19 +162,16 @@
     `;
   }
 
-  // --------- LOAD DRAFT (compat) ----------
+  // --------- LOAD DRAFT (proxy) ----------
   function loadDraftToForm(d) {
-    // Proxy para a função oficial do form.js (mantém compatibilidade com ingestor)
     if (window.Clara.form?.loadDraftToForm) {
       window.Clara.form.loadDraftToForm(d);
-      // Após preencher, reatualiza a revisão
       setTimeout(updateReview, 50);
     }
   }
 
   // --------- BINDS ----------
   function bindReviewUI() {
-    // salvar rascunho
     $('#btnSalvar')?.addEventListener('click', ()=>{
       const data = window.Clara.form?.saveDraft?.();
       window.Clara.history?.saveVersion?.('manual_save');
@@ -193,22 +179,13 @@
       if (data) toast('Rascunho salvo e revisão atualizada');
     });
 
-    // prévia forense (só rerender)
     $('#btnForense')?.addEventListener('click', ()=>{
       const data = window.Clara.form?.collect?.() || {};
       renderPreviewDoc(data);
       toast('Prévia atualizada');
     });
 
-    // ganchos simples (perícia/dossiê abrem modais se existirem)
-    $('#btnPericia')?.addEventListener('click', ()=> {
-      document.getElementById('periciaModal')?.classList.remove('hidden');
-    });
-    $('#btnDossie')?.addEventListener('click', ()=> {
-      document.getElementById('dossieModal')?.classList.remove('hidden');
-    });
-
-    // atualizar review ao navegar entre passos (se UI disparar eventos)
+    // atualizar review ao navegar entre passos
     window.addEventListener('step:changed', updateReview);
 
     // quando valores mudarem, reatualiza revisão/preview
@@ -224,7 +201,6 @@
 
   window.addEventListener('app:ready', () => {
     bindReviewUI();
-    // Primeira renderização
     setTimeout(updateReview, 100);
   });
 })();
