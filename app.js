@@ -1,7 +1,11 @@
 /* ==========================================================
    Editor de Peças Trabalhistas – app.js
    ========================================================== */
-;(() => {
+
+// 🔹 Import no topo do arquivo (fora da função principal)
+import { FFP } from './data/fatos-fundamentos-pedidos.js';
+
+(() => {
   'use strict';
 
   /* ===== Seletores rápidos ===== */
@@ -10,7 +14,6 @@
 
   /* ===== Estado ===== */
   const trechos = {};
-  let FFP = [];
 
   /* ===== Controle de abas ===== */
   const tabs = $$('.tabs button');
@@ -25,25 +28,25 @@
     });
   });
 
- /* ==========================================================
-   Carregar base de fatos-fundamentos-pedidos.js (via import)
-   ========================================================== */
-import { FFP } from './data/fatos-fundamentos-pedidos.js';
-
-function carregarFFP() {
-  if (!FFP || !Array.isArray(FFP)) {
-    console.error('Base FFP não carregada ou inválida');
-    return;
+  /* ==========================================================
+     Carregar base de fatos-fundamentos-pedidos.js (via import)
+     ========================================================== */
+  function carregarFFP() {
+    if (!FFP || !Array.isArray(FFP)) {
+      console.error('❌ Base FFP não carregada ou inválida');
+      return;
+    }
+    console.log(`✅ ${FFP.length} registros FFP carregados`);
+    popularFatos();
   }
-  popularFatos();
-}
-
-
 
   function popularFatos() {
     const sel = $('#select-fato');
     if (!sel || !FFP.length) return;
-    FFP.forEach(f => {
+
+    // Limpa e repovoa a lista de fatos
+    sel.innerHTML = '<option value="">Selecione um fato</option>';
+    FFP.filter(f => f.fato).forEach(f => {
       const opt = document.createElement('option');
       opt.value = f.fato;
       opt.textContent = f.fato;
@@ -56,13 +59,15 @@ function carregarFFP() {
       const pedBox = $('#pedidos-box');
       fundBox.innerHTML = '';
       pedBox.innerHTML = '';
+
       if (fatoSel) {
-        fatoSel.fundamentos.forEach(f => {
+        (fatoSel.fundamentos || []).forEach(f => {
           const li = document.createElement('li');
           li.textContent = f;
           fundBox.appendChild(li);
         });
-        fatoSel.pedidos.forEach(p => {
+
+        (fatoSel.pedidos || []).forEach(p => {
           const li = document.createElement('li');
           li.textContent = p;
           pedBox.appendChild(li);
@@ -71,7 +76,9 @@ function carregarFFP() {
     });
   }
 
-  carregarFFP();
+  carregarFFP(); // 🚀 Inicializa a base ao carregar a página
+
+})();
 
   /* ==========================================================
      Botão "Abrir no Google Modo IA"
@@ -279,5 +286,8 @@ Use linguagem técnica e padrão forense.`;
     doc.text('Gerado pelo Editor de Peças Trabalhistas', 70, 290);
 
     doc.save('peticao_trabalhista.pdf');
+
+     carregarFFP();
+
   });
 })();
