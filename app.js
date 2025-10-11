@@ -208,6 +208,58 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     const sec = document.getElementById(id);
     return sec ? sec.querySelector('.editor-mini') : null;
   }
+// ================== PRELIMINARES (popular e adicionar) ==================
+function popularPreliminares() {
+  const sel   = document.getElementById('preliminares-select');
+  const btn   = document.getElementById('add-preliminar');
+  const lista = document.getElementById('preliminares-list');
+  const editor = sectionEditor('preliminares');
+  if (!sel || !btn || !lista || !editor || !Array.isArray(PRELIMINARES)) return;
+
+  // preenche o select
+  sel.innerHTML = '<option value="">Selecione…</option>';
+  PRELIMINARES.forEach((p, i) => {
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    opt.textContent = `${p.titulo} — ${p.fundamentoCurto}`;
+    sel.appendChild(opt);
+  });
+
+  // adiciona a preliminar ao clicar no botão
+  btn.addEventListener('click', () => {
+    const idx = parseInt(sel.value, 10);
+    if (isNaN(idx)) return;
+    const item = PRELIMINARES[idx];
+
+    // cria linha clicável na lista (toggle no editor)
+    const li = document.createElement('li');
+    li.textContent = `${item.titulo} — ${item.fundamentoCurto}`;
+    li.style.cursor = 'pointer';
+    li.title = 'Clique para inserir/remover no editor';
+    lista.appendChild(li);
+
+    const bloco = `<p><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
+    // insere no editor ao adicionar
+    editor.innerHTML += bloco;
+    trechos['preliminares'] = editor.innerHTML;
+    atualizarFinal();
+    persist();
+
+    // toggle por clique na linha
+    li.addEventListener('click', () => {
+      if (editor.innerHTML.includes(bloco)) {
+        editor.innerHTML = editor.innerHTML.replace(bloco, '');
+      } else {
+        editor.innerHTML += bloco;
+      }
+      trechos['preliminares'] = editor.innerHTML;
+      atualizarFinal();
+      persist();
+    });
+
+    sel.value = '';
+  });
+}
 
   // ===== Provas catálogo =====
   function buildProvas() {
@@ -423,6 +475,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   // ===== Provas e inicialização =====
   buildProvas();
   carregarFFP();
+  popularPreliminares();   // <— adicione esta linha
   restore();
   recalcTabela();
 
