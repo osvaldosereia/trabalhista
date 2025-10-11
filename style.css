@@ -1,6 +1,6 @@
-/* ================================
-   style.css – Montador Trabalhista
-   ================================ */
+/* ===========================
+   style.css – Layout em colunas
+   =========================== */
 
 :root {
   --radius: 12px;
@@ -8,14 +8,13 @@
   --transition: 0.25s ease;
 }
 
-/* Layout geral */
 body {
   background-color: #f9fafb;
   color: #1f2937;
   font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
 
-/* Card de capítulo */
+/* Cards */
 .capitulo {
   background: #fff;
   border-radius: var(--radius);
@@ -23,64 +22,57 @@ body {
   border: 1px solid #e5e7eb;
   transition: var(--transition);
 }
-
 .capitulo:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
-/* Cabeçalho do capítulo */
 .capitulo-header {
   cursor: pointer;
-  padding: 1rem 1.25rem;
+  padding: 0.75rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #f3f4f6;
 }
-
 .capitulo-header h3 {
   font-weight: 600;
   font-size: 1rem;
 }
-
 .capitulo-header button {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   background: #f3f4f6;
   color: #374151;
   border-radius: 8px;
-  padding: 0.35rem 0.7rem;
+  padding: 0.3rem 0.7rem;
   transition: var(--transition);
 }
-
 .capitulo-header button:hover {
   background: #e5e7eb;
 }
 
-/* Corpo do capítulo */
+/* Corpo */
 .capitulo-body {
   display: none;
-  padding: 1rem 1.25rem;
+  padding: 1rem;
 }
-
 .capitulo-body.open {
   display: block;
 }
 
-/* Subtemas (checkbox list) */
+/* Subtemas */
 .subtemas label {
   display: block;
   margin-bottom: 0.3rem;
   font-size: 0.9rem;
   cursor: pointer;
 }
-
 .subtemas input {
   margin-right: 0.5rem;
   accent-color: #2563eb;
 }
 
-/* Botão de unir capítulo */
+/* Botões */
 .btn-unir {
   margin-top: 0.75rem;
   background: #fef3c7;
@@ -90,22 +82,29 @@ body {
   font-size: 0.85rem;
   transition: var(--transition);
 }
-
 .btn-unir:hover {
   background: #fde68a;
 }
 
-/* Área de prompt final */
+/* Prompt */
 #saidaPrompt {
-  background: #f9fafb;
-  border: 1px solid #d1d5db;
   resize: vertical;
-  font-family: "JetBrains Mono", monospace;
   transition: var(--transition);
+  border: 1px solid #d1d5db;
 }
-
 #saidaPrompt:focus {
   border-color: #2563eb;
   outline: none;
   box-shadow: 0 0 0 2px rgba(37,99,235,0.3);
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  main {
+    grid-template-columns: 1fr !important;
+  }
+  #menuCapitulos {
+    max-height: none;
+    overflow-y: visible;
+  }
 }
