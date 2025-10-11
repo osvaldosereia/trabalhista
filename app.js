@@ -53,18 +53,62 @@ Use linguagem técnica e padrão forense.`;
     });
   });
 
-  /* ===== Salvar trechos ===== */
-  $$('.btn-save').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const section = btn.closest('.tab-content');
-      const id = section.id;
-      const viewer = section.querySelector('.viewer');
-      const texto = viewer.textContent.trim();
-      if (!texto) return alert('Nada para salvar.');
-      trechos[id] = texto;
-      alert('Trecho salvo!');
+    /* ==========================================================
+     Editor formatado + sincronização com o final
+     ========================================================== */
+
+  // Substitui todos os .viewer por editores formatáveis
+  $$('.viewer').forEach(view => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'editor-area';
+
+    const toolbar = document.createElement('div');
+    toolbar.className = 'toolbar';
+    toolbar.innerHTML = `
+      <button data-cmd="bold"><b>B</b></button>
+      <button data-cmd="italic"><i>I</i></button>
+      <button data-cmd="insertUnorderedList">• Lista</button>
+      <button data-cmd="removeFormat">🧹 Limpar</button>
+    `;
+
+    const editor = document.createElement('div');
+    editor.className = 'editor-mini';
+    editor.contentEditable = true;
+    editor.dataset.section = view.closest('.tab-content').id;
+
+    wrapper.appendChild(toolbar);
+    wrapper.appendChild(editor);
+    view.replaceWith(wrapper);
+
+    // Eventos de formatação
+    toolbar.addEventListener('click', e => {
+      if (e.target.dataset.cmd) {
+        document.execCommand(e.target.dataset.cmd, false, null);
+      }
+    });
+
+    // Atualiza visualizador final automaticamente
+    editor.addEventListener('input', () => {
+      const id = editor.dataset.section;
+      trechos[id] = editor.innerHTML;
+      atualizarFinal();
     });
   });
+
+  // Atualiza visualizador final em tempo real
+  function atualizarFinal() {
+    const editorFinal = $('#editor-final');
+    const ordem = [
+      'qualificacao','preliminares','contrato','fatos','fundamentos',
+      'pedidos','calculos','provas','valor'
+    ];
+    const partes = ordem
+      .filter(id => trechos[id])
+      .map(id => `<h3>${capitalizar(id)}</h3>${trechos[id]}`)
+      .join('<hr>');
+    editorFinal.innerHTML = partes || '<p>Nenhum trecho adicionado ainda.</p>';
+  }
+
 
   /* ===== Gerar prompt final ===== */
   $('#btn-gerar-final').addEventListener('click', () => {
