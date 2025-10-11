@@ -1,81 +1,33 @@
 /* =========================================================
-   app.js — Montador de Petição Trabalhista
+   app.js — Montador de Petição Trabalhista (v2)
    ========================================================= */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const cont = document.getElementById('capitulos');
+  const lista = document.getElementById('capitulos');
+  const visualizador = document.getElementById('visualizador');
+  const saida = document.getElementById('saidaPrompt');
   const btnGerar = document.getElementById('gerarPrompt');
-  const areaSaida = document.getElementById('saidaPrompt');
-  const secSaida = document.getElementById('resultado');
   const btnCopiar = document.getElementById('copiarPrompt');
+  const btnLimpar = document.getElementById('limparPrompt');
 
   let capitulos = [];
   let selecionados = [];
 
-  /* === 1. Ler e processar o arquivo TXT === */
+  // ===== 1. Ler arquivo TXT =====
   try {
     const txt = await fetch('capitulos_trabalhista.txt').then(r => r.text());
     capitulos = parseTXT(txt);
-    renderCapitulos(capitulos, cont);
+    renderCapitulos();
   } catch (err) {
-    cont.innerHTML = `<p class="text-red-600">Erro ao carregar o arquivo capitulos_trabalhista.txt</p>`;
-    console.error(err);
+    lista.innerHTML = `<p class="text-red-600">Erro ao carregar capitulos_trabalhista.txt</p>`;
   }
 
-  /* === 2. Gerar Prompt Final === */
-  btnGerar.addEventListener('click', () => {
-    const blocos = selecionados.map(idx => capitulos[idx]);
-    if (!blocos.length) {
-      alert('Selecione pelo menos um capítulo.');
-      return;
-    }
+  // ===== 2. Renderizar =====
+  function renderCapitulos() {
+    lista.innerHTML = '';
+    capitulos.forEach((c, i) => {
+      if (!c.titulo || !c.prompt) return; // ignora vazios
 
-    const promptFinal = blocos.map(b => {
-      const subtemasMarcados = Array.from(
-        document.querySelectorAll(`#subs-${b.id} input:checked`)
-      ).map(c => c.value);
-      const lista = subtemasMarcados.length
-        ? `\n\nSubtemas escolhidos:\n- ${subtemasMarcados.join('\n- ')}`
-        : '';
-      return `### ${b.titulo}\n${b.prompt}${lista}`;
-    }).join('\n\n-----\n\n');
-
-    areaSaida.value = `Você é ADVOGADO TRABALHISTA EXPERIENTE.\nAnalise os documentos anexados e redija a PETIÇÃO INICIAL conforme os capítulos abaixo.\n\n${promptFinal}`;
-    secSaida.classList.remove('hidden');
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  });
-
-  /* === 3. Copiar Prompt === */
-  btnCopiar.addEventListener('click', () => {
-    areaSaida.select();
-    document.execCommand('copy');
-    btnCopiar.textContent = 'Copiado ✔';
-    setTimeout(() => (btnCopiar.textContent = 'Copiar'), 2000);
-  });
-
-  /* === Funções === */
-
-  function parseTXT(texto) {
-    const blocos = texto.split('=====').filter(x => x.trim().length);
-    return blocos.map((bloco, i) => {
-      const titulo = bloco.match(/CAP[IÍ]TULO.*?[\n\r]/i)?.[0]?.trim() || `Capítulo ${i+1}`;
-      const descricao = getTag(bloco, '@descricao');
-      const subtemas = getTag(bloco, '@subtemas')
-        .split('\n').map(l => l.replace(/^-/, '').trim()).filter(Boolean);
-      const prompt = getTag(bloco, '@prompt');
-      return { id: i, titulo, descricao, subtemas, prompt };
-    });
-  }
-
-  function getTag(txt, tag) {
-    const regex = new RegExp(`${tag}:([\\s\\S]*?)(?=@|$|-----)`, 'i');
-    const match = txt.match(regex);
-    return match ? match[1].trim() : '';
-  }
-
-  function renderCapitulos(lista, container) {
-    container.innerHTML = '';
-    lista.forEach((c, i) => {
       const card = document.createElement('div');
       card.className = 'capitulo';
       card.innerHTML = `
@@ -92,44 +44,103 @@ document.addEventListener('DOMContentLoaded', async () => {
             ${c.subtemas.map(s => `<label><input type="checkbox" value="${s}">${s}</label>`).join('')}
           </div>
           <button class="btn-unir" data-i="${i}">Unir com anterior</button>
-        </div>
-      `;
-      container.appendChild(card);
+        </div>`;
+      lista.appendChild(card);
     });
 
-    // expandir/colapsar
-    container.querySelectorAll('.btnExpand').forEach(btn => {
+    ativarEventos();
+  }
+
+  // ===== 3. Eventos =====
+  function ativarEventos() {
+    document.querySelectorAll('.btnExpand').forEach(btn => {
       btn.addEventListener('click', () => {
-        const body = document.getElementById(`body-${btn.dataset.i}`);
+        const i = btn.dataset.i;
+        const body = document.getElementById(`body-${i}`);
         body.classList.toggle('open');
         btn.textContent = body.classList.contains('open') ? 'Fechar' : 'Abrir';
+        if (body.classList.contains('open')) mostrarCapitulo(i);
       });
     });
 
-    // adicionar
-    container.querySelectorAll('.btnAdd').forEach(btn => {
+    document.querySelectorAll('.btnAdd').forEach(btn => {
       btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.i);
-        if (selecionados.includes(idx)) {
-          selecionados = selecionados.filter(x => x !== idx);
+        const i = parseInt(btn.dataset.i);
+        if (selecionados.includes(i)) {
+          selecionados = selecionados.filter(x => x !== i);
           btn.textContent = 'Adicionar';
-          btn.classList.remove('bg-blue-600','text-white');
+          btn.classList.remove('bg-blue-600', 'text-white');
         } else {
-          selecionados.push(idx);
+          selecionados.push(i);
           btn.textContent = 'Adicionado';
-          btn.classList.add('bg-blue-600','text-white');
+          btn.classList.add('bg-blue-600', 'text-white');
+          mostrarCapitulo(i);
         }
       });
     });
 
-    // unir
-    container.querySelectorAll('.btn-unir').forEach(btn => {
+    document.querySelectorAll('.btn-unir').forEach(btn => {
       btn.addEventListener('click', () => {
-        const idx = parseInt(btn.dataset.i);
-        if (idx === 0) return alert('Nada a unir acima.');
-        capitulos[idx - 1].prompt += '\n\n' + capitulos[idx].prompt;
-        alert(`Capítulo ${idx} unido ao anterior.`);
+        const i = parseInt(btn.dataset.i);
+        if (i === 0) return alert('Nada para unir acima.');
+        capitulos[i - 1].prompt += '\n\n' + capitulos[i].prompt;
+        alert(`Capítulo ${i} unido ao anterior.`);
       });
     });
+  }
+
+  // ===== 4. Mostrar no painel direito =====
+  function mostrarCapitulo(i) {
+    const c = capitulos[i];
+    visualizador.innerHTML = `
+      <h3 class="font-semibold text-lg mb-2">${c.titulo}</h3>
+      <p class="text-sm text-gray-700 mb-3">${c.descricao}</p>
+      <pre class="text-xs bg-gray-100 border rounded p-3 whitespace-pre-wrap">${c.prompt}</pre>
+    `;
+  }
+
+  // ===== 5. Gerar prompt final =====
+  btnGerar.addEventListener('click', () => {
+    if (!selecionados.length) return alert('Selecione ao menos um capítulo.');
+    const blocos = selecionados.map(i => {
+      const c = capitulos[i];
+      const marcados = Array.from(document.querySelectorAll(`#subs-${i} input:checked`)).map(x => x.value);
+      const temas = marcados.length ? `\n\nSubtemas:\n- ${marcados.join('\n- ')}` : '';
+      return `### ${c.titulo}\n${c.prompt}${temas}`;
+    }).join('\n\n-----\n\n');
+
+    saida.value = `Você é ADVOGADO TRABALHISTA EXPERIENTE.\nAnalise os documentos anexados e redija a PETIÇÃO INICIAL conforme os capítulos abaixo.\n\n${blocos}`;
+    visualizador.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // ===== 6. Copiar e limpar =====
+  btnCopiar.addEventListener('click', () => {
+    saida.select();
+    document.execCommand('copy');
+    btnCopiar.textContent = 'Copiado ✔';
+    setTimeout(() => (btnCopiar.textContent = 'Copiar'), 2000);
+  });
+  btnLimpar.addEventListener('click', () => {
+    saida.value = '';
+    visualizador.innerHTML = '';
+    selecionados = [];
+    renderCapitulos();
+  });
+
+  // ===== 7. Parser TXT =====
+  function parseTXT(txt) {
+    const blocos = txt.split('=====').filter(b => b.trim().length > 10);
+    return blocos.map((b, i) => ({
+      id: i,
+      titulo: (b.match(/CAP[IÍ]TULO.*?(?==|$)/i)?.[0] || `Capítulo ${i+1}`).trim(),
+      descricao: getTag(b, '@descricao'),
+      subtemas: getTag(b, '@subtemas').split('\n').map(s => s.replace(/^-/, '').trim()).filter(Boolean),
+      prompt: getTag(b, '@prompt')
+    }));
+  }
+  function getTag(txt, tag) {
+    const r = new RegExp(`${tag}:([\\s\\S]*?)(?=@|$|-----)`, 'i');
+    const m = txt.match(r);
+    return m ? m[1].trim() : '';
   }
 });
