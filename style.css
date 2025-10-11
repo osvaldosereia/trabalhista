@@ -188,3 +188,35 @@ form input, textarea {
     padding: 0.8rem;
   }
 }
+/* ===== Mini Editor ===== */
+.editor-area {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  box-shadow: var(--shadow);
+  margin-top: 0.5rem;
+}
+.toolbar {
+  border-bottom: 1px solid var(--line);
+  background: #f3f4f6;
+  padding: 0.4rem;
+  display: flex;
+  gap: 0.4rem;
+}
+.toolbar button {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+}
+.toolbar button:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.editor-mini {
+  min-height: 120px;
+  padding: 0.6rem;
+  outline: none;
+  font-size: 0.95rem;
+}
