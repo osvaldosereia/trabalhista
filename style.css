@@ -69,7 +69,7 @@ header p {
 
 /* ===== Conteúdo das Abas ===== */
 main {
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
   background: var(--card);
   border-radius: var(--radius);
@@ -165,22 +165,6 @@ button:hover {
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.toolbar {
-  display: flex;
-  gap: .4rem;
-  padding: .4rem;
-  border-bottom: 1px solid var(--border);
-  background: #f9fafb;
-}
-
-.toolbar button {
-  background: white;
-  border: 1px solid var(--border);
-  padding: .3rem .6rem;
-  border-radius: var(--radius);
-  font-size: .9rem;
-}
-
 .editor-mini {
   min-height: 150px;
   padding: .8rem;
@@ -191,7 +175,27 @@ button:hover {
   background: #f9fafb;
 }
 
-/* ===== Listas automáticas ===== */
+/* ===== Blocos Dinâmicos ===== */
+.fato-bloco {
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: var(--radius);
+  padding: .5rem .8rem;
+  margin-bottom: .5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fato-bloco button {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* ===== Fundamentos e Pedidos ===== */
 ul#fundamentos-box, ul#pedidos-box {
   background: #f9fafb;
   border: 1px solid var(--border);
@@ -203,6 +207,28 @@ ul#fundamentos-box, ul#pedidos-box {
 ul li {
   margin-left: 1.2rem;
   margin-bottom: .3rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+ul li:hover {
+  background: #e0f2fe;
+  border-radius: 6px;
+  padding-left: 4px;
+}
+
+ul li.ativo {
+  background: #2563eb;
+  color: white;
+  border-radius: 6px;
+  padding-left: 6px;
+}
+
+/* ===== Provas ===== */
+#provas label {
+  display: block;
+  margin-bottom: .4rem;
+  cursor: pointer;
 }
 
 /* ===== Editor Final ===== */
@@ -216,9 +242,19 @@ ul li {
   overflow-y: auto;
 }
 
-/* ===== PDF Botão especial ===== */
+#editor-final h3 {
+  color: var(--primary);
+  margin-top: 1rem;
+}
+
+/* ===== PDF e IA ===== */
 #btn-pdf {
   background: var(--accent);
+  color: white;
+}
+
+#btn-gerar-final {
+  background: #0d9488;
   color: white;
 }
 
