@@ -925,6 +925,90 @@ export const FFP = [
   }
 
 ];
+// ===================== PRELIMINARES (selecionáveis) =====================
+export const PRELIMINARES = [
+  {
+    titulo: "Justiça Gratuita",
+    fundamentoCurto: "CF/88 art. 5º, LXXIV; CPC art. 98; CLT art. 790 §§3º-4º; Súmula 463/TST",
+    modelo:
+      "Requer a concessão da justiça gratuita, nos termos do art. 5º, LXXIV, da CF/88, art. 98 do CPC e art. 790, §§ 3º e 4º, da CLT, em razão da hipossuficiência econômica do Reclamante, conforme declaração e documentos que instruem a inicial.",
+    prompt:
+      "Elabore o tópico 'Da Justiça Gratuita' com base na declaração de hipossuficiência e documentos anexos, citando CF/88 art. 5º, LXXIV, CPC art. 98, CLT art. 790 §§3º-4º e Súmula 463/TST."
+  },
+  {
+    titulo: "Competência Territorial",
+    fundamentoCurto: "CLT art. 651",
+    modelo:
+      "É competente este Juízo, pois o local da prestação de serviços foi nesta circunscrição, nos termos do art. 651 da CLT.",
+    prompt:
+      "Redija tópico curto confirmando a competência territorial com base no local da prestação dos serviços, citando CLT art. 651."
+  },
+  {
+    titulo: "Competência Material",
+    fundamentoCurto: "CF/88 art. 114",
+    modelo:
+      "A matéria versa sobre relação de trabalho, atraindo a competência material da Justiça do Trabalho, na forma do art. 114 da Constituição Federal.",
+    prompt:
+      "Redija fundamento objetivo sobre a competência material da Justiça do Trabalho com base no art. 114 da CF/88."
+  },
+  {
+    titulo: "Segredo de Justiça (dados sensíveis)",
+    fundamentoCurto: "CPC art. 189, I; LGPD",
+    modelo:
+      "Requer-se segredo de justiça, haja vista a presença de dados sensíveis/íntimos constantes dos autos, nos termos do art. 189, I, do CPC, sem prejuízo da tutela de dados pessoais.",
+    prompt:
+      "Redija requerimento sucinto de segredo de justiça quando houver dados sensíveis, citando CPC art. 189, I."
+  },
+  {
+    titulo: "Prioridade de Tramitação",
+    fundamentoCurto: "Lei 10.741/03; CPC art. 1.048",
+    modelo:
+      "Tendo o Reclamante direito à prioridade de tramitação (idade/saúde), requer-se a observância preferencial do feito, consoante art. 1.048 do CPC e legislação aplicável.",
+    prompt:
+      "Redija tópico solicitando prioridade de tramitação com base em idade/saúde, citando CPC art. 1.048."
+  },
+  {
+    titulo: "Tutela de Urgência",
+    fundamentoCurto: "CPC arts. 300-301; CLT art. 300 por remissão",
+    modelo:
+      "Diante do perigo de dano e da probabilidade do direito, requer-se tutela de urgência consistente em [especificar], nos termos dos arts. 300 e 301 do CPC.",
+    prompt:
+      "Elabore pedido objetivo de tutela de urgência, especificando a providência e os fundamentos de probabilidade e perigo de dano."
+  },
+  {
+    titulo: "Intimações em Nome do Advogado",
+    fundamentoCurto: "CPC art. 272, §5º",
+    modelo:
+      "Requerem-se as intimações exclusivamente em nome do advogado [NOME], OAB/[UF] [NÚMERO], sob pena de nulidade, nos termos do art. 272, §5º, do CPC.",
+    prompt:
+      "Redija cláusula de intimações exclusivas em nome do patrono, com CPC art. 272, §5º."
+  },
+  {
+    titulo: "Produção de Provas",
+    fundamentoCurto: "CLT art. 818; CPC arts. 369 e segs.",
+    modelo:
+      "Requer a produção de todas as provas em direito admitidas, em especial documental, testemunhal e pericial, se necessária, nos termos da CLT e do CPC.",
+    prompt:
+      "Redija pedido padrão de produção de provas (documental, testemunhal e pericial) com base na CLT e no CPC."
+  },
+  {
+    titulo: "Citação/Notificação Eletrônica",
+    fundamentoCurto: "CPC art. 246; atos normativos do TRT",
+    modelo:
+      "Requer-se a citação/notificação eletrônica da Reclamada no endereço constante do cadastro e nos termos da regulamentação do E-Proc/TrT competente.",
+    prompt:
+      "Redija pedido de citação/notificação eletrônica, indicando base normativa e endereço cadastral."
+  },
+  {
+    titulo: "Distribuição por Dependência (se houver conexão)",
+    fundamentoCurto: "CPC arts. 55 e 286",
+    modelo:
+      "Requer-se a distribuição por dependência ao processo nº [indicar], por conexão/continência, para evitar decisões conflitantes, conforme arts. 55 e 286 do CPC.",
+    prompt:
+      "Redija pedido de distribuição por dependência quando houver processo conexo, citando CPC arts. 55 e 286."
+  }
+];
+
 
 // ===========================================================
 // ✅ FIM DO ARQUIVO
