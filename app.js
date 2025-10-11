@@ -33,19 +33,22 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
   // ===== Inicialização FFP =====
   function carregarFFP() {
-    if (!Array.isArray(FFP) || !FFP.length) {
-      console.error('FFP não carregado.');
-      return;
-    }
-    const sel = $('#select-fato');
-    sel.innerHTML = '<option value="">Selecione um fato</option>';
-    FFP.filter(x => x.fato).forEach(item => {
-      const op = document.createElement('option');
-      op.value = item.fato;
-      op.textContent = item.fato;
-      sel.appendChild(op);
-    });
+  if (!Array.isArray(FFP) || !FFP.length) {
+    console.error('FFP não carregado.');
+    return;
   }
+  const sel = $('#select-fato');
+  if (!sel) return; // <-- guarda extra
+
+  sel.innerHTML = '<option value="">Selecione um fato</option>';
+  FFP.filter(x => x.fato).forEach(item => {
+    const op = document.createElement('option');
+    op.value = item.fato;
+    op.textContent = item.fato;
+    sel.appendChild(op);
+  });
+}
+
 
   // ===== Adicionar múltiplos Fatos =====
   function uiAddFato(nomeFato) {
@@ -447,19 +450,20 @@ function popularPreliminares() {
     }
   }
 
-  // ===== Botões .btn-save genéricos de cada seção =====
-  $$('.tab-content .btn-save').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const sec = btn.closest('.tab-content').id;
-      const editor = sectionEditor(sec);
-      if (editor) {
-        trechos[sec] = editor.innerHTML;
-        atualizarFinal();
-        persist();
-        alert('Trecho salvo.');
-      }
-    });
+ // Botões "Salvar Trecho" das ações de cada aba
+$$('.tab-content .btn-save').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sec = btn.closest('.tab-content')?.id;
+    if (!sec) return;
+    const ed = sectionEditor(sec);
+    if (!ed) return;
+    trechos[sec] = ed.innerHTML;
+    atualizarFinal();
+    persist();
+    alert('Trecho salvo.');
   });
+});
+
 
   // ===== Google IA por seção =====
   function openGoogleIAForSection(sectionId, editorEl) {
