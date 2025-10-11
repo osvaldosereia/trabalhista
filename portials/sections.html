@@ -93,6 +93,50 @@
       </div>
     </fieldset>
 
+    <!-- Ingestão por IA (antes de Fatos) -->
+    <section class="card">
+      <div class="row between">
+        <h3>Ingestão de Documentos (IA)</h3>
+        <small class="muted">
+          Envie até 10 arquivos (.pdf, .txt, .csv). A IA irá ler holerites, cartões de ponto, contratos e documentos pessoais
+          e propor um preenchimento estruturado. Nada será aplicado sem sua autorização.
+        </small>
+      </div>
+
+      <div class="row gap">
+        <input id="bulkUpload" type="file" multiple accept=".pdf,.txt,.csv"/>
+        <button id="btnIngestIA" type="button" class="secondary">Gerar relatório e proposta de preenchimento</button>
+      </div>
+
+      <div class="stack" style="margin-top:8px">
+        <details>
+          <summary>Arquivos selecionados</summary>
+          <ul id="bulkList" class="stack"></ul>
+        </details>
+      </div>
+
+      <div class="grid-2" style="margin-top:8px">
+        <div>
+          <label>Relatório de Conferência (editável)
+            <textarea id="ingestReport" rows="14" class="mono" placeholder="A IA descreverá aqui o que reconheceu em: documentos pessoais, contratos, holerites (verbas, datas, valores), cartões de ponto (jornadas, intervalos, adicionais), e itens não reconhecidos... Você pode editar antes de aplicar."></textarea>
+          </label>
+        </div>
+        <div>
+          <label>Proposta de Preenchimento (JSON editável)
+            <textarea id="ingestJson" rows="14" class="mono" placeholder='A IA devolverá um JSON no schema do formulário (juizo, reclamante, reclamadas[], contrato, fatos, fundamentos, pedidos[], provas[], justicaGratuita, honorarios, valorCausa). Revise/edite antes de aplicar.'></textarea>
+          </label>
+          <div class="row end gap">
+            <button id="btnIngestDiscard" type="button" class="ghost">Descartar</button>
+            <button id="btnIngestApply" type="button" class="primary">Aplicar automaticamente no formulário</button>
+          </div>
+          <small class="muted">
+            Observação: holerites e cartões de ponto serão preservados com o máximo de detalhe reconhecido (datas, horas, adicionais),
+            e poderão ser usados pela Calculadora com IA.
+          </small>
+        </div>
+      </div>
+    </section>
+
     <!-- 3 Fatos -->
     <fieldset class="step card hidden">
       <legend>Fatos</legend>
@@ -143,11 +187,13 @@
             <label>Provas</label>
             <div class="row gap">
               <button id="addProva" type="button" class="mini">+ prova</button>
-              <input type="file" id="docUpload" multiple accept=".pdf,.txt"/>
+              <input type="file" id="docUpload" multiple accept=".pdf,.txt,.csv"/>
             </div>
           </div>
           <div id="provasWrap" class="stack"></div>
-          <div class="muted">Anexe holerites, pontos e PDFs para extração de texto. A IA usará trechos para cálculos e narrativa.</div>
+          <div class="muted">
+            Anexe holerites, cartões de ponto e PDFs. A IA poderá utilizar trechos para estimativas e narrativa; nada é aplicado sem sua autorização.
+          </div>
         </div>
       </div>
     </fieldset>
@@ -278,12 +324,26 @@
 </section>
 
 <script>
-  // handlers de botões de sugestão e jurisprudência
+  // handlers de botões de sugestão, jurisprudência e ingestão
   document.addEventListener('click', (e)=>{
     if (e.target?.id==='btnSugFatos') window.Clara.catalog?.pushSuggestions('fatos');
     if (e.target?.id==='btnSugNarr') window.Clara.catalog?.pushSuggestions('narrativa');
     if (e.target?.id==='btnSugFund') window.Clara.catalog?.pushSuggestions('fundamentos');
     if (e.target?.id==='btnSugPedidos') window.Clara.catalog?.pushSuggestions('pedidos');
     if (e.target?.id==='btnJuris') window.Clara.juris?.buscarJurisprudencia();
+  });
+
+  // preview dos arquivos selecionados (lista)
+  document.addEventListener('change', (e)=>{
+    if (e.target?.id==='bulkUpload') {
+      const ul = document.getElementById('bulkList');
+      if (!ul) return;
+      ul.innerHTML = '';
+      Array.from(e.target.files||[]).slice(0,10).forEach(f=>{
+        const li = document.createElement('li');
+        li.textContent = `${f.name} (${f.type||'desconhecido'})`;
+        ul.appendChild(li);
+      });
+    }
   });
 </script>
