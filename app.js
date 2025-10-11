@@ -89,5 +89,40 @@
   function capitalizar(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
+  /* ==========================================================
+     Salvamento automático (localStorage)
+     ========================================================== */
+
+  const STORAGE_KEY = 'editorTrabalhista:trechos';
+
+  // Carregar automaticamente ao iniciar
+  window.addEventListener('load', () => {
+    try {
+      const dados = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      Object.assign(trechos, dados);
+      console.log('Trechos carregados:', trechos);
+    } catch (e) {
+      console.warn('Falha ao carregar localStorage', e);
+    }
+  });
+
+  // Salvar automaticamente a cada 5s
+  setInterval(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(trechos));
+  }, 5000);
+
+  // Botão limpar (opcional)
+  const finalSection = $('#final .actions');
+  const btnClear = document.createElement('button');
+  btnClear.textContent = '🧹 Limpar Tudo';
+  btnClear.addEventListener('click', () => {
+    if (confirm('Tem certeza que deseja apagar todos os trechos salvos?')) {
+      localStorage.removeItem(STORAGE_KEY);
+      Object.keys(trechos).forEach(k => delete trechos[k]);
+      $('#editor-final').textContent = '';
+      alert('Dados limpos.');
+    }
+  });
+  finalSection.appendChild(btnClear);
 
 })();
