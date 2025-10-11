@@ -1,127 +1,134 @@
-/* ia.js — geração de prompt, chamada OpenAI, refinamento */
-(function(){
-  const { $, state, toast, fmtBRL } = window.Clara;
-  const saida = $('#saida'), saidaIa = $('#saidaIa');
-  const modal = $('#modal'); const apiKeyInput = $('#apiKey'), modelInput = $('#model'), temperatureInput = $('#temperature'), maxTokensInput = $('#maxTokens'), currentUserInput = $('#currentUser');
+/* ia.js — Configuração e chamada à OpenAI (chat/completions)
+   - Guarda/recupera config (API Key, modelo, temperatura, máx tokens, baseUrl)
+   - callOpenAI({ prompt, cfg?, system?, json? }) -> string (conteúdo da resposta)
+   - estimateTokens(text) -> estimativa simples p/ UX
+*/
+(function () {
+  const { $, toast, storage } = window.Clara;
 
-  function loadCfg(){
-    const cfg = JSON.parse(localStorage.getItem('openai_cfg')||'{}');
-    if(apiKeyInput && cfg.apiKey) apiKeyInput.value = cfg.apiKey;
-    if(modelInput && cfg.model) modelInput.value = cfg.model;
-    if(temperatureInput && cfg.temperature!=null) temperatureInput.value = cfg.temperature;
-    if(maxTokensInput && cfg.maxTokens!=null) maxTokensInput.value = cfg.maxTokens;
-    if(currentUserInput && cfg.user) currentUserInput.value = cfg.user;
-    return cfg;
-  }
-  function saveCfg(){
-    const prev = JSON.parse(localStorage.getItem('openai_cfg')||'{}');
-    const cfg = {
-      ...prev,
-      apiKey: (apiKeyInput?.value||'').trim(),
-      model: modelInput?.value || 'gpt-4o-mini',
-      temperature: Number(temperatureInput?.value||0.2),
-      maxTokens: Number(maxTokensInput?.value||2048),
-      user: (currentUserInput?.value||'').trim()
-    };
-    localStorage.setItem('openai_cfg', JSON.stringify(cfg));
-    toast('Configuração salva','good'); modal?.classList.add('hidden');
-  }
-  $('#btnConfig')?.addEventListener('click', ()=>{ loadCfg(); modal?.classList.remove('hidden'); });
-  $('#closeConfig')?.addEventListener('click', ()=> modal?.classList.add('hidden'));
-  $('#saveConfig')?.addEventListener('click', saveCfg);
+  // -------------------- CONFIG --------------------
+  const CFG_KEY = 'clara_ia_cfg';
+  const DEFAULT_CFG = {
+    apiKey: '',
+    model: 'gpt-4o-mini',
+    temperature: 0.2,
+    maxTokens: 2000,
+    baseUrl: 'https://api.openai.com/v1'
+  };
 
-  function collectAll(){
-    const d = window.Clara.collect?.();
-    return d || {};
+  function loadCfg() {
+    return Object.assign({}, DEFAULT_CFG, storage.get(CFG_KEY, {}));
+  }
+  function saveCfg(cfg) {
+    const merged = Object.assign({}, DEFAULT_CFG, cfg || {});
+    storage.set(CFG_KEY, merged);
+    toast?.('Configuração de IA salva');
+    return merged;
   }
 
-  function buildPrompt(d){
-    const reclams = (d.reclamadas||[]).map((r,i)=>`${i+1}. ${r.nome}${r.doc?`, ${r.doc}`:''}${r.end?`, ${r.end}`:''}`).join('\n');
-    return `Você é ADVOGADO TRABALHISTA no Brasil.
-Redija uma PETIÇÃO INICIAL TRABALHISTA COMPLETA.
+  // Bind simples ao modal de configuração (se existir)
+  function bindCfgUI() {
+    const modal = $('#modal');
+    if (!modal) return;
+    const inpKey = modal.querySelector('#apiKey');
+    const inpModel = modal.querySelector('#apiModel');
+    const inpTemp = modal.querySelector('#apiTemp');
+    const inpMaxT = modal.querySelector('#apiMaxTokens');
+    const inpBase = modal.querySelector('#apiBaseUrl');
 
-[JUÍZO] ${d.juizo}
-[QUALIFICAÇÃO] Reclamante: ${d.reclamante?.nome}.
-Reclamadas: 
-${reclams||'-'}
+    const cfg = loadCfg();
+    if (inpKey) inpKey.value = cfg.apiKey || '';
+    if (inpModel) inpModel.value = cfg.model || DEFAULT_CFG.model;
+    if (inpTemp) inpTemp.value = cfg.temperature;
+    if (inpMaxT) inpMaxT.value = cfg.maxTokens;
+    if (inpBase) inpBase.value = cfg.baseUrl;
 
-[CONTRATO] Admissão: ${d.contrato?.adm||'-'}; Saída: ${d.contrato?.saida||'-'}; Função: ${d.contrato?.funcao||'-'}; Salário: ${d.contrato?.salario?`R$ ${d.contrato.salario}`:'-'}; Jornada: ${d.contrato?.jornada||'-'}; Controle: ${d.contrato?.controlePonto||'-'}; Desligamento: ${d.contrato?.desligamento||'-'}.
-[FATOS]
-${d.fatos||'-'}
-
-[FUNDAMENTOS]
-${d.fundamentos||'-'}
-
-[PEDIDOS]
-${(d.pedidos||[]).map((p,i)=>`${i+1}) ${p.titulo}${p.detalhe?` — ${p.detalhe}`:''}${(p.subpedidos||[]).length?`\n  ${(p.subpedidos||[]).map((s,j)=>`${i+1}.${j+1}) ${s}`).join('\n  ')}`:''}`).join('\n')}
-
-[PROVAS] ${(d.provas||[]).join('; ')||'documentos e testemunhas'}
-[VALOR DA CAUSA] ${fmtBRL(d.valorCausa||0)}
-
-Modelo PDF (estilo): ${state.tplText || '(sem modelo)'}
-Docs/Anexos: ${state.docsText || '(sem docs)'}`.trim();
-  }
-
-  async function callOpenAI({ prompt, cfg }){
-    const endpoint = 'https://api.openai.com/v1/chat/completions';
-    const body = {
-      model: cfg.model || 'gpt-4o-mini',
-      temperature: isNaN(cfg.temperature)?0.2:cfg.temperature,
-      max_tokens: isNaN(cfg.maxTokens)?2048:cfg.maxTokens,
-      messages: [
-        { role: 'system', content: 'Você é um advogado trabalhista brasileiro sênior.' },
-        { role: 'user', content: prompt }
-      ]
-    };
-    const res = await fetch(endpoint, {
-      method: 'POST', headers: { 'Content-Type':'application/json','Authorization': `Bearer ${cfg.apiKey}` },
-      body: JSON.stringify(body)
+    modal.querySelector('#btnSaveCfg')?.addEventListener('click', () => {
+      const next = {
+        apiKey: inpKey?.value?.trim() || '',
+        model: inpModel?.value?.trim() || DEFAULT_CFG.model,
+        temperature: Number(inpTemp?.value ?? DEFAULT_CFG.temperature),
+        maxTokens: Number(inpMaxT?.value ?? DEFAULT_CFG.maxTokens),
+        baseUrl: inpBase?.value?.trim() || DEFAULT_CFG.baseUrl
+      };
+      saveCfg(next);
+      modal.classList.add('hidden');
     });
-    if(!res.ok){ const errText = await res.text().catch(()=> ''); throw new Error(`HTTP ${res.status} – ${errText||res.statusText}`); }
-    const data = await res.json();
-    return data?.choices?.[0]?.message?.content?.trim() || '';
   }
 
-  async function gerarPrompt(){
-    const d = window.Clara.collect?.(); const p = buildPrompt(d);
-    if(saida) saida.value = p;
-    window.Clara.ui?.showResultado();
-    window.Clara.review?.lintAndTokens(p, '');
-    window.Clara.history?.saveVersion('gerar_prompt');
-    window.Clara.toast('Prompt gerado');
+  // -------------------- HELPERS --------------------
+  function estimateTokens(text) {
+    if (!text) return 0;
+    // Aproximação: ~4 chars por token (inglês). Em PT pode variar 3–4.5.
+    const len = String(text).length;
+    return Math.ceil(len / 4);
   }
 
-  async function gerarIA(){
-    const d = window.Clara.collect?.(); const p = buildPrompt(d);
-    if(saida) saida.value = p;
-    window.Clara.ui?.showResultado();
-    const cfg = loadCfg(); if(!cfg.apiKey){ toast('Cole sua OpenAI API key em Configurar IA','bad'); document.getElementById('modal')?.classList.remove('hidden'); return; }
-    try{
-      document.getElementById('loading')?.classList.remove('hidden');
-      const text = await callOpenAI({ prompt: p, cfg });
-      if(saidaIa) saidaIa.value = text||'(sem conteúdo)';
-      window.Clara.review?.lintAndTokens(p, text);
-      window.Clara.history?.saveVersion('gerar_ia');
-      toast('Petição gerada com IA');
-    }catch(err){
-      if(saidaIa) saidaIa.value = `Falha ao gerar com ChatGPT: ${err?.message||err}`;
-      toast('Erro ao gerar','bad');
-    }finally{ document.getElementById('loading')?.classList.add('hidden'); }
+  // Monta mensagens (system + user) p/ Chat Completions
+  function buildChat({ prompt, system }) {
+    const sys = system || 'Você é um assistente jurídico especializado em Direito do Trabalho no Brasil. Seja objetivo, cite a base legal quando apropriado e mantenha linguagem forense clara.';
+    return [
+      { role: 'system', content: sys },
+      { role: 'user', content: prompt }
+    ];
   }
 
-  async function refinarIA(){
-    const base = (saidaIa?.value||'').trim();
-    if(!base){ toast('Gere o texto com ChatGPT antes','warn'); return; }
-    const instr = prompt('Como refinar?');
-    if(!instr) return;
-    const cfg = loadCfg(); if(!cfg.apiKey){ toast('Cole sua OpenAI API key em Configurar IA','bad'); document.getElementById('modal')?.classList.remove('hidden'); return; }
-    try{
-      document.getElementById('loading')?.classList.remove('hidden');
-      const text = await callOpenAI({ prompt: `Refine juridicamente o texto conforme: [${instr}]\n\nTexto:\n${base}\n\nDevolva somente o texto final.`, cfg });
-      if(text) saidaIa.value = text;
-      toast('Texto refinado');
-    }catch{ toast('Erro ao refinar','bad'); }finally{ document.getElementById('loading')?.classList.add('hidden'); }
+  // -------------------- OPENAI CALL --------------------
+  async function callOpenAI({ prompt, cfg, system, json } = {}) {
+    const conf = cfg || loadCfg();
+    if (!conf.apiKey) throw new Error('API Key ausente');
+    const url = `${conf.baseUrl.replace(/\/+$/,'')}/chat/completions`;
+
+    // Preferência por resposta em texto; JSON opcional
+    const response_format = json ? { type: 'json_object' } : undefined;
+
+    // timeout de 60s
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 60_000);
+
+    const body = {
+      model: conf.model || DEFAULT_CFG.model,
+      temperature: Number.isFinite(conf.temperature) ? conf.temperature : DEFAULT_CFG.temperature,
+      max_tokens: Number.isFinite(conf.maxTokens) ? conf.maxTokens : DEFAULT_CFG.maxTokens,
+      messages: buildChat({ prompt, system }),
+      response_format
+    };
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        signal: ctrl.signal,
+        headers: {
+          'Authorization': `Bearer ${conf.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+      clearTimeout(to);
+
+      if (!res.ok) {
+        const errText = await res.text().catch(()=>'');
+        throw new Error(`OpenAI ${res.status}: ${errText || res.statusText}`);
+      }
+      const data = await res.json();
+      const content = data?.choices?.[0]?.message?.content ?? '';
+      // token info para UI
+      const usage = data?.usage || {};
+      const info = `~${usage.prompt_tokens||0}t prompt / ~${usage.completion_tokens||0}t resp.`;
+      const slot = $('#tokenInfo');
+      if (slot) slot.textContent = info;
+
+      return content;
+    } catch (e) {
+      if (e.name === 'AbortError') throw new Error('Tempo de resposta excedido (timeout)');
+      throw e;
+    }
   }
 
-  window.Clara.ia = { loadCfg, saveCfg, buildPrompt, callOpenAI, gerarPrompt, gerarIA, refinarIA };
+  // -------------------- EXPOSE --------------------
+  window.Clara = Object.assign(window.Clara || {}, {
+    ia: { loadCfg, saveCfg, callOpenAI, estimateTokens }
+  });
+
+  window.addEventListener('app:ready', bindCfgUI);
 })();
