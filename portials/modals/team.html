@@ -1,0 +1,51 @@
+
+<div id="teamModal" class="modal hidden">
+  <div class="dialog">
+    <div class="row between"><h3>Equipe — Templates e Pacotes</h3><button id="closeTeam" class="icon">✕</button></div>
+    <div class="grid-2">
+      <div>
+        <h4>Templates de Caso</h4>
+        <ul id="teamTplList" class="stack" style="max-height:220px;overflow:auto;"></ul>
+        <div class="row gap">
+          <button id="teamTplNew" class="ghost">Novo</button>
+          <button id="teamTplSave" class="secondary">Salvar</button>
+          <button id="teamTplApply" class="ghost">Aplicar no formulário</button>
+          <button id="teamTplDelete" class="ghost danger">Excluir</button>
+        </div>
+        <div class="row gap">
+          <button id="teamTplExport" class="ghost">Exportar</button>
+          <button id="teamTplImportBtn" class="ghost">Importar</button>
+          <input id="teamTplImport" type="file" accept="application/json" class="hidden">
+        </div>
+      </div>
+      <div>
+        <label>Nome do Template <input id="teamTplName" placeholder="Ex.: Ação HE c/ reflexos"></label>
+        <label>JSON do Template
+          <textarea id="teamTplJson" rows="12" class="mono">{}</textarea>
+        </label>
+        <hr/>
+        <h4>Pacotes de Fundamentos</h4>
+        <ul id="packList" class="stack" style="max-height:120px;overflow:auto;"></ul>
+        <label>Nome do Pacote <input id="packName" placeholder="Ex.: HE — base legal"></label>
+        <label>Linhas (um por linha)
+          <textarea id="packLines" rows="6"></textarea>
+        </label>
+        <div class="row gap">
+          <button id="packNew" class="ghost">Novo</button>
+          <button id="packSave" class="secondary">Salvar</button>
+          <button id="packApply" class="ghost">Aplicar em Fundamentos</button>
+          <button id="packDelete" class="ghost danger">Excluir</button>
+        </div>
+        <div class="row gap">
+          <button id="packExport" class="ghost">Exportar</button>
+          <button id="packImportBtn" class="ghost">Importar</button>
+          <input id="packImport" type="file" accept="application/json" class="hidden">
+        </div>
+        <div class="row end">
+          <button id="btnExportAll" class="ghost">Exportar coleção</button>
+          <button id="btnImportAll" class="ghost">Importar coleção</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

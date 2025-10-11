@@ -1,0 +1,22 @@
+
+<div id="dossieModal" class="modal hidden">
+  <div class="dialog">
+    <div class="row between"><h3>Dossiê de Protocolo</h3><button id="dosClose" class="icon">✕</button></div>
+    <div class="grid">
+      <label>Órgão/Seção <input id="dosOrgao"></label>
+      <label>Ref. interna <input id="dosRef"></label>
+      <label>Responsável <input id="dosResp"></label>
+    </div>
+    <div class="row gap">
+      <button id="dosAdd" class="ghost">+ documento</button>
+      <button id="dosBuild" class="secondary">Gerar prévia</button>
+      <button id="dosCopyHtml" class="ghost">Copiar</button>
+      <button id="dosPrint" class="ghost">Imprimir</button>
+    </div>
+    <div id="dosDocs" class="stack"></div>
+    <label>Observações
+      <textarea id="dosObs" rows="6"></textarea>
+    </label>
+    <div id="dosPreview" class="preview" style="max-height:320px;overflow:auto;"></div>
+  </div>
+</div>

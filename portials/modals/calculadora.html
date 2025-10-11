@@ -1,0 +1,29 @@
+
+<div id="calcModal" class="modal hidden">
+  <div class="dialog">
+    <div class="row between"><h3>Calculadora</h3><button id="calcClose" class="icon">✕</button></div>
+    <div class="grid">
+      <label>Salário (R$) <input id="c_sal" type="number" step="0.01" value="0"></label>
+      <label>Horas semanais <input id="c_sem" type="number" value="44"></label>
+      <label>Meses no período <input id="c_meses" type="number" value="1"></label>
+      <label>HE 50% (h/mês) <input id="c_he50" type="number" value="0"></label>
+      <label>HE 100% (h/mês) <input id="c_he100" type="number" value="0"></label>
+      <label>Noturno (h/mês) <input id="c_not" type="number" value="0"></label>
+      <label>% Noturno <input id="c_not_perc" type="number" value="20"></label>
+      <label>Dias úteis/mês <input id="c_uteis" type="number" value="22"></label>
+      <label>Descansos/mês <input id="c_desc" type="number" value="8"></label>
+    </div>
+    <div class="grid">
+      <div>Valor hora: <strong id="c_hora">R$ 0,00</strong></div>
+      <div>HE (mês): <strong id="c_val_he">R$ 0,00</strong></div>
+      <div>Noturno (mês): <strong id="c_val_not">R$ 0,00</strong></div>
+      <div>DSR s/ HE (mês): <strong id="c_val_dsr">R$ 0,00</strong></div>
+      <div>Total/mês: <strong id="c_total_mes">R$ 0,00</strong></div>
+      <div>Total/período: <strong id="c_total_per">R$ 0,00</strong></div>
+    </div>
+    <div class="row end gap">
+      <button id="calcApplyIA" class="ghost">Calcular com IA</button>
+      <button id="calcApply" class="secondary">Aplicar estimativas</button>
+    </div>
+  </div>
+</div>

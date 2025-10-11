@@ -1,0 +1,30 @@
+
+<div id="periciaModal" class="modal hidden">
+  <div class="dialog">
+    <div class="row between"><h3>Perícia</h3><button id="perClose" class="icon">✕</button></div>
+    <div class="grid">
+      <label>Tipo
+        <select id="perTipo">
+          <option value="insalubridade">Insalubridade</option>
+          <option value="periculosidade">Periculosidade</option>
+          <option value="noturno">Noturno</option>
+        </select>
+      </label>
+      <label>Honorários (R$) <input id="perHonor" type="number" step="0.01" value="0"></label>
+      <label>Adiantamento (R$) <input id="perAdiant" type="number" step="0.01" value="0"></label>
+    </div>
+    <div class="row gap">
+      <button id="perLoadPreset" class="ghost">Carregar quesitos padrão</button>
+      <button id="perAddQ" class="ghost">+ quesito</button>
+      <button id="perApplyToForm" class="secondary">Inserir no caso</button>
+      <button id="perExport" class="ghost">Exportar .txt</button>
+    </div>
+    <label>Quesitos
+      <textarea id="perQuesitos" rows="10"></textarea>
+    </label>
+    <label>Observações
+      <textarea id="perObs" rows="4"></textarea>
+    </label>
+    <div class="row end">Total estimado: <strong id="perTotal">R$ 0,00</strong></div>
+  </div>
+</div>
