@@ -186,5 +186,63 @@ Use linguagem técnica e padrão forense.`;
     }
   });
   finalSection.appendChild(btnClear);
+  /* ==========================================================
+     Exportar PDF (layout jurídico)
+     ========================================================== */
+  $('#btn-pdf').addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      format: 'a4',
+      unit: 'mm',
+      orientation: 'portrait'
+    });
+
+    const content = $('#editor-final').innerHTML;
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+
+    // Formatação básica
+    const margin = 20;
+    const lineHeight = 7;
+    const maxWidth = 170;
+    let y = margin;
+
+    const splitText = (text, doc) => {
+      return doc.splitTextToSize(text.replace(/<[^>]+>/g, ''), maxWidth);
+    };
+
+    const allBlocks = tempDiv.querySelectorAll('h3, p, div, li');
+    doc.setFont('Times', 'Roman');
+    doc.setFontSize(12);
+
+    allBlocks.forEach(block => {
+      const text = block.textContent.trim();
+      if (!text) return;
+
+      if (block.tagName === 'H3') {
+        doc.setFont('Times', 'Bold');
+        doc.setFontSize(13);
+        const lines = splitText(`\n${text.toUpperCase()}`, doc);
+        lines.forEach(line => {
+          if (y > 280) { doc.addPage(); y = margin; }
+          doc.text(line, margin, y);
+          y += lineHeight;
+        });
+        doc.setFont('Times', 'Roman');
+        doc.setFontSize(12);
+        y += 3;
+      } else {
+        const lines = splitText(text, doc);
+        lines.forEach(line => {
+          if (y > 280) { doc.addPage(); y = margin; }
+          doc.text(line, margin, y);
+          y += lineHeight;
+        });
+        y += 2;
+      }
+    });
+
+    doc.save('peticao_trabalhista.pdf');
+  });
 
 })();
