@@ -4,49 +4,45 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Clara · Gerador de Petições Trabalhistas</title>
+
+  <!-- Estilos -->
   <link rel="stylesheet" href="style.css"/>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Libs usadas pelos módulos -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.1/docx.umd.min.js"></script>
 </head>
 <body>
-<header class="appbar" data-include="portials/header.html"></header>
 
-<main class="container" data-include="portials/sections.html"></main>
+  <!-- Partials (pasta: portials/) -->
+  <header class="appbar" data-include="portials/header.html"></header>
 
-<!-- Toasts -->
-<div class="toast-wrap" id="toasts"></div>
+  <main class="container" data-include="portials/sections.html"></main>
 
-<!-- Loading -->
-<div id="loading" class="loading hidden"><div class="spinner"></div><span>Gerando com ChatGPT…</span></div>
+  <!-- Toasts -->
+  <div class="toast-wrap" id="toasts"></div>
 
-<!-- Config IA -->
-<div id="modal" class="modal hidden" data-include="portials/config.html"></div>
+  <!-- Loading -->
+  <div id="loading" class="loading hidden">
+    <div class="spinner"></div><span>Gerando com ChatGPT…</span>
+  </div>
 
-<!-- Modais -->
-<div data-include="portials/modals/history.html"></div>
-<div data-include="portials/modals/audit.html"></div>
-<div data-include="portials/modals/team.html"></div>
-<div data-include="portials/modals/pericia.html"></div>
-<div data-include="portials/modals/dossie.html"></div>
-<div data-include="portials/modals/calculadora.html"></div>
+  <!-- Modal Config IA -->
+  <div id="modal" class="modal hidden" data-include="portials/config.html"></div>
 
-<!-- libs -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.1/docx.umd.min.js"></script>
+  <!-- Modais -->
+  <div data-include="portials/modals/history.html"></div>
+  <div data-include="portials/modals/audit.html"></div>
+  <div data-include="portials/modals/team.html"></div>
+  <div data-include="portials/modals/pericia.html"></div>
+  <div data-include="portials/modals/dossie.html"></div>
+  <div data-include="portials/modals/calculadora.html"></div>
 
-<!-- loader de portials -->
-<script src="include.js"></script>
-<!-- módulos do app -->
-<script src="js/core.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/form.js"></script>
-<script src="js/ia.js"></script>
-<script src="js/export.js"></script>
-<script src="js/history.js"></script>
-<script src="js/calc.js"></script>
-<script src="js/review.js"></script>
-<script src="js/main.js"></script>
+  <!-- Loader de partials + injetor dos módulos JS (ordem garantida) -->
+  <script src="include.js"></script>
 </body>
 </html>
