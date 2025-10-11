@@ -1,13 +1,33 @@
-
-<div class="brand">
-  <span class="dot"></span>
-  <strong>Clara</strong>
-  <span class="muted">· Petições Trabalhistas</span>
+<!-- portials/header.html -->
+<div class="row between" style="gap:12px">
+  <div class="row" style="gap:10px">
+    <div style="width:28px;height:28px;border-radius:8px;background:#0ea5e9"></div>
+    <div>
+      <strong style="font-size:16px;letter-spacing:-0.02em">Portials</strong>
+      <div class="muted" style="font-size:12px;margin-top:2px">Petições Iniciais Trabalhistas — fluxo manual</div>
+    </div>
+  </div>
+  <nav class="row" style="gap:8px">
+    <button data-open="#aboutModal" class="ghost">Sobre</button>
+  </nav>
 </div>
-<nav class="actions">
-  <button id="btnTheme" class="ghost">Tema: Claro</button>
-  <button id="btnConfig" class="ghost">Configurar IA</button>
-  <button id="btnEquipe" class="ghost">Equipe</button>
-  <button id="btnAudit" class="ghost">Auditoria</button>
-  <button id="btnHistory" class="ghost">Histórico</button>
-</nav>
+
+<!-- Modal "Sobre" -->
+<div id="aboutModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="box" style="max-width:640px">
+    <div class="head">
+      <strong id="aboutTitle">Sobre o Portials</strong>
+      <button class="modal-close" aria-label="Fechar">×</button>
+    </div>
+    <div class="content stack">
+      <p>Ferramenta para auxiliar na elaboração de petições iniciais trabalhistas, com foco em organização e completude do conteúdo.
+        Este build está configurado para <strong>entrada 100% manual</strong>, sem upload de documentos ou uso de IA.</p>
+      <ul class="muted" style="margin:0">
+        <li>Sugestões de fatos, narrativa, fundamentos e pedidos por tema.</li>
+        <li>Geração de prompt final e prévia forense em HTML.</li>
+        <li>Exportação: JSON do caso, DOC (HTML compatível), PDF via impressão.</li>
+      </ul>
+      <small class="muted">Versão: Portials (manual)</small>
+    </div>
+  </div>
+</div>
