@@ -186,32 +186,48 @@ Use linguagem técnica e padrão forense.`;
     }
   });
   finalSection.appendChild(btnClear);
-  /* ==========================================================
-     Exportar PDF (layout jurídico)
+    /* ==========================================================
+     Exportar PDF com Folha de Rosto (layout jurídico)
      ========================================================== */
   $('#btn-pdf').addEventListener('click', () => {
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({
-      format: 'a4',
-      unit: 'mm',
-      orientation: 'portrait'
-    });
+    const doc = new jsPDF({ format: 'a4', unit: 'mm', orientation: 'portrait' });
 
+    // ======= Cabeçalho / Folha de rosto =======
+    const reclamante = $('[name="reclamante"]').value || 'NOME DO RECLAMANTE';
+    const reclamada  = $('[name="reclamada"]').value  || 'NOME DA RECLAMADA';
+    const vara = '___ª VARA DO TRABALHO DE __________ / UF';
+
+    doc.setFont('Times', 'Bold');
+    doc.setFontSize(13);
+    doc.text('EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DA', 20, 30);
+    doc.text(vara, 20, 38);
+
+    doc.setFont('Times', 'Roman');
+    doc.setFontSize(12);
+    doc.text(`\n\n${reclamante.toUpperCase()}, Reclamante, em face de ${reclamada.toUpperCase()}, Reclamada, apresenta:`, 20, 55);
+
+    doc.setFont('Times', 'Bold');
+    doc.setFontSize(14);
+    doc.text('RECLAMAÇÃO TRABALHISTA', 70, 80);
+
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.3);
+    doc.line(20, 85, 190, 85); // linha separadora
+
+    // ======= Corpo da Petição =======
     const content = $('#editor-final').innerHTML;
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = content;
 
-    // Formatação básica
     const margin = 20;
     const lineHeight = 7;
     const maxWidth = 170;
-    let y = margin;
+    let y = 95;
 
-    const splitText = (text, doc) => {
-      return doc.splitTextToSize(text.replace(/<[^>]+>/g, ''), maxWidth);
-    };
-
+    const splitText = (text, doc) => doc.splitTextToSize(text.replace(/<[^>]+>/g, ''), maxWidth);
     const allBlocks = tempDiv.querySelectorAll('h3, p, div, li');
+
     doc.setFont('Times', 'Roman');
     doc.setFontSize(12);
 
@@ -242,7 +258,13 @@ Use linguagem técnica e padrão forense.`;
       }
     });
 
+    // ======= Rodapé =======
+    doc.setFont('Times', 'Italic');
+    doc.setFontSize(10);
+    doc.text('Gerado pelo Editor de Peças Trabalhistas', 70, 290);
+
     doc.save('peticao_trabalhista.pdf');
+  
   });
 
 })();
