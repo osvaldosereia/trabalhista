@@ -30,65 +30,106 @@
   <!-- Conteúdo das abas -->
   <main>
 
+    <!-- QUALIFICAÇÃO (atualizada para casar com o app.js) -->
     <section id="qualificacao" class="tab-content active">
       <h2>Qualificação das Partes</h2>
-      <p>Preencha os dados do reclamante e da reclamada. Clique em “Gerar com IA” para criar o texto da qualificação.</p>
+      <p>Preencha os dados. Ao salvar, o texto é enviado para esta aba e para o visualizador final.</p>
+
       <form id="form-qualificacao">
-        <label>Nome do Reclamante <input type="text" name="reclamante"></label>
-        <label>CPF <input type="text" name="cpf"></label>
-        <label>Profissão <input type="text" name="profissao"></label>
-        <label>Endereço <input type="text" name="endereco"></label>
-        <label>Nome da Reclamada <input type="text" name="reclamada"></label>
-        <label>CNPJ <input type="text" name="cnpj"></label>
-        <label>Endereço <input type="text" name="endereco_reclamada"></label>
+        <fieldset>
+          <legend>Reclamante</legend>
+          <label>Nome completo <input type="text" name="reclamante_nome"></label>
+          <label>CPF <input type="text" name="reclamante_cpf"></label>
+          <label>RG <input type="text" name="reclamante_rg"></label>
+          <label>CTPS <input type="text" name="reclamante_ctps"></label>
+          <label>Série/UF <input type="text" name="reclamante_ctps_serie"></label>
+          <label>Profissão <input type="text" name="reclamante_profissao"></label>
+          <label>Endereço (rua, nº, compl.) <input type="text" name="reclamante_endereco"></label>
+          <label>Bairro <input type="text" name="reclamante_bairro"></label>
+          <label>Cidade <input type="text" name="reclamante_cidade"></label>
+          <label>UF <input type="text" name="reclamante_uf" maxlength="2"></label>
+          <label>CEP <input type="text" name="reclamante_cep"></label>
+          <label>Telefone <input type="text" name="reclamante_fone"></label>
+          <label>E-mail <input type="email" name="reclamante_email"></label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Reclamada</legend>
+          <label>Razão social / Nome empresarial <input type="text" name="reclamada_nome"></label>
+          <label>CNPJ <input type="text" name="reclamada_cnpj"></label>
+          <label>Endereço (rua, nº, compl.) <input type="text" name="reclamada_endereco"></label>
+          <label>Bairro <input type="text" name="reclamada_bairro"></label>
+          <label>Cidade <input type="text" name="reclamada_cidade"></label>
+          <label>UF <input type="text" name="reclamada_uf" maxlength="2"></label>
+          <label>CEP <input type="text" name="reclamada_cep"></label>
+          <label>Telefone <input type="text" name="reclamada_fone"></label>
+          <label>E-mail <input type="email" name="reclamada_email"></label>
+        </fieldset>
       </form>
+
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
-        <button class="btn-save">Salvar Trecho</button>
+        <button class="btn-save" id="btn-save-qualificacao">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
 
-   <section id="preliminares" class="tab-content">
-  <h2>Preliminares</h2>
-  <p>Selecione modelos prontos ou edite o texto.</p>
+    <!-- PRELIMINARES (com UI para seleção de modelos) -->
+    <section id="preliminares" class="tab-content">
+      <h2>Preliminares</h2>
+      <p>Selecione modelos prontos ou edite o texto.</p>
 
-  <div class="preliminares-ui">
-    <label for="preliminares-select">Escolha uma preliminar:</label>
-    <select id="preliminares-select">
-      <option value="">Selecione…</option>
-      <!-- opções vêm do PRELIMINARES (data/fatos-fundamentos-pedidos.js) -->
-    </select>
-    <button id="add-preliminar" type="button">Adicionar Preliminar</button>
+      <div class="preliminares-ui">
+        <label for="preliminares-select">Escolha uma preliminar:</label>
+        <select id="preliminares-select">
+          <option value="">Selecione…</option>
+          <!-- opções vêm do PRELIMINARES (data/fatos-fundamentos-pedidos.js) -->
+        </select>
+        <button id="add-preliminar" type="button">Adicionar Preliminar</button>
 
-    <!-- Lista de preliminares adicionadas (cada item é clicável para inserir/remover no editor) -->
-    <ul id="preliminares-list"></ul>
-  </div>
+        <!-- Lista de preliminares adicionadas (cada item é clicável para inserir/remover no editor) -->
+        <ul id="preliminares-list"></ul>
+      </div>
 
-  <div class="actions">
-    <button class="btn-ia">Gerar com IA</button>
-    <button class="btn-save">Salvar Trecho</button>
-  </div>
-
-  <!-- O app.js substitui .viewer por um mini editor desta seção -->
-  <div class="viewer"></div>
-</section>
-
-
-
-    <section id="contrato" class="tab-content">
-      <h2>Contrato de Trabalho</h2>
-      <p>Descreva os dados contratuais: cargo, função, período, remuneração.</p>
-      <form id="form-contrato">
-        <label>Data de admissão <input type="date" name="admissao"></label>
-        <label>Data de saída <input type="date" name="saida"></label>
-        <label>Função <input type="text" name="funcao"></label>
-        <label>Salário mensal (R$) <input type="number" name="salario" step="0.01"></label>
-      </form>
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
         <button class="btn-save">Salvar Trecho</button>
       </div>
+
+      <!-- O app.js substitui .viewer por um mini editor desta seção -->
+      <div class="viewer"></div>
+    </section>
+
+    <!-- CONTRATO (atualizada para casar com o app.js) -->
+    <section id="contrato" class="tab-content">
+      <h2>Contrato de Trabalho</h2>
+      <p>Descreva os dados contratuais. Ao salvar, envia para esta aba e para o visualizador final.</p>
+
+      <form id="form-contrato">
+        <label>Data de admissão <input type="date" name="admissao"></label>
+        <label>Data de saída (se houver) <input type="date" name="saida"></label>
+        <label>Função / Cargo <input type="text" name="funcao"></label>
+        <label>Salário mensal (R$) <input type="number" name="salario" step="0.01"></label>
+        <label>Tipo contratual
+          <select name="tipo_contrato">
+            <option value="">Selecione…</option>
+            <option>Prazo indeterminado</option>
+            <option>Experiência</option>
+            <option>Prazo determinado</option>
+            <option>Intermitente</option>
+          </select>
+        </label>
+        <label>Jornada (ex.: 08:00–17:00 c/ 1h intervalo)
+          <input type="text" name="jornada">
+        </label>
+        <label>Local de trabalho <input type="text" name="local_trabalho"></label>
+      </form>
+
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save" id="btn-save-contrato">Salvar Trecho</button>
+      </div>
+
       <div class="viewer"></div>
     </section>
 
@@ -193,8 +234,8 @@
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- app.js já importa os dados via ES Module -->
-<script type="module" src="app.js"></script>
+  <!-- app.js já importa os dados via ES Module -->
+  <script type="module" src="app.js"></script>
 
 </body>
 </html>
