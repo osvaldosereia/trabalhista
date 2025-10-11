@@ -25,22 +25,19 @@
     });
   });
 
-  /* ==========================================================
-   Carregar base de fatos-fundamentos-pedidos.js
+ /* ==========================================================
+   Carregar base de fatos-fundamentos-pedidos.js (via import)
    ========================================================== */
-async function carregarFFP() {
-  try {
-    const res = await fetch('./data/fatos-fundamentos-pedidos.js');
-    const text = await res.text();
-    const data = text.match(/\{[\s\S]*\}/);
-    if (data) {
-      FFP = eval(text); // carrega o conteúdo do arquivo
-      popularFatos();
-    }
-  } catch (e) {
-    console.error('Erro ao carregar FFP:', e);
+import { FFP } from './data/fatos-fundamentos-pedidos.js';
+
+function carregarFFP() {
+  if (!FFP || !Array.isArray(FFP)) {
+    console.error('Base FFP não carregada ou inválida');
+    return;
   }
+  popularFatos();
 }
+
 
 
   function popularFatos() {
