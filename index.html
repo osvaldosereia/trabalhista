@@ -13,7 +13,6 @@
     <p>Monte petições iniciais completas com blocos inteligentes e IA integrada</p>
   </header>
 
-  <!-- Navegação das abas -->
   <nav class="tabs">
     <button data-tab="qualificacao" class="active">1️⃣ Qualificação</button>
     <button data-tab="preliminares">2️⃣ Preliminares</button>
@@ -27,12 +26,10 @@
     <button data-tab="final">🔟 Visualizador Final</button>
   </nav>
 
-  <!-- Conteúdo das abas -->
   <main>
 
     <section id="qualificacao" class="tab-content active">
       <h2>Qualificação das Partes</h2>
-      <p>Preencha os dados do reclamante e da reclamada. Clique em “Gerar com IA” para criar o texto da qualificação.</p>
       <form id="form-qualificacao">
         <label>Nome do Reclamante <input type="text" name="reclamante"></label>
         <label>CPF <input type="text" name="cpf"></label>
@@ -61,7 +58,6 @@
 
     <section id="contrato" class="tab-content">
       <h2>Contrato de Trabalho</h2>
-      <p>Descreva os dados contratuais: cargo, função, período, remuneração.</p>
       <form id="form-contrato">
         <label>Data de admissão <input type="date" name="admissao"></label>
         <label>Data de saída <input type="date" name="saida"></label>
@@ -77,24 +73,17 @@
 
     <section id="fatos" class="tab-content">
       <h2>Fatos</h2>
-      <p>Selecione ou descreva os acontecimentos que motivam a ação.</p>
-
       <label for="select-fato">Escolha um fato:</label>
-      <select id="select-fato">
-        <option value="">Selecione um fato</option>
-      </select>
-
+      <select id="select-fato"><option value="">Selecione um fato</option></select>
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
         <button class="btn-save">Salvar Trecho</button>
       </div>
-
       <div class="viewer"></div>
     </section>
 
     <section id="fundamentos" class="tab-content">
       <h2>Fundamentos Jurídicos</h2>
-      <p>Fundamentos carregados automaticamente com base no fato selecionado.</p>
       <ul id="fundamentos-box"></ul>
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
@@ -105,7 +94,6 @@
 
     <section id="pedidos" class="tab-content">
       <h2>Pedidos</h2>
-      <p>Pedidos correspondentes ao fato e fundamentos escolhidos.</p>
       <ul id="pedidos-box"></ul>
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
@@ -116,7 +104,6 @@
 
     <section id="calculos" class="tab-content">
       <h2>Cálculos e Tabelas</h2>
-      <p>Monte a tabela de valores conforme os pedidos. Edite conforme necessário.</p>
       <textarea id="tabela" rows="8" placeholder="Exemplo: Horas extras, FGTS, verbas rescisórias..."></textarea>
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
@@ -127,7 +114,6 @@
 
     <section id="provas" class="tab-content">
       <h2>Provas e Documentos</h2>
-      <p>Liste as provas documentais e testemunhais que acompanharão a inicial.</p>
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
         <button class="btn-save">Salvar Trecho</button>
@@ -137,7 +123,6 @@
 
     <section id="valor" class="tab-content">
       <h2>Valor da Causa</h2>
-      <p>Informe o valor estimado da causa conforme os pedidos.</p>
       <input type="number" id="valorCausa" placeholder="Valor total em R$">
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
@@ -148,7 +133,6 @@
 
     <section id="final" class="tab-content">
       <h2>Visualizador Final / Prompt Completo</h2>
-      <p>Revise todo o texto gerado pelas abas anteriores. Edite, copie ou exporte.</p>
       <div id="editor-final" contenteditable="true" class="editor"></div>
       <div class="actions">
         <button id="btn-gerar-final">Gerar Petição Completa</button>
