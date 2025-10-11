@@ -78,16 +78,24 @@
     <section id="fatos" class="tab-content">
       <h2>Fatos</h2>
       <p>Selecione ou descreva os acontecimentos que motivam a ação.</p>
+
+      <label for="select-fato">Escolha um fato:</label>
+      <select id="select-fato">
+        <option value="">Selecione um fato</option>
+      </select>
+
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
         <button class="btn-save">Salvar Trecho</button>
       </div>
+
       <div class="viewer"></div>
     </section>
 
     <section id="fundamentos" class="tab-content">
       <h2>Fundamentos Jurídicos</h2>
-      <p>Apresente a base legal e jurisprudencial para os pedidos formulados.</p>
+      <p>Fundamentos carregados automaticamente com base no fato selecionado.</p>
+      <ul id="fundamentos-box"></ul>
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
         <button class="btn-save">Salvar Trecho</button>
@@ -97,7 +105,8 @@
 
     <section id="pedidos" class="tab-content">
       <h2>Pedidos</h2>
-      <p>Liste os pedidos conforme os fundamentos, em formato numerado.</p>
+      <p>Pedidos correspondentes ao fato e fundamentos escolhidos.</p>
+      <ul id="pedidos-box"></ul>
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
         <button class="btn-save">Salvar Trecho</button>
@@ -146,12 +155,12 @@
         <button id="btn-copiar">Copiar Prompt</button>
         <button id="btn-baixar">Baixar .txt</button>
         <button id="btn-pdf">📄 Exportar PDF</button>
-
       </div>
     </section>
 
   </main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="app.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
