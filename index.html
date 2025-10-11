@@ -50,14 +50,25 @@
     </section>
 
     <section id="preliminares" class="tab-content">
-      <h2>Preliminares</h2>
-      <p>Inclua argumentos sobre justiça gratuita, competência ou valor da causa.</p>
-      <div class="actions">
-        <button class="btn-ia">Gerar com IA</button>
-        <button class="btn-save">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
+  <h2>Preliminares</h2>
+  <p>Selecione modelos prontos ou edite o texto.</p>
+
+  <label for="preliminares-select">Escolha uma preliminar:</label>
+  <select id="preliminares-select">
+    <option value="">Selecione…</option>
+    <!-- opções vêm do PRELIMINARES (data/fatos-fundamentos-pedidos.js) -->
+  </select>
+  <button id="add-preliminar" type="button">Adicionar Preliminar</button>
+
+  <ul id="preliminares-list"></ul>
+
+  <div class="actions">
+    <button class="btn-ia">Gerar com IA</button>
+    <button class="btn-save">Salvar Trecho</button>
+  </div>
+  <div class="viewer"></div>
+</section>
+
 
     <section id="contrato" class="tab-content">
       <h2>Contrato de Trabalho</h2>
