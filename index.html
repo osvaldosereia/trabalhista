@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Clara · Gerador de Petições Trabalhistas</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="appbar" data-include="partials/header.html"></header>
+
+<main class="container" data-include="partials/sections.html"></main>
+
+<!-- Toasts -->
+<div class="toast-wrap" id="toasts"></div>
+
+<!-- Loading -->
+<div id="loading" class="loading hidden"><div class="spinner"></div><span>Gerando com ChatGPT…</span></div>
+
+<!-- Config IA -->
+<div id="modal" class="modal hidden" data-include="partials/config.html"></div>
+
+<!-- Modais -->
+<div data-include="partials/modals/history.html"></div>
+<div data-include="partials/modals/audit.html"></div>
+<div data-include="partials/modals/team.html"></div>
+<div data-include="partials/modals/pericia.html"></div>
+<div data-include="partials/modals/dossie.html"></div>
+<div data-include="partials/modals/calculadora.html"></div>
+
+<!-- libs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.0.1/docx.umd.min.js"></script>
+
+<!-- loader de partials -->
+<script src="include.js"></script>
+<!-- módulos do app -->
+<script src="js/core.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/form.js"></script>
+<script src="js/ia.js"></script>
+<script src="js/export.js"></script>
+<script src="js/history.js"></script>
+<script src="js/calc.js"></script>
+<script src="js/review.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
