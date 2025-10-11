@@ -49,25 +49,31 @@
       <div class="viewer"></div>
     </section>
 
-    <section id="preliminares" class="tab-content">
+   <section id="preliminares" class="tab-content">
   <h2>Preliminares</h2>
   <p>Selecione modelos prontos ou edite o texto.</p>
 
-  <label for="preliminares-select">Escolha uma preliminar:</label>
-  <select id="preliminares-select">
-    <option value="">Selecione…</option>
-    <!-- opções vêm do PRELIMINARES (data/fatos-fundamentos-pedidos.js) -->
-  </select>
-  <button id="add-preliminar" type="button">Adicionar Preliminar</button>
+  <div class="preliminares-ui">
+    <label for="preliminares-select">Escolha uma preliminar:</label>
+    <select id="preliminares-select">
+      <option value="">Selecione…</option>
+      <!-- opções vêm do PRELIMINARES (data/fatos-fundamentos-pedidos.js) -->
+    </select>
+    <button id="add-preliminar" type="button">Adicionar Preliminar</button>
 
-  <ul id="preliminares-list"></ul>
+    <!-- Lista de preliminares adicionadas (cada item é clicável para inserir/remover no editor) -->
+    <ul id="preliminares-list"></ul>
+  </div>
 
   <div class="actions">
     <button class="btn-ia">Gerar com IA</button>
     <button class="btn-save">Salvar Trecho</button>
   </div>
+
+  <!-- O app.js substitui .viewer por um mini editor desta seção -->
   <div class="viewer"></div>
 </section>
+
 
 
     <section id="contrato" class="tab-content">
