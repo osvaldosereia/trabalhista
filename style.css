@@ -1,222 +1,239 @@
-/* ==========================================================
-   Editor de Peças Trabalhistas – CSS Base
-   ========================================================== */
+:root {
+  --bg: #f5f6fa;
+  --card: #ffffff;
+  --primary: #2563eb;
+  --secondary: #22c55e;
+  --accent: #f97316;
+  --text: #1e293b;
+  --muted: #6b7280;
+  --border: #e2e8f0;
+  --radius: 10px;
+}
 
-/* ===== Reset e tema ===== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
-
-:root {
-  --bg: #f5f6fa;
-  --ink: #1a1a1a;
-  --muted: #6b7280;
-  --accent: #0051ff;
-  --radius: 10px;
-  --card: #ffffff;
-  --line: #e5e7eb;
-  --shadow: 0 2px 8px rgba(0,0,0,0.06);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
 }
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Inter, sans-serif;
-  color: var(--ink);
   background: var(--bg);
+  color: var(--text);
   line-height: 1.5;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  padding-bottom: 60px;
 }
 
-/* ===== Cabeçalho ===== */
 header {
   text-align: center;
-  padding: 1rem 0.5rem;
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-header h1 {
-  font-size: 1.5rem;
-  margin-bottom: 0.25rem;
-}
-header p {
-  color: var(--muted);
-  font-size: 0.9rem;
+  padding: 2rem 1rem 1rem;
 }
 
-/* ===== Abas (nav) ===== */
+header h1 {
+  color: var(--primary);
+  font-size: 1.6rem;
+  margin-bottom: .4rem;
+}
+
+header p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* ===== Abas ===== */
 .tabs {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.4rem;
-  padding: 0.6rem;
-  background: #fff;
-  border-bottom: 1px solid var(--line);
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  gap: .5rem;
+  margin: 1rem auto;
+  max-width: 1100px;
 }
 
 .tabs button {
-  flex: 1 1 auto;
-  padding: 0.5rem 0.8rem;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--card);
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  padding: .5rem 1rem;
+  border-radius: 30px;
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-}
-.tabs button.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-.tabs button:hover:not(.active) {
-  background: #f0f0f0;
+  transition: all 0.25s ease;
 }
 
-/* ===== Conteúdo das abas ===== */
+.tabs button.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(37,99,235,0.3);
+}
+
+/* ===== Conteúdo das Abas ===== */
 main {
-  flex: 1;
-  padding: 1rem;
-  max-width: 900px;
-  margin: 0 auto;
+  max-width: 800px;
+  margin: auto;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 2rem;
 }
 
 .tab-content {
   display: none;
-  background: var(--card);
-  padding: 1rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
 }
+
 .tab-content.active {
   display: block;
 }
 
 .tab-content h2 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
+  font-size: 1.3rem;
+  color: var(--primary);
 }
+
 .tab-content p {
-  margin-bottom: 1rem;
   color: var(--muted);
-  font-size: 0.95rem;
+  margin-bottom: 1rem;
 }
 
 /* ===== Formulários ===== */
-form label {
-  display: block;
-  margin-bottom: 0.6rem;
-  font-size: 0.9rem;
+form {
+  display: grid;
+  gap: .6rem;
+  margin-bottom: 1rem;
 }
-form input, textarea {
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid var(--line);
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: var(--text);
+  font-size: .9rem;
+}
+
+input, select, textarea {
+  padding: .6rem .8rem;
   border-radius: var(--radius);
-  margin-top: 0.3rem;
-  font-size: 0.95rem;
+  border: 1px solid var(--border);
+  font-size: .95rem;
+  color: var(--text);
+  background: white;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary);
+  outline: none;
 }
 
 /* ===== Ações ===== */
 .actions {
-  margin: 1rem 0;
   display: flex;
+  gap: .6rem;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  margin: 1rem 0;
 }
-.actions button {
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius);
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-.actions .btn-ia {
-  background: var(--accent);
-  color: #fff;
-}
-.actions .btn-save {
-  background: #10b981;
-  color: #fff;
-}
-.actions .btn-ia:hover { opacity: 0.9; }
-.actions .btn-save:hover { opacity: 0.9; }
 
-/* ===== Visualizador de IA ===== */
-.viewer {
-  background: #fafafa;
-  border: 1px solid var(--line);
-  padding: 0.75rem;
+button {
+  cursor: pointer;
+  border: none;
   border-radius: var(--radius);
-  min-height: 100px;
-  font-size: 0.9rem;
-  white-space: pre-wrap;
+  padding: .6rem 1.2rem;
+  font-weight: 500;
+  transition: all 0.25s ease;
+}
+
+button.btn-ia {
+  background: var(--primary);
+  color: white;
+}
+
+button.btn-save {
+  background: var(--secondary);
+  color: white;
+}
+
+button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ===== Editor ===== */
+.editor-area {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.toolbar {
+  display: flex;
+  gap: .4rem;
+  padding: .4rem;
+  border-bottom: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.toolbar button {
+  background: white;
+  border: 1px solid var(--border);
+  padding: .3rem .6rem;
+  border-radius: var(--radius);
+  font-size: .9rem;
+}
+
+.editor-mini {
+  min-height: 150px;
+  padding: .8rem;
+  outline: none;
+}
+
+.editor-mini:focus {
+  background: #f9fafb;
+}
+
+/* ===== Listas automáticas ===== */
+ul#fundamentos-box, ul#pedidos-box {
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .8rem;
+  margin-bottom: 1rem;
+}
+
+ul li {
+  margin-left: 1.2rem;
+  margin-bottom: .3rem;
 }
 
 /* ===== Editor Final ===== */
-.editor {
-  background: #fff;
-  border: 1px solid var(--line);
+#editor-final {
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  min-height: 300px;
+  background: white;
   padding: 1rem;
-  font-size: 0.95rem;
-  white-space: pre-wrap;
-  outline: none;
+  min-height: 300px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  overflow-y: auto;
 }
 
-/* ===== Responsividade ===== */
-@media (max-width: 700px) {
-  .tabs {
-    overflow-x: auto;
-    justify-content: flex-start;
-  }
-  .tabs button {
-    flex: none;
-    white-space: nowrap;
-  }
-  main {
-    padding: 0.5rem;
-  }
-  .tab-content {
-    padding: 0.8rem;
-  }
-}
-/* ===== Mini Editor ===== */
-.editor-area {
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: #fff;
-  box-shadow: var(--shadow);
-  margin-top: 0.5rem;
-}
-.toolbar {
-  border-bottom: 1px solid var(--line);
-  background: #f3f4f6;
-  padding: 0.4rem;
-  display: flex;
-  gap: 0.4rem;
-}
-.toolbar button {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  cursor: pointer;
-  padding: 0.3rem 0.6rem;
-}
-.toolbar button:hover {
+/* ===== PDF Botão especial ===== */
+#btn-pdf {
   background: var(--accent);
-  color: #fff;
+  color: white;
 }
-.editor-mini {
-  min-height: 120px;
-  padding: 0.6rem;
-  outline: none;
-  font-size: 0.95rem;
+
+/* ===== Responsivo ===== */
+@media (max-width: 700px) {
+  main {
+    padding: 1rem;
+  }
+
+  .tabs {
+    gap: .3rem;
+  }
+
+  .tabs button {
+    padding: .4rem .8rem;
+    font-size: .8rem;
+  }
 }
