@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Gerador de Petições Trabalhistas · Clara</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="appbar">
+  <div class="brand">
+    <span class="dot"></span>
+    <strong>Clara</strong>
+    <span class="muted">· Petições Trabalhistas</span>
+  </div>
+  <nav class="actions">
+    <button id="btnConfig" class="ghost">Configurar IA</button>
+    <button id="btnEquipe" class="ghost">Equipe</button>
+    <button id="btnAudit" class="ghost">Auditoria</button>
+    <button id="btnHistory" class="ghost">Histórico</button>
+  </nav>
+</header>
+
+<main class="container">
+
+  <!-- Intro -->
+  <section id="intro" class="card big">
+    <h1>Construa petições iniciais com padrão forense</h1>
+    <p class="lead">Fluxo guiado para coletar informações, gerar o prompt completo e exportar texto, PDF e DOCX.</p>
+    <div class="row gap">
+      <button id="btnIniciar" class="primary">Começar novo caso</button>
+      <button id="btnLoadDraft" class="secondary">Abrir rascunho</button>
+      <button id="btnReset" class="ghost">Resetar app</button>
+    </div>
+  </section>
+
+  <!-- Wizard -->
+  <section id="wizard" class="hidden">
+    <div class="wizard-head">
+      <ol id="stepsList" class="steps">
+        <li class="active">Juízo</li>
+        <li>Partes</li>
+        <li>Contrato</li>
+        <li>Fatos</li>
+        <li>Pedidos</li>
+        <li>Fundamentos & Provas</li>
+        <li>Blocos & Template</li>
+        <li>Valores</li>
+        <li>Revisão</li>
+      </ol>
+      <div id="progress" class="progress"><span style="width:0%"></span></div>
+    </div>
+
+    <form id="formPeticao" class="stack">
+
+      <!-- Step 0: Juízo -->
+      <fieldset class="step card">
+        <legend>Juízo</legend>
+        <div class="grid">
+          <label>Nº da Vara (opcional)
+            <input type="text" id="juizoNum" placeholder="Ex.: 5ª"/>
+          </label>
+          <label>Cidade
+            <input type="text" id="cidade" placeholder="Ex.: São Paulo" required/>
+          </label>
+          <label>UF
+            <input type="text" id="uf" maxlength="2" placeholder="SP" required/>
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- Step 1: Partes -->
+      <fieldset class="step card hidden">
+        <legend>Partes</legend>
+        <h3>Reclamante</h3>
+        <div class="grid">
+          <label>Nome <input id="reclamante_nome" required></label>
+          <label>Estado civil <input id="reclamante_estado_civil"></label>
+          <label>Profissão <input id="reclamante_prof"></label>
+          <label>CPF <input id="reclamante_cpf"></label>
+          <label>RG <input id="reclamante_rg"></label>
+          <label>E-mail <input id="reclamante_email" type="email"></label>
+          <label>Telefone <input id="reclamante_tel"></label>
+          <label>CEP <input id="reclamante_cep"></label>
+          <label>Endereço <input id="reclamante_end"></label>
+        </div>
+
+        <div class="row between">
+          <h3>Reclamada(s)</h3>
+          <button id="addReclamada" type="button" class="mini">+ adicionar reclamada</button>
+        </div>
+        <div id="reclamadasWrap" class="stack">
+          <div class="card subtle reclamada">
+            <div class="grid">
+              <label>Razão social / Nome <input name="reclamada_nome" required></label>
+              <label>CNPJ/CPF <input name="reclamada_doc"></label>
+              <label>E-mail <input name="reclamada_email" type="email"></label>
+              <label>Telefone <input name="reclamada_tel"></label>
+              <label>CEP <input name="reclamada_cep"></label>
+              <label>Endereço <input name="reclamada_end"></label>
+            </div>
+            <div class="row end"><button type="button" class="mini danger btnRemoveReclamada">remover</button></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Step 2: Contrato -->
+      <fieldset class="step card hidden">
+        <legend>Contrato</legend>
+        <div class="grid">
+          <label>Admissão <input type="date" id="adm"></label>
+          <label>Saída <input type="date" id="saida"></label>
+          <label>Função <input id="funcao"></label>
+          <label>Salário (R$) <input id="salario" placeholder="0,00"></label>
+          <label>Jornada <input id="jornada" placeholder="Ex.: 8h/d, 44h/sem"></label>
+          <label>Controle de ponto <input id="controlePonto" placeholder="Ex.: manual/eletrônico/none"></label>
+          <label>Desligamento <input id="desligamento" placeholder="Ex.: sem justa causa, pedido de demissão"></label>
+        </div>
+      </fieldset>
+
+      <!-- Step 3: Fatos -->
+      <fieldset class="step card hidden">
+        <legend>Fatos</legend>
+        <textarea id="fatos" rows="10" placeholder="Descreva a narrativa fática..."></textarea>
+      </fieldset>
+
+      <!-- Step 4: Pedidos -->
+      <fieldset class="step card hidden">
+        <legend>Pedidos</legend>
+        <div class="chips">
+          <button type="button" class="chip" data-preset="Horas Extras">Horas Extras</button>
+          <button type="button" class="chip" data-preset="Intervalo Intrajornada">Intervalo</button>
+          <button type="button" class="chip" data-preset="Adicional Noturno">Adicional Noturno</button>
+          <button type="button" class="chip" data-preset="FGTS + 40%">FGTS + 40%</button>
+          <button type="button" class="chip" data-preset="Dano Moral">Dano Moral</button>
+        </div>
+        <div class="row end"><button id="addPedido" type="button" class="mini">+ pedido</button></div>
+        <div id="pedidosWrap" class="stack"></div>
+      </fieldset>
+
+      <!-- Step 5: Fundamentos & Provas -->
+      <fieldset class="step card hidden">
+        <legend>Fundamentos & Provas</legend>
+        <div class="grid-2">
+          <div>
+            <label>Fundamentos (um por linha)
+              <textarea id="fundamentos" rows="10" placeholder="Ex.: CLT art. 58..."></textarea>
+            </label>
+            <div id="fundTips" class="stack"></div>
+          </div>
+          <div>
+            <div class="row between">
+              <label>Provas</label>
+              <button id="addProva" type="button" class="mini">+ prova</button>
+            </div>
+            <div id="provasWrap" class="stack"></div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Step 6: Blocos Inteligentes & Template -->
+      <fieldset class="step card hidden">
+        <legend>Blocos Inteligentes & Template</legend>
+        <div class="grid">
+          <label>Tipo de Ação
+            <select id="tipoAcao">
+              <option value="">— selecione —</option>
+              <option value="horas_extras">Horas Extras</option>
+              <option value="rescisao_indireta">Rescisão Indireta</option>
+              <option value="equiparacao">Equiparação Salarial</option>
+              <option value="assedio_moral">Assédio Moral</option>
+            </select>
+          </label>
+        </div>
+        <div class="row gap">
+          <button id="aplicarTemplate" type="button" class="secondary">Aplicar Template</button>
+          <button id="limparTemplate" type="button" class="ghost">Limpar Itens de Template</button>
+        </div>
+        <div class="stack">
+          <label class="check"><input type="checkbox" class="blk" value="intervalo"> Incluir “Intervalo Intrajornada”</label>
+          <label class="check"><input type="checkbox" class="blk" value="adicional_noturno"> Incluir “Adicional Noturno”</label>
+          <label class="check"><input type="checkbox" class="blk" value="insalubridade"> Incluir “Insalubridade”</label>
+          <label class="check"><input type="checkbox" class="blk" value="periculosidade"> Incluir “Periculosidade”</label>
+          <label class="check"><input type="checkbox" class="blk" value="reflexos" checked> Adicionar reflexos comuns (DSR, 13º, férias + 1/3, FGTS + 40%)</label>
+          <label class="check"><input type="checkbox" class="blk" value="multa_477"> Multa 477 CLT</label>
+          <label class="check"><input type="checkbox" class="blk" value="fgts40"> FGTS + 40%</label>
+        </div>
+      </fieldset>
+
+      <!-- Step 7: Valores -->
+      <fieldset class="step card hidden">
+        <legend>Valores</legend>
+        <div class="row between">
+          <div class="muted">Preencha valores estimados por pedido.</div>
+          <button id="btnCalc" type="button" class="mini">Abrir calculadora</button>
+        </div>
+        <div id="valoresWrap" class="stack"></div>
+        <div class="total">Valor da Causa: <strong id="valorCausa">R$ 0,00</strong></div>
+        <div class="row gap">
+          <label class="check"><input type="checkbox" id="justicaGratuita"> Requer justiça gratuita</label>
+          <label class="check"><input type="checkbox" id="honorarios"> Requer honorários (art. 791-A)</label>
+        </div>
+      </fieldset>
+
+      <!-- Step 8: Revisão -->
+      <fieldset class="step card hidden">
+        <legend>Revisão</legend>
+        <pre id="review" class="review"></pre>
+        <ul id="lintList" class="lint"></ul>
+        <div class="row gap">
+          <button id="btnSalvar" type="button" class="ghost">Salvar rascunho</button>
+          <button id="btnForense" type="button" class="ghost">Prévia forense</button>
+          <button id="btnPericia" type="button" class="ghost">Perícia</button>
+          <button id="btnDossie" type="button" class="ghost">Dossiê</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <div class="wizard-foot row between">
+      <div class="row gap">
+        <button id="btnPrev" class="secondary">Voltar</button>
+        <button id="btnNext" class="primary">Avançar</button>
+      </div>
+      <div class="row gap">
+        <button id="btnGerar" class="ghost">Gerar Prompt</button>
+        <button id="btnGerarIA" class="primary">Gerar com ChatGPT</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resultado -->
+  <section id="resultado" class="hidden">
+    <div class="toolbar row between">
+      <div class="row gap">
+        <button id="voltar" class="secondary">← Voltar</button>
+        <button id="exportPdf" class="ghost">Exportar PDF</button>
+        <button id="exportDocx" class="ghost">Exportar DOCX</button>
+        <button id="btnExportJson" class="ghost">Exportar JSON do caso</button>
+        <button id="btnImportJson" class="ghost">Importar JSON</button>
+      </div>
+      <div class="row gap">
+        <span id="tokenInfo" class="muted">~0t prompt / ~0t resp.</span>
+      </div>
+    </div>
+
+    <div class="grid-2-tall">
+      <div class="panel">
+        <h3>Prompt completo</h3>
+        <textarea id="saida" rows="26" class="mono"></textarea>
+        <div class="row end gap">
+          <button id="copiar" class="secondary">Copiar prompt</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Texto gerado pela IA</h3>
+        <textarea id="saidaIa" rows="26" class="mono"></textarea>
+        <div class="row end gap">
+          <button id="refinarIa" class="ghost">Refinar</button>
+          <button id="copiarIa" class="secondary">Copiar texto</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Prévia forense</h3>
+      <div id="previewDoc" class="preview"></div>
+      <div class="row end gap">
+        <button id="copyHtml" class="ghost">Copiar HTML</button>
+        <button id="printDoc" class="secondary">Imprimir</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Loading -->
+<div id="loading" class="loading hidden"><div class="spinner"></div><span>Gerando com ChatGPT…</span></div>
+
+<!-- Config Modal -->
+<div id="modal" class="modal hidden">
+  <div class="dialog">
+    <div class="row between"><h3>Configurar IA</h3><button id="closeConfig" class="icon">✕</button></div>
+    <div class="grid">
+      <label>API Key <input id="apiKey" placeholder="sk-..." autocomplete="off"></label>
+      <label>Modelo <input id="model" value="gpt-4o-mini"></label>
+      <label>Temperature <input id="temperature" type="number" step="0.1" value="0.2"></label>
+      <label>Max tokens <input id="maxTokens" type="number" value="2048"></label>
+      <label>Usuário (para auditoria) <input id="currentUser" placeholder="Ex.: Osvaldo"></label>
+    </div>
+    <div class="row end"><button id="saveConfig" class="primary">Salvar</button></div>
+  </div>
+</div>
+
+<!-- History Modal -->
+<div id="historyModal" class="modal hidden">
+  <div class="dialog wide">
+    <div class="row between"><h3>Histórico de versões</h3><button id="closeHistory" class="icon">✕</button></div>
+    <div class="grid-2">
+      <div>
+        <ul id="versionList" class="list"></ul>
+        <button id="exportHistory" class="ghost">Exportar histórico</button>
+      </div>
+      <div>
+        <div class="grid">
+          <label>Comparar A <select id="compareA"></select></label>
+          <label>Comparar B <select id="compareB"></select></label>
+        </div>
+        <div class="row gap">
+          <button id="btnCompare" class="secondary">Comparar</button>
+          <button id="btnRestore" class="ghost">Restaurar B</button>
+          <button id="btnDelete" class="ghost danger">Excluir B</button>
+        </div>
+        <pre id="diffView" class="review"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Team Modal -->
+<div id="teamModal" class="modal hidden">
+  <div class="dialog wide">
+    <div class="row between"><h3>Equipe · Templates & Fundamentos</h3><button id="closeTeam" class="icon">✕</button></div>
+    <div class="grid-2">
+      <div>
+        <h4>Templates de equipe</h4>
+        <ul id="teamTplList" class="list"></ul>
+        <div class="row gap">
+          <button id="teamTplNew" class="mini">Novo</button>
+          <button id="teamTplDelete" class="mini danger">Excluir</button>
+          <button id="teamTplExport" class="mini">Exportar</button>
+          <input type="file" id="teamTplImport" class="hidden">
+          <button id="teamTplImportBtn" class="mini">Importar</button>
+        </div>
+      </div>
+      <div class="stack">
+        <label>Nome <input id="teamTplName"></label>
+        <label>JSON <textarea id="teamTplJson" rows="10" class="mono"></textarea></label>
+        <button id="teamTplSave" class="secondary">Salvar template</button>
+        <button id="teamTplApply" class="ghost">Aplicar no formulário</button>
+      </div>
+    </div>
+    <hr/>
+    <div class="grid-2">
+      <div>
+        <h4>Pacotes de fundamentos</h4>
+        <ul id="packList" class="list"></ul>
+        <div class="row gap">
+          <button id="packNew" class="mini">Novo</button>
+          <button id="packDelete" class="mini danger">Excluir</button>
+          <button id="packExport" class="mini">Exportar</button>
+          <input type="file" id="packImport" class="hidden">
+          <button id="packImportBtn" class="mini">Importar</button>
+        </div>
+      </div>
+      <div class="stack">
+        <label>Nome <input id="packName"></label>
+        <label>Linhas (uma por linha) <textarea id="packLines" rows="10" class="mono"></textarea></label>
+        <button id="packSave" class="secondary">Salvar pacote</button>
+        <button id="packApply" class="ghost">Aplicar fundamentos</button>
+      </div>
+    </div>
+    <hr/>
+    <div class="row end gap">
+      <button id="btnExportAll" class="ghost">Exportar coleção</button>
+      <button id="btnImportAll" class="ghost">Importar coleção</button>
+    </div>
+  </div>
+</div>
+
+<!-- Audit Modal -->
+<div id="auditModal" class="modal hidden">
+  <div class="dialog wide">
+    <div class="row between"><h3>Auditoria</h3><button id="auditClose" class="icon">✕</button></div>
+    <div class="row gap">
+      <label>Filtrar por tipo
+        <select id="auditFilter">
+          <option value="">Todos</option>
+          <option>FIELD</option>
+          <option>VERSION</option>
+          <option>IA_REQUEST</option>
+          <option>IA_RESPONSE</option>
+          <option>EXPORT</option>
+          <option>PACK</option>
+          <option>TEMPLATE</option>
+          <option>LOCK</option>
+        </select>
+      </label>
+      <button id="auditExport" class="ghost">Exportar</button>
+      <button id="auditClear" class="ghost danger">Limpar</button>
+      <button id="auditCopy" class="ghost">Copiar detalhe</button>
+    </div>
+    <div class="grid-2">
+      <ul id="auditList" class="list"></ul>
+      <pre id="auditDetail" class="review"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- Perícia Modal -->
+<div id="periciaModal" class="modal hidden">
+  <div class="dialog">
+    <div class="row between"><h3>Perícia</h3><button id="perClose" class="icon">✕</button></div>
+    <div class="grid">
+      <label>Tipo
+        <select id="perTipo">
+          <option value="insalubridade">Insalubridade</option>
+          <option value="periculosidade">Periculosidade</option>
+          <option value="noturno">Adicional noturno</option>
+        </select>
+      </label>
+      <label>Honorários (R$) <input id="perHonor" type="number" step="0.01"></label>
+      <label>Adiantamento (R$) <input id="perAdiant" type="number" step="0.01"></label>
+      <div class="total">Total: <strong id="perTotal">R$ 0,00</strong></div>
+    </div>
+    <label>Quesitos <textarea id="perQuesitos" rows="8" class="mono"></textarea></label>
+    <label>Observações <textarea id="perObs" rows="3"></textarea></label>
+    <div class="row gap">
+      <button id="perLoadPreset" class="ghost">Carregar quesitos padrão</button>
+      <button id="perAddQ" class="ghost">+ quesito</button>
+      <button id="perApplyToForm" class="secondary">Inserir no caso</button>
+      <button id="perExport" class="ghost">Exportar .txt</button>
+    </div>
+    <ul id="perChecklist" class="lint"></ul>
+  </div>
+</div>
+
+<!-- Calculadora Modal -->
+<div id="calcModal" class="modal hidden">
+  <div class="dialog">
+    <div class="row between"><h3>Calculadora de estimativas</h3><button id="calcClose" class="icon">✕</button></div>
+    <div class="grid">
+      <label>Salário (R$) <input id="c_sal" type="number" step="0.01"></label>
+      <label>Carga semanal (h) <input id="c_sem" type="number" value="44"></label>
+      <label>Meses no período <input id="c_meses" type="number" value="1"></label>
+      <label>HE 50% (h/mês) <input id="c_he50" type="number" value="0"></label>
+      <label>HE 100% (h/mês) <input id="c_he100" type="number" value="0"></label>
+      <label>Noturnas (h/mês) <input id="c_not" type="number" value="0"></label>
+      <label>% Noturno <input id="c_not_perc" type="number" value="20"></label>
+      <label>Dias úteis/mês <input id="c_uteis" type="number" value="22"></label>
+      <label>Descansos/mês <input id="c_desc" type="number" value="8"></label>
+    </div>
+    <div class="stack small">
+      <div>Valor hora: <strong id="c_hora">R$ 0,00</strong></div>
+      <div>Extras (mês): <strong id="c_val_he">R$ 0,00</strong></div>
+      <div>Noturno (mês): <strong id="c_val_not">R$ 0,00</strong></div>
+      <div>DSR sobre extras (mês): <strong id="c_val_dsr">R$ 0,00</strong></div>
+      <div>Total mês: <strong id="c_total_mes">R$ 0,00</strong></div>
+      <div>Total período: <strong id="c_total_per">R$ 0,00</strong></div>
+    </div>
+    <div class="row end"><button id="calcApply" class="primary">Aplicar aos pedidos</button></div>
+  </div>
+</div>
+
+<!-- Dossiê Modal -->
+<div id="dossieModal" class="modal hidden">
+  <div class="dialog wide">
+    <div class="row between"><h3>Dossiê de Protocolo</h3><button id="dosClose" class="icon">✕</button></div>
+    <div class="grid-2">
+      <div class="stack">
+        <div class="grid">
+          <label>Órgão/Seção <input id="dosOrgao" placeholder="Ex.: Vara do Trabalho de ..."/></label>
+          <label>Ref. interna <input id="dosRef"/></label>
+        </div>
+        <div class="grid">
+          <label>Responsável <input id="dosResp"/></label>
+          <label>Observações <input id="dosObs"/></label>
+        </div>
+        <div class="row between">
+          <h4>Documentos</h4>
+          <div class="row gap">
+            <button id="dosAdd" class="mini">+ doc</button>
+            <button id="dosBuild" class="mini">Atualizar prévia</button>
+          </div>
+        </div>
+        <div id="dosDocs" class="stack"></div>
+      </div>
+      <div>
+        <div id="dosPreview" class="preview"></div>
+        <div class="row end gap">
+          <button id="dosCopyHtml" class="ghost">Copiar HTML</button>
+          <button id="dosPrint" class="secondary">Imprimir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@8.1.0/build/index.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
