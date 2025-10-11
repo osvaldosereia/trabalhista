@@ -1,0 +1,203 @@
+===== CAPÍTULO 1 – PREÂMBULO =====
+@descricao:
+Introduz a petição, definindo o juízo competente, a qualificação das partes e o objeto da ação.
+@subtemas:
+- Endereçamento
+- Qualificação das Partes
+- Objeto da Ação
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Leia os DADOS e DOCUMENTOS ANEXADOS e redija o PREÂMBULO da Reclamação Trabalhista, contendo endereçamento, qualificação completa das partes e breve indicação do objeto da ação. Utilize linguagem técnica, precisa e conforme o padrão forense trabalhista. Fundamente cada elemento conforme a CLT, CPC e jurisprudência, se necessário.
+-----
+
+===== CAPÍTULO 2 – PEDIDOS PRELIMINARES =====
+@descricao:
+Inclui os requerimentos iniciais que antecedem o mérito, tratando de aspectos processuais e garantias.
+@subtemas:
+- Justiça gratuita
+- Competência do foro
+- Conciliação prévia
+- Prioridade de tramitação
+- Outras preliminares (prescrição, prevenção)
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Analise os documentos e gere o texto dos PEDIDOS PRELIMINARES da Reclamação Trabalhista, abordando os pontos aplicáveis (justiça gratuita, competência, conciliação, prioridade, prescrição). Pesquise em fontes oficiais (CLT, CPC, TST) e em sites especializados (JusBrasil, Migalhas) para embasar cada fundamento jurídico.
+-----
+
+===== CAPÍTULO 3 – EXPOSIÇÃO DOS FATOS =====
+@descricao:
+Apresenta a narrativa fática do contrato de trabalho, suas condições e a forma de rescisão.
+@subtemas:
+- Contrato de trabalho (dados básicos)
+- Evolução contratual
+- Condições de trabalho
+- Jornada efetiva
+- Término do vínculo
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Com base nos documentos anexados, descreva de forma cronológica e técnica os FATOS RELEVANTES do contrato de trabalho, incluindo admissões, funções, salário, jornada e forma de rescisão. Use estilo claro, objetivo e linguagem de petição inicial.
+-----
+
+===== CAPÍTULO 4 – LEGITIMIDADE E RESPONSABILIDADE =====
+@descricao:
+Identifica os reclamados e fundamenta a responsabilidade de cada parte.
+@subtemas:
+- Identificação dos réus
+- Grupo econômico
+- Terceirização
+- Sucessão de empresas
+- Desconsideração da personalidade jurídica
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Analise os documentos e elabore o capítulo sobre LEGITIMIDADE E RESPONSABILIDADE, indicando quem deve figurar no polo passivo e qual a forma de responsabilização (solidária, subsidiária). Fundamente conforme CLT, art. 2º e 455, e Súmulas do TST.
+-----
+
+===== CAPÍTULO 5 – DO VÍNCULO EMPREGATÍCIO =====
+@descricao:
+Trata da relação de emprego, sua comprovação e efeitos jurídicos.
+@subtemas:
+- Reconhecimento de vínculo
+- Fraude na contratação
+- Período e dados do vínculo
+- Efeitos do reconhecimento
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Examine os documentos e redija o texto do capítulo sobre VÍNCULO EMPREGATÍCIO, demonstrando a presença dos requisitos da relação de emprego (pessoalidade, habitualidade, onerosidade e subordinação). Fundamente conforme o art. 3º da CLT e jurisprudência do TST.
+-----
+
+===== CAPÍTULO 6 – DA JORNADA E HORAS EXTRAS =====
+@descricao:
+Discute a jornada efetiva e eventuais irregularidades no controle de horário.
+@subtemas:
+- Horário contratual vs real
+- Intervalos intra/interjornada
+- Trabalho em domingos/feriados
+- Banco de horas
+- Horas in itinere
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Analise os cartões de ponto e demais provas para redigir o capítulo da JORNADA DE TRABALHO. Fundamente pedidos de horas extras, intervalos suprimidos e reflexos com base nos arts. 58, 59 e 71 da CLT e Súmulas 85, 437 e 366 do TST.
+-----
+
+===== CAPÍTULO 7 – DOS ADICIONAIS =====
+@descricao:
+Trata de adicionais legais devidos em razão de condições especiais de trabalho.
+@subtemas:
+- Adicional noturno
+- Adicional de insalubridade
+- Adicional de periculosidade
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Analise as condições de trabalho do reclamante e redija o texto sobre ADICIONAIS. Fundamente a exposição com base nos arts. 73, 192 e 193 da CLT e nas NRs 15 e 16 do MTE, citando Súmulas 60 e 364 do TST.
+-----
+
+===== CAPÍTULO 8 – DAS DIFERENÇAS SALARIAIS E REENQUADRAMENTO =====
+@descricao:
+Aborda diferenças de remuneração, desvio, acúmulo de função e equiparação salarial.
+@subtemas:
+- Equiparação salarial
+- Desvio ou acúmulo de função
+- Piso e reajustes
+- Promoções não aplicadas
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Elabore o texto das DIFERENÇAS SALARIAIS, detalhando as hipóteses de equiparação, desvio e acúmulo de função. Utilize o art. 461 da CLT, Súmulas 6 e 372 do TST e CCT aplicável.
+-----
+
+===== CAPÍTULO 9 – DAS VERBAS SALARIAIS E RESCISÓRIAS =====
+@descricao:
+Discute valores salariais, comissões, descontos indevidos e verbas rescisórias não pagas.
+@subtemas:
+- Salários atrasados
+- Comissões e prêmios
+- Descontos indevidos
+- Férias, 13º e aviso-prévio
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Elabore o capítulo das VERBAS SALARIAIS E RESCISÓRIAS, identificando parcelas inadimplidas e requerendo seu pagamento conforme CLT, arts. 457, 459, 467 e 477.
+-----
+
+===== CAPÍTULO 10 – DO FGTS E SEGURO-DESEMPREGO =====
+@descricao:
+Aponta falhas em depósitos de FGTS e omissão de guias de seguro-desemprego.
+@subtemas:
+- Depósitos faltantes
+- Multa de 40%
+- Liberação de valores
+- Indenização substitutiva
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Verifique os comprovantes de FGTS e redija o capítulo correspondente, pleiteando diferenças e multa de 40%. Inclua o pedido de entrega das guias CD/SD e indenização substitutiva, se cabível.
+-----
+
+===== CAPÍTULO 11 – DAS MULTAS E PENALIDADES =====
+@descricao:
+Trata das multas legais e normativas aplicáveis.
+@subtemas:
+- Multa do art. 467 CLT
+- Multa do art. 477 CLT
+- Multa normativa
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Fundamente o pedido das MULTAS legais (arts. 467 e 477 da CLT), detalhando atraso e inadimplemento. Inclua menção a eventuais multas previstas em convenção coletiva.
+-----
+
+===== CAPÍTULO 12 – DAS ESTABILIDADES E REINTEGRAÇÕES =====
+@descricao:
+Discute garantias de emprego e indenizações substitutivas.
+@subtemas:
+- Gestante
+- Acidentária
+- Dirigente sindical
+- CIPA
+- Pré-aposentadoria
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Redija o capítulo sobre ESTABILIDADES, identificando o tipo aplicável e requerendo reintegração ou indenização. Fundamente com base no art. 10, II, “a” e “b” do ADCT e art. 118 da Lei 8.213/91.
+-----
+
+===== CAPÍTULO 13 – DA NULIDADE DA JUSTA CAUSA =====
+@descricao:
+Impugna demissão motivada sem prova de falta grave.
+@subtemas:
+- Contexto e alegações do empregador
+- Falta de prova ou desproporcionalidade
+- Consequências e reversão
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Redija o texto da NULIDADE DA JUSTA CAUSA, analisando os documentos e narrando a ausência de prova robusta. Fundamente nos princípios da proporcionalidade e imediaticidade, conforme jurisprudência do TST.
+-----
+
+===== CAPÍTULO 14 – DA RESCISÃO INDIRETA =====
+@descricao:
+Pede a rescisão indireta por faltas graves do empregador.
+@subtemas:
+- Atrasos reiterados
+- Assédio
+- Falta de pagamento
+- Descumprimento contratual
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Analise os fatos e elabore o capítulo da RESCISÃO INDIRETA conforme art. 483 da CLT, descrevendo condutas patronais que justifiquem o rompimento do vínculo e requerendo o pagamento das verbas rescisórias correspondentes.
+-----
+
+===== CAPÍTULO 15 – DA RESPONSABILIDADE SOLIDÁRIA OU SUBSIDIÁRIA =====
+@descricao:
+Discute a responsabilidade entre empregadora, tomadora e sucessoras.
+@subtemas:
+- Grupo econômico
+- Terceirização
+- Sucessão empresarial
+- Sócios
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Fundamente a RESPONSABILIDADE SOLIDÁRIA/SUBSIDIÁRIA conforme art. 2º §2º e art. 455 da CLT, Súmula 331 e jurisprudência atualizada do TST. Descreva a relação entre as reclamadas.
+-----
+
+===== CAPÍTULO 16 – DOS DANOS MORAIS E MATERIAIS =====
+@descricao:
+Trata de assédio, discriminação, acidentes e outros prejuízos pessoais.
+@subtemas:
+- Assédio moral
+- Assédio sexual
+- Discriminação
+- Dano material
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Elabore o texto dos DANOS MORAIS E MATERIAIS, descrevendo os fatos e pedindo indenização conforme art. 223-A e seguintes da CLT e jurisprudência recente. Use linguagem técnica e equilibrada.
+-----
+
+===== CAPÍTULO 17 – DOS PEDIDOS FINAIS =====
+@descricao:
+Consolida os pedidos, valor da causa e requerimentos processuais.
+@subtemas:
+- Lista de pedidos
+- Valor da causa
+- Requerimentos
+@prompt:
+Você é ADVOGADO TRABALHISTA EXPERIENTE. Redija os PEDIDOS FINAIS, listando todas as verbas pleiteadas, indicando valor da causa e requerendo citação, audiência, produção de provas, custas e honorários. Utilize linguagem formal e numeração padrão.
+-----
