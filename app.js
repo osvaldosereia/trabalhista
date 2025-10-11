@@ -25,13 +25,31 @@
     });
   });
 
-  /* ===== Botões IA (placeholders) ===== */
+    /* ==========================================================
+     Botão "Abrir no Google Modo IA"
+     ========================================================== */
   $$('.btn-ia').forEach(btn => {
     btn.addEventListener('click', () => {
       const parent = btn.closest('.tab-content');
       const viewer = parent.querySelector('.viewer');
-      viewer.textContent =
-        '⚙️ [IA simulada] O texto será gerado aqui com base nas informações desta aba...';
+      const texto = viewer.textContent.trim();
+
+      // Captura dados extras dos formulários da aba
+      const inputs = parent.querySelectorAll('input, textarea');
+      const dados = Array.from(inputs)
+        .map(el => `${el.name || el.id}: ${el.value}`)
+        .filter(x => !x.endsWith(': '))
+        .join(' | ');
+
+      // Define contexto da aba
+      const titulo = parent.querySelector('h2')?.textContent || 'Trecho da Petição';
+      const contexto = `Redija o trecho "${titulo}" de uma Reclamação Trabalhista com base nos seguintes dados: ${dados}. 
+O texto atual é: ${texto}. 
+Use linguagem técnica e padrão forense.`;
+
+      // Monta link para Google modo IA
+      const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
+      window.open(url, '_blank');
     });
   });
 
