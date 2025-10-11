@@ -1,6 +1,6 @@
-/* style.css — tema claro (estilo clean), grid utilitária e componentes
-   - Tipografia inspirada em interfaces Apple (SF system stack)
-   - Somente tema CLARO; sem dark mode
+/* style.css — tema claro (clean), grid utilitária e componentes
+   - Sem dark mode
+   - Modais responsivos com rolagem interna (máx. 92vh)
 */
 
 /* ---------- Reset / Base ---------- */
@@ -47,17 +47,17 @@ pre.review{
   white-space:pre-wrap; padding:12px; border:1px solid var(--line);
   background:#fff; border-radius:var(--radius-sm); max-height:360px; overflow:auto;
 }
-.preview{background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px}
+.preview{background:#fff;border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px; overflow:auto}
 
 /* ---------- Layout helpers ---------- */
-.row{display:flex; align-items:center}
+.row{display:flex; align-items:center; min-width:0}
 .row.gap{gap:10px}
 .row.between{justify-content:space-between}
 .row.end{justify-content:flex-end}
-.stack{display:flex; flex-direction:column; gap:10px}
-.grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px}
-.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-.grid-2-tall{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.stack{display:flex; flex-direction:column; gap:10px; min-width:0}
+.grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; min-width:0}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:12px; min-width:0}
+.grid-2-tall{display:grid; grid-template-columns:1fr 1fr; gap:16px; min-width:0}
 @media (max-width:960px){
   .grid{grid-template-columns:1fr}
   .grid-2,.grid-2-tall{grid-template-columns:1fr}
@@ -76,9 +76,10 @@ label{display:flex; flex-direction:column; gap:6px; font-weight:600}
 input,select,textarea{
   appearance:none; border:1px solid var(--line); border-radius:12px;
   padding:10px 12px; background:#fff; color:var(--ink); outline:none;
-  transition:border .2s, box-shadow .2s;
+  transition:border .2s, box-shadow .2s; min-width:0;
 }
 textarea{min-height:120px; resize:vertical}
+select[multiple]{min-height:220px}
 input:focus,select:focus,textarea:focus{border-color:#c7d2fe; box-shadow:0 0 0 3px rgba(59,130,246,.15)}
 input[readonly],textarea[readonly]{background:#f9fafb}
 
@@ -101,6 +102,11 @@ button.ghost{background:transparent}
 button.danger{background:#fee2e2; border-color:#fecaca; color:#991b1b}
 button.mini{padding:6px 10px; font-size:12px; border-radius:10px}
 
+/* disabled */
+button:disabled, input:disabled, select:disabled, textarea:disabled{
+  opacity:.6; cursor:not-allowed
+}
+
 /* ---------- Wizard ---------- */
 #wizard.hidden, #resultado.hidden, .hidden{display:none !important}
 .steps{list-style:none; margin:0 0 10px; padding:0; display:flex; gap:8px; flex-wrap:wrap}
@@ -118,17 +124,31 @@ table{border-collapse:collapse;width:100%}
 th,td{border:1px solid var(--line);padding:8px 10px;text-align:left}
 th{background:#f8fafc}
 
-/* ---------- Modais ---------- */
+/* ---------- Modais (responsivos) ---------- */
 .modal{
-  position:fixed; inset:0; background:rgba(15,23,42,.35);
-  display:flex; align-items:center; justify-content:center; z-index:9998;
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background:rgba(15,23,42,.35); z-index:9998; padding:16px; overflow:auto;
 }
 .modal .box{
-  width:min(720px,95vw); background:#fff; border-radius:16px; border:1px solid var(--line);
-  box-shadow:var(--shadow); padding:16px;
+  width:min(860px, 100%);
+  max-width:100%;
+  max-height:92vh;
+  background:#fff; border-radius:16px; border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  display:flex; flex-direction:column;
 }
-.modal .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.modal .modal-close{cursor:pointer;font-weight:800;border:none;background:transparent;font-size:18px}
+.modal .head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 16px; border-bottom:1px solid var(--line)
+}
+.modal .content{padding:12px 16px; overflow:auto}
+.modal .modal-close{
+  cursor:pointer; font-weight:800; border:none; background:transparent; font-size:18px; line-height:1
+}
+@media (max-width:560px){
+  .modal{padding:8px}
+  .modal .box{border-radius:12px}
+}
 
 /* ---------- Loading Overlay ---------- */
 #loading{
@@ -162,3 +182,11 @@ details summary{cursor:pointer;font-weight:700}
 /* ---------- Header/Footer (se usados) ---------- */
 header,footer{color:var(--muted)}
 footer{margin:24px 0}
+
+/* ---------- Correções de overflow em painéis e listas ---------- */
+#fatosSug{width:100%; overflow:auto}
+#previewDoc{max-height:520px}
+#review{max-height:420px}
+
+/* ---------- Forçar tema claro ---------- */
+:root, html, body { color-scheme: light; }
