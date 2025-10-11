@@ -1,7 +1,6 @@
 /* ==========================================================
    Editor de Peças Trabalhistas – app.js
    ========================================================== */
-
 ;(() => {
   'use strict';
 
@@ -10,7 +9,8 @@
   const $$ = (q, el = document) => Array.from(el.querySelectorAll(q));
 
   /* ===== Estado ===== */
-  const trechos = {}; // armazena texto final por aba
+  const trechos = {};
+  let FFP = [];
 
   /* ===== Controle de abas ===== */
   const tabs = $$('.tabs button');
@@ -25,43 +25,87 @@
     });
   });
 
-    /* ==========================================================
+  /* ==========================================================
+     Carregar base de fatos-fundamentos-pedidos.js
+     ========================================================== */
+  async function carregarFFP() {
+    try {
+      const res = await fetch('./data/fatos-fundamentos-pedidos.js');
+      const text = await res.text();
+      const data = text.match(/\{[\s\S]*\}/);
+      if (data) {
+        FFP = eval(text); // carrega o conteúdo do arquivo
+        popularFatos();
+      }
+    } catch (e) {
+      console.error('Erro ao carregar FFP:', e);
+    }
+  }
+
+  function popularFatos() {
+    const sel = $('#select-fato');
+    if (!sel || !FFP.length) return;
+    FFP.forEach(f => {
+      const opt = document.createElement('option');
+      opt.value = f.fato;
+      opt.textContent = f.fato;
+      sel.appendChild(opt);
+    });
+
+    sel.addEventListener('change', () => {
+      const fatoSel = FFP.find(f => f.fato === sel.value);
+      const fundBox = $('#fundamentos-box');
+      const pedBox = $('#pedidos-box');
+      fundBox.innerHTML = '';
+      pedBox.innerHTML = '';
+      if (fatoSel) {
+        fatoSel.fundamentos.forEach(f => {
+          const li = document.createElement('li');
+          li.textContent = f;
+          fundBox.appendChild(li);
+        });
+        fatoSel.pedidos.forEach(p => {
+          const li = document.createElement('li');
+          li.textContent = p;
+          pedBox.appendChild(li);
+        });
+      }
+    });
+  }
+
+  carregarFFP();
+
+  /* ==========================================================
      Botão "Abrir no Google Modo IA"
      ========================================================== */
   $$('.btn-ia').forEach(btn => {
     btn.addEventListener('click', () => {
       const parent = btn.closest('.tab-content');
       const viewer = parent.querySelector('.viewer');
-      const texto = viewer.textContent.trim();
+      const texto = viewer?.textContent?.trim() || '';
 
-      // Captura dados extras dos formulários da aba
       const inputs = parent.querySelectorAll('input, textarea');
       const dados = Array.from(inputs)
         .map(el => `${el.name || el.id}: ${el.value}`)
         .filter(x => !x.endsWith(': '))
         .join(' | ');
 
-      // Define contexto da aba
       const titulo = parent.querySelector('h2')?.textContent || 'Trecho da Petição';
       const contexto = `Redija o trecho "${titulo}" de uma Reclamação Trabalhista com base nos seguintes dados: ${dados}. 
 O texto atual é: ${texto}. 
 Use linguagem técnica e padrão forense.`;
 
-      // Monta link para Google modo IA
       const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
       window.open(url, '_blank');
     });
   });
 
-    /* ==========================================================
+  /* ==========================================================
      Editor formatado + sincronização com o final
      ========================================================== */
-
-  // Substitui todos os .viewer por editores formatáveis
   $$('.viewer').forEach(view => {
     const wrapper = document.createElement('div');
     wrapper.className = 'editor-area';
-
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     toolbar.innerHTML = `
@@ -70,7 +114,6 @@ Use linguagem técnica e padrão forense.`;
       <button data-cmd="insertUnorderedList">• Lista</button>
       <button data-cmd="removeFormat">🧹 Limpar</button>
     `;
-
     const editor = document.createElement('div');
     editor.className = 'editor-mini';
     editor.contentEditable = true;
@@ -80,14 +123,12 @@ Use linguagem técnica e padrão forense.`;
     wrapper.appendChild(editor);
     view.replaceWith(wrapper);
 
-    // Eventos de formatação
     toolbar.addEventListener('click', e => {
       if (e.target.dataset.cmd) {
         document.execCommand(e.target.dataset.cmd, false, null);
       }
     });
 
-    // Atualiza visualizador final automaticamente
     editor.addEventListener('input', () => {
       const id = editor.dataset.section;
       trechos[id] = editor.innerHTML;
@@ -95,12 +136,11 @@ Use linguagem técnica e padrão forense.`;
     });
   });
 
-  // Atualiza visualizador final em tempo real
   function atualizarFinal() {
     const editorFinal = $('#editor-final');
     const ordem = [
-      'qualificacao','preliminares','contrato','fatos','fundamentos',
-      'pedidos','calculos','provas','valor'
+      'qualificacao', 'preliminares', 'contrato', 'fatos',
+      'fundamentos', 'pedidos', 'calculos', 'provas', 'valor'
     ];
     const partes = ordem
       .filter(id => trechos[id])
@@ -109,13 +149,12 @@ Use linguagem técnica e padrão forense.`;
     editorFinal.innerHTML = partes || '<p>Nenhum trecho adicionado ainda.</p>';
   }
 
-
   /* ===== Gerar prompt final ===== */
   $('#btn-gerar-final').addEventListener('click', () => {
     const editor = $('#editor-final');
     const ordem = [
-      'qualificacao','preliminares','contrato','fatos','fundamentos',
-      'pedidos','calculos','provas','valor'
+      'qualificacao', 'preliminares', 'contrato', 'fatos',
+      'fundamentos', 'pedidos', 'calculos', 'provas', 'valor'
     ];
     const partes = ordem
       .filter(id => trechos[id])
@@ -151,34 +190,29 @@ Use linguagem técnica e padrão forense.`;
   function capitalizar(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
+
   /* ==========================================================
      Salvamento automático (localStorage)
      ========================================================== */
-
   const STORAGE_KEY = 'editorTrabalhista:trechos';
-
-  // Carregar automaticamente ao iniciar
   window.addEventListener('load', () => {
     try {
       const dados = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
       Object.assign(trechos, dados);
-      console.log('Trechos carregados:', trechos);
     } catch (e) {
       console.warn('Falha ao carregar localStorage', e);
     }
   });
 
-  // Salvar automaticamente a cada 5s
   setInterval(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(trechos));
   }, 5000);
 
-  // Botão limpar (opcional)
   const finalSection = $('#final .actions');
   const btnClear = document.createElement('button');
   btnClear.textContent = '🧹 Limpar Tudo';
   btnClear.addEventListener('click', () => {
-    if (confirm('Tem certeza que deseja apagar todos os trechos salvos?')) {
+    if (confirm('Apagar todos os trechos salvos?')) {
       localStorage.removeItem(STORAGE_KEY);
       Object.keys(trechos).forEach(k => delete trechos[k]);
       $('#editor-final').textContent = '';
@@ -186,16 +220,16 @@ Use linguagem técnica e padrão forense.`;
     }
   });
   finalSection.appendChild(btnClear);
-    /* ==========================================================
-     Exportar PDF com Folha de Rosto (layout jurídico)
+
+  /* ==========================================================
+     Exportar PDF com Folha de Rosto
      ========================================================== */
   $('#btn-pdf').addEventListener('click', () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ format: 'a4', unit: 'mm', orientation: 'portrait' });
 
-    // ======= Cabeçalho / Folha de rosto =======
     const reclamante = $('[name="reclamante"]').value || 'NOME DO RECLAMANTE';
-    const reclamada  = $('[name="reclamada"]').value  || 'NOME DA RECLAMADA';
+    const reclamada = $('[name="reclamada"]').value || 'NOME DA RECLAMADA';
     const vara = '___ª VARA DO TRABALHO DE __________ / UF';
 
     doc.setFont('Times', 'Bold');
@@ -213,9 +247,8 @@ Use linguagem técnica e padrão forense.`;
 
     doc.setDrawColor(0);
     doc.setLineWidth(0.3);
-    doc.line(20, 85, 190, 85); // linha separadora
+    doc.line(20, 85, 190, 85);
 
-    // ======= Corpo da Petição =======
     const content = $('#editor-final').innerHTML;
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = content;
@@ -234,37 +267,19 @@ Use linguagem técnica e padrão forense.`;
     allBlocks.forEach(block => {
       const text = block.textContent.trim();
       if (!text) return;
-
-      if (block.tagName === 'H3') {
-        doc.setFont('Times', 'Bold');
-        doc.setFontSize(13);
-        const lines = splitText(`\n${text.toUpperCase()}`, doc);
-        lines.forEach(line => {
-          if (y > 280) { doc.addPage(); y = margin; }
-          doc.text(line, margin, y);
-          y += lineHeight;
-        });
-        doc.setFont('Times', 'Roman');
-        doc.setFontSize(12);
-        y += 3;
-      } else {
-        const lines = splitText(text, doc);
-        lines.forEach(line => {
-          if (y > 280) { doc.addPage(); y = margin; }
-          doc.text(line, margin, y);
-          y += lineHeight;
-        });
-        y += 2;
-      }
+      const lines = splitText(text, doc);
+      lines.forEach(line => {
+        if (y > 280) { doc.addPage(); y = margin; }
+        doc.text(line, margin, y);
+        y += lineHeight;
+      });
+      y += 2;
     });
 
-    // ======= Rodapé =======
     doc.setFont('Times', 'Italic');
     doc.setFontSize(10);
     doc.text('Gerado pelo Editor de Peças Trabalhistas', 70, 290);
 
     doc.save('peticao_trabalhista.pdf');
-  
   });
-
 })();
