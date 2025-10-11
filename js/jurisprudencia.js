@@ -1,36 +1,75 @@
-/* jurisprudencia.js — pede à IA para listar jurisprudências com ementa + link */
+/* jurisprudencia.js — Pesquisa orientada por IA para listar jurisprudências com ementa + link
+   - Gera uma lista (máx. 8) com: Tribunal, nº do processo, ementa resumida (2–3 linhas) e link
+   - Usa o tema selecionado e os dados do formulário/arquivos como contexto
+   - Resultado vai para #jurisBox (editável)
+*/
 (function () {
+  const { $, toast } = window.Clara;
+
+  function buildPrompt(assunto, contexto, docs) {
+    return `Você é um advogado trabalhista brasileiro sênior.
+Liste JURISPRUDÊNCIAS REAIS e RECENTES (TST/TRTs/STF/STJ quando pertinente) sobre: "${assunto}".
+
+Formate até 8 itens, cada um com:
+1) Tribunal (e Turma se houver) e nº do processo
+2) Tese/ementa resumida (2–3 linhas, linguagem clara)
+3) Link (URL verificável). Se não tiver link confiável, escreva "verificar no site do tribunal".
+
+Regras:
+- Priorize julgados pós-2017 (reforma) quando aplicável.
+- NÃO invente número de processo. Prefira citar o número padrão (ex.: RR-XXXXX-XX.XXXX.5.XX.XXXX).
+- Indique quando a tese divergir (se houver).
+
+Contexto do caso (resumo do formulário):
+${JSON.stringify(contexto || {}, null, 2)}
+
+Trechos dos documentos anexados (recorte):
+${(docs || '(sem docs)').slice(0, 20000)}
+`;
+  }
+
   async function buscarJurisprudencia() {
     const cfg = window.Clara.ia?.loadCfg();
-    if (!cfg?.apiKey) { window.Clara.toast('Cole sua OpenAI API key em Configurar IA', 'bad'); document.getElementById('modal')?.classList.remove('hidden'); return; }
-    const d = window.Clara.collect?.();
-    const tema = document.getElementById('temaSelect')?.value || '';
-    const assunto = prompt('Tema/assunto para pesquisar jurisprudência (ex.: horas extras; dano moral; rescisão indireta):', tema ? window.Clara.catalog?.data?.[tema]?.nome : '') || '';
+    if (!cfg?.apiKey) {
+      toast('Cole sua OpenAI API key em Configurar IA', 'bad');
+      $('#modal')?.classList.remove('hidden');
+      return;
+    }
+
+    const temaKey = $('#temaSelect')?.value || '';
+    const temaNome = window.Clara.catalog?.data?.[temaKey]?.nome || '';
+    const assunto = prompt('Tema/assunto para pesquisar jurisprudência:', temaNome) || temaNome || '';
     if (!assunto) return;
 
-    const docs = (window.Clara.state?.docsText || '').slice(0, 30000);
-    const prompt = `Você é advogado trabalhista. Liste jurisprudências REAIS e RECENTES (TST/TRTs/STF/STJ quando cabível) sobre "${assunto}". 
-Forneça até 8 itens com:
-- Tribunal e número do processo,
-- Tese/ementa resumida (2-3 linhas),
-- Link (URL) verificável.
+    const contexto = window.Clara.collect?.() || {};
+    const docs = window.Clara.state?.docsText || '';
 
-Use linguagem concisa, formato:
-1) [TRIBUNAL – nº] Ementa... Link: https://...
-Contexto do caso (se ajudar): ${JSON.stringify(d, null, 2)}
-Documentos anexados (trechos): ${docs || '(sem docs)'}
+    const prompt = buildPrompt(assunto, contexto, docs);
 
-Importante:
-- Priorize julgados pós-2017 (reforma) quando aplicável.
-- Se não tiver certeza do link, diga "verificar no site do tribunal".
-- Não invente número de processo.`;
     try {
-      document.getElementById('loading')?.classList.remove('hidden');
+      $('#loading')?.classList.remove('hidden');
       const text = await window.Clara.ia.callOpenAI({ prompt, cfg });
-      const box = document.getElementById('jurisBox');
-      if (box) { box.value = text; window.Clara.toast('Jurisprudência sugerida (confira os links).'); }
-    } catch (e) { window.Clara.toast('Falha ao buscar jurisprudência', 'bad'); }
-    finally { document.getElementById('loading')?.classList.add('hidden'); }
+      const box = $('#jurisBox');
+      if (box) {
+        // Limpeza simples de saídas não estruturadas
+        const cleaned = text
+          .replace(/^\s*Jurisprud[eê]ncia[s]?:?\s*/i, '')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+        box.value = cleaned;
+        toast('Jurisprudência sugerida (revise e valide os links).');
+      }
+    } catch (e) {
+      console.error(e);
+      toast('Falha ao buscar jurisprudência', 'bad');
+    } finally {
+      $('#loading')?.classList.add('hidden');
+    }
   }
-  window.Clara.juris = { buscarJurisprudencia };
+
+  // Expor e bind
+  window.Clara = Object.assign(window.Clara || {}, { juris: { buscarJurisprudencia } });
+  window.addEventListener('app:ready', () => {
+    $('#btnJuris')?.addEventListener('click', buscarJurisprudencia);
+  });
 })();
