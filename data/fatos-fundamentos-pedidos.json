@@ -1,0 +1,116 @@
+[
+  {
+    "fato": "Ausência de registro na CTPS",
+    "fundamentos": [
+      "Art. 2º e 3º da CLT – caracterização do vínculo de emprego.",
+      "Art. 29 da CLT – obrigatoriedade de anotação da CTPS.",
+      "Súmula 12 do TST – presunção relativa da data de admissão.",
+      "CF/88, art. 7º, I – relação de emprego protegida."
+    ],
+    "pedidos": [
+      "Reconhecimento do vínculo empregatício.",
+      "Anotação da CTPS com data de admissão e função.",
+      "Pagamento de verbas rescisórias correspondentes.",
+      "Indenização substitutiva do seguro-desemprego."
+    ]
+  },
+  {
+    "fato": "Trabalho em ambiente insalubre sem EPI",
+    "fundamentos": [
+      "Art. 192 da CLT – adicional de insalubridade.",
+      "NR-15 da Portaria 3.214/78 – limites de tolerância.",
+      "Súmula 289 do TST – perícia obrigatória.",
+      "CF/88, art. 7º, XXII – redução dos riscos ocupacionais."
+    ],
+    "pedidos": [
+      "Pagamento do adicional de insalubridade (40%).",
+      "Reflexos em férias, 13º, DSR e FGTS.",
+      "Realização de perícia técnica judicial."
+    ]
+  },
+  {
+    "fato": "Ausência de pagamento de verbas rescisórias",
+    "fundamentos": [
+      "Art. 467 e 477 da CLT – multas por mora rescisória.",
+      "Súmula 381 do TST – incidência de juros e correção.",
+      "CF/88, art. 7º, VIII – FGTS com multa de 40%."
+    ],
+    "pedidos": [
+      "Pagamento de saldo de salário, férias, 13º proporcional.",
+      "Multas dos arts. 467 e 477 da CLT.",
+      "Depósito do FGTS e multa de 40%."
+    ]
+  },
+  {
+    "fato": "Jornada superior a 8h diárias e 44h semanais",
+    "fundamentos": [
+      "Art. 7º, XIII e XVI da CF/88 – limitação de jornada.",
+      "Art. 59 da CLT – horas extras e adicional de 50%.",
+      "Súmula 85 do TST – compensação e banco de horas."
+    ],
+    "pedidos": [
+      "Pagamento de horas extras com adicional de 50%.",
+      "Reflexos em férias, 13º, DSR e FGTS."
+    ]
+  },
+  {
+    "fato": "Falta de depósito do FGTS",
+    "fundamentos": [
+      "Lei 8.036/90, arts. 15 e 17 – obrigação de recolhimento.",
+      "Decreto 99.684/90, art. 9º §1º – multa e correção.",
+      "CF/88, art. 7º, III – direito ao FGTS."
+    ],
+    "pedidos": [
+      "Depósito dos valores de FGTS de todo o contrato.",
+      "Pagamento da multa de 40% sobre o total depositável."
+    ]
+  },
+  {
+    "fato": "Dispensa sem justa causa",
+    "fundamentos": [
+      "Art. 7º, I da CF/88 – proteção contra dispensa arbitrária.",
+      "Art. 477 da CLT – quitação de verbas rescisórias.",
+      "Lei 7.998/90 – direito ao seguro-desemprego."
+    ],
+    "pedidos": [
+      "Pagamento integral das verbas rescisórias.",
+      "Liberação das guias de FGTS e seguro-desemprego.",
+      "Indenização substitutiva se não fornecidas as guias."
+    ]
+  },
+  {
+    "fato": "Inadimplemento salarial",
+    "fundamentos": [
+      "Art. 459 §1º da CLT – pagamento até o 5º dia útil.",
+      "CF/88, art. 7º, X – proteção ao salário.",
+      "Súmula 381 do TST – atualização monetária."
+    ],
+    "pedidos": [
+      "Pagamento dos salários em atraso.",
+      "Multa do art. 467 da CLT sobre verbas incontroversas."
+    ]
+  },
+  {
+    "fato": "Hipossuficiência econômica",
+    "fundamentos": [
+      "Art. 790 §3º da CLT – justiça gratuita.",
+      "Art. 98 e 99 do CPC – gratuidade de justiça.",
+      "CF/88, art. 5º, LXXIV – assistência integral aos necessitados."
+    ],
+    "pedidos": [
+      "Concessão dos benefícios da justiça gratuita."
+    ]
+  },
+  {
+    "fato": "Atuação de sócio de fato",
+    "fundamentos": [
+      "Art. 2º §2º da CLT – grupo econômico.",
+      "Art. 455 da CLT – responsabilidade solidária.",
+      "Súmula 129 do TST – subordinação indireta."
+    ],
+    "pedidos": [
+      "Reconhecimento da legitimidade passiva do sócio de fato.",
+      "Condenação solidária ao pagamento das verbas trabalhistas."
+    ]
+  }
+]
