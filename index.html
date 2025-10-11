@@ -6,15 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Portials — Petições Iniciais Trabalhistas</title>
   <meta name="color-scheme" content="light">
-  <link rel="stylesheet" href="css/style.css" />
+  <!-- AJUSTE DE CAMINHO DO CSS: use style.css na RAIZ -->
+  <link rel="stylesheet" href="style.css" />
   <style>
-    /* container básico da página */
+    /* Fallback: se o CSS externo falhar, esconda o overlay */
+    .hidden{display:none !important}
     #appShell{min-height:100vh;display:flex;flex-direction:column}
     header, footer{padding:12px 0}
     main{flex:1}
   </style>
   <script>
-    /* Raiz dos partials (sections.html, etc.) — ajuste se estiver em outra pasta */
+    /* Raiz dos partials (sections.html, etc.) */
     window.PORTIALS_ROOT = '.';
   </script>
 </head>
