@@ -1,211 +1,155 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Editor Jurídico – Fato, Fundamento e Pedido</title>
-  <style>
-    :root {
-      --bg: #f6f7fb;
-      --card: #fff;
-      --line: #d0d0d0;
-      --ink: #111;
-      --accent: #0050d0;
-      --radius: 8px;
-    }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-    }
-    header {
-      background: var(--accent);
-      color: #fff;
-      text-align: center;
-      padding: 14px;
-      font-weight: 600;
-      font-size: 1.2rem;
-      letter-spacing: 0.5px;
-    }
-    main {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    section {
-      flex: 1;
-      min-width: 300px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 15px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-    h2, h3 {
-      margin-top: 0;
-      color: var(--accent);
-      font-size: 1.05rem;
-    }
-    button {
-      display: block;
-      width: 100%;
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: var(--radius);
-      margin: 6px 0;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: 0.2s;
-    }
-    button:hover {
-      background: #003b9e;
-    }
-    .item {
-      background: #f1f1f1;
-      border-radius: 5px;
-      padding: 8px 10px;
-      margin: 4px 0;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    .item:hover {
-      background: #e0e0e0;
-    }
-    textarea {
-      width: 100%;
-      height: 220px;
-      margin-top: 10px;
-      font-family: monospace;
-      padding: 10px;
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      resize: vertical;
-    }
-    #acoes {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    @media (max-width: 700px) {
-      main { flex-direction: column; }
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Peças Trabalhistas</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>Editor Jurídico – Relação entre Fatos, Fundamentos e Pedidos</header>
 
+  <header>
+    <h1>🧠 Editor de Peças Trabalhistas</h1>
+    <p>Monte petições iniciais completas com blocos inteligentes e IA integrada</p>
+  </header>
+
+  <!-- Navegação das abas -->
+  <nav class="tabs">
+    <button data-tab="qualificacao" class="active">1️⃣ Qualificação</button>
+    <button data-tab="preliminares">2️⃣ Preliminares</button>
+    <button data-tab="contrato">3️⃣ Contrato</button>
+    <button data-tab="fatos">4️⃣ Fatos</button>
+    <button data-tab="fundamentos">5️⃣ Fundamentos</button>
+    <button data-tab="pedidos">6️⃣ Pedidos</button>
+    <button data-tab="calculos">7️⃣ Cálculos</button>
+    <button data-tab="provas">8️⃣ Provas</button>
+    <button data-tab="valor">9️⃣ Valor da Causa</button>
+    <button data-tab="final">🔟 Visualizador Final</button>
+  </nav>
+
+  <!-- Conteúdo das abas -->
   <main>
-    <section>
+
+    <section id="qualificacao" class="tab-content active">
+      <h2>Qualificação das Partes</h2>
+      <p>Preencha os dados do reclamante e da reclamada. Clique em “Gerar com IA” para criar o texto da qualificação.</p>
+      <form id="form-qualificacao">
+        <label>Nome do Reclamante <input type="text" name="reclamante"></label>
+        <label>CPF <input type="text" name="cpf"></label>
+        <label>Profissão <input type="text" name="profissao"></label>
+        <label>Endereço <input type="text" name="endereco"></label>
+        <label>Nome da Reclamada <input type="text" name="reclamada"></label>
+        <label>CNPJ <input type="text" name="cnpj"></label>
+        <label>Endereço <input type="text" name="endereco_reclamada"></label>
+      </form>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="preliminares" class="tab-content">
+      <h2>Preliminares</h2>
+      <p>Inclua argumentos sobre justiça gratuita, competência ou valor da causa.</p>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="contrato" class="tab-content">
+      <h2>Contrato de Trabalho</h2>
+      <p>Descreva os dados contratuais: cargo, função, período, remuneração.</p>
+      <form id="form-contrato">
+        <label>Data de admissão <input type="date" name="admissao"></label>
+        <label>Data de saída <input type="date" name="saida"></label>
+        <label>Função <input type="text" name="funcao"></label>
+        <label>Salário mensal (R$) <input type="number" name="salario"></label>
+      </form>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="fatos" class="tab-content">
       <h2>Fatos</h2>
-      <div id="lista-fatos">Carregando fatos...</div>
+      <p>Selecione ou descreva os acontecimentos que motivam a ação.</p>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
     </section>
 
-    <section>
-      <h2>Fundamentos sugeridos</h2>
-      <div id="fundamentos">Selecione um fato para ver os fundamentos.</div>
+    <section id="fundamentos" class="tab-content">
+      <h2>Fundamentos Jurídicos</h2>
+      <p>Apresente a base legal e jurisprudencial para os pedidos formulados.</p>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
     </section>
 
-    <section>
-      <h2>Pedidos correspondentes</h2>
-      <div id="pedidos">Selecione um fato para ver os pedidos.</div>
+    <section id="pedidos" class="tab-content">
+      <h2>Pedidos</h2>
+      <p>Liste os pedidos conforme os fundamentos, em formato numerado.</p>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
     </section>
+
+    <section id="calculos" class="tab-content">
+      <h2>Cálculos e Tabelas</h2>
+      <p>Monte a tabela de valores conforme os pedidos. Edite conforme necessário.</p>
+      <textarea id="tabela" rows="8" placeholder="Exemplo: Horas extras, FGTS, verbas rescisórias..."></textarea>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="provas" class="tab-content">
+      <h2>Provas e Documentos</h2>
+      <p>Liste as provas documentais e testemunhais que acompanharão a inicial.</p>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="valor" class="tab-content">
+      <h2>Valor da Causa</h2>
+      <p>Informe o valor estimado da causa conforme os pedidos.</p>
+      <input type="number" id="valorCausa" placeholder="Valor total em R$">
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="final" class="tab-content">
+      <h2>Visualizador Final / Prompt Completo</h2>
+      <p>Revise todo o texto gerado pelas abas anteriores. Edite, copie ou exporte.</p>
+      <div id="editor-final" contenteditable="true" class="editor"></div>
+      <div class="actions">
+        <button id="btn-gerar-final">Gerar Petição Completa</button>
+        <button id="btn-copiar">Copiar Prompt</button>
+        <button id="btn-baixar">Baixar .txt</button>
+      </div>
+    </section>
+
   </main>
 
-  <section style="max-width:1200px;margin:20px auto;">
-    <h2>Prompt Final</h2>
-    <textarea id="editor" placeholder="Os blocos selecionados aparecerão aqui..."></textarea>
-    <div id="acoes">
-      <button onclick="gerarPeticaoCompleta()">Gerar Petição Completa</button>
-      <button onclick="copiarPrompt()">Copiar Prompt</button>
-      <button onclick="limpar()">Limpar</button>
-    </div>
-  </section>
-
-  <script>
-  let dadosGlobais = [];
-
-  async function carregarFatos() {
-    const listaFatos = document.getElementById("lista-fatos");
-    const fundamentosDiv = document.getElementById("fundamentos");
-    const pedidosDiv = document.getElementById("pedidos");
-    const editor = document.getElementById("editor");
-
-    try {
-      const res = await fetch("data/fatos-fundamentos-pedidos.json");
-      if (!res.ok) throw new Error("Arquivo não encontrado");
-      const dados = await res.json();
-      dadosGlobais = dados;
-
-      listaFatos.innerHTML = "";
-      dados.forEach((item) => {
-        const bt = document.createElement("button");
-        bt.textContent = item.fato;
-        bt.onclick = () => mostrarRelacionados(item);
-        listaFatos.appendChild(bt);
-      });
-
-      function mostrarRelacionados(item) {
-        fundamentosDiv.innerHTML = "";
-        pedidosDiv.innerHTML = "";
-
-        item.fundamentos.forEach((f) => {
-          const el = document.createElement("div");
-          el.className = "item";
-          el.textContent = f;
-          el.onclick = () => adicionarBloco("[Fundamento] " + f);
-          fundamentosDiv.appendChild(el);
-        });
-
-        item.pedidos.forEach((p) => {
-          const el = document.createElement("div");
-          el.className = "item";
-          el.textContent = p;
-          el.onclick = () => adicionarBloco("[Pedido] " + p);
-          pedidosDiv.appendChild(el);
-        });
-
-        adicionarBloco("[Fato] " + item.fato);
-      }
-
-      function adicionarBloco(texto) {
-        editor.value += texto + "\n";
-      }
-
-    } catch (e) {
-      listaFatos.innerHTML = "Erro ao carregar dados.";
-      console.error(e);
-    }
-  }
-
-  function gerarPeticaoCompleta() {
-    const editor = document.getElementById("editor");
-    editor.value = "";
-    dadosGlobais.forEach(item => {
-      editor.value += `[Fato] ${item.fato}\n`;
-      item.fundamentos.forEach(f => editor.value += `[Fundamento] ${f}\n`);
-      item.pedidos.forEach(p => editor.value += `[Pedido] ${p}\n`);
-      editor.value += "\n";
-    });
-    alert("Petição completa gerada com todos os blocos!");
-  }
-
-  function copiarPrompt() {
-    const texto = document.getElementById("editor").value;
-    navigator.clipboard.writeText(texto);
-    alert("Prompt copiado para a área de transferência!");
-  }
-
-  function limpar() {
-    document.getElementById("editor").value = "";
-  }
-
-  carregarFatos();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
