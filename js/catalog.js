@@ -14,11 +14,12 @@
         { t: "Jornada superior a 8h/dia ou 44h/semana sem pagamento integral.", tip: "Indicar períodos específicos e variações." },
         { t: "Intervalo intrajornada suprimido total ou parcialmente.", tip: "Ex.: pausa de 20–30min em vez de 1h." },
         { t: "Compensação/banco de horas inválidos.", tip: "Sem ACT/CCT válido; ausência de transparência." },
-        { t: "Ponto britânico/por exceção que não reflete a realidade.", tip: "Registros idênticos; manipulações; rasuras." }
+        { t: "Ponto britânico/por exceção que não reflete a realidade.", tip: "Registros idênticos; manipulações; rasuras." },
+        { t: "Labor em domingos/feriados sem folga compensatória.", tip: "Registrar datas e escalas." }
       ],
       narrativa: [
-        { t: "Laborava de segunda a sábado, iniciando às 08:00 e encerrando por volta das 19:00, com apenas ~20 minutos de intervalo.", tip: "Adaptar por período." },
-        { t: "Os cartões de ponto eram por exceção/manipulados, não refletindo a jornada efetiva.", tip: "Mencionar indícios (padrões repetidos)." }
+        { t: "Laborava de segunda a sábado, iniciando às 08:00 e encerrando por volta das 19:00, com ~20 minutos de intervalo.", tip: "Adaptar por período." },
+        { t: "Os cartões de ponto não refletiam a jornada efetiva, pois eram por exceção/manipulados.", tip: "Apontar padrões repetidos." }
       ],
       fundamentos: [
         { t: "CF/88 art. 7º, XIII e XVI; CLT art. 59 (adicional 50%).", tip: "Reflexos: DSR, 13º, férias + 1/3, FGTS + 40%." },
@@ -54,7 +55,8 @@
     adicional_noturno: {
       nome: "Adicional Noturno",
       fatos: [
-        { t: "Trabalho após 22h sem pagamento do adicional devido.", tip: "Hora noturna reduzida (52m30s)." }
+        { t: "Trabalho após 22h sem pagamento do adicional devido.", tip: "Hora noturna reduzida (52m30s)." },
+        { t: "Prorrogação do noturno sem adicional devido.", tip: "Horas após 5h." }
       ],
       narrativa: [
         { t: "Prestava labor noturno habitual, das 22h às 05h, com variações por escala.", tip: "Indicar frequência." }
@@ -71,7 +73,8 @@
     insalubridade: {
       nome: "Insalubridade",
       fatos: [
-        { t: "Exposição a agentes nocivos acima dos limites da NR-15.", tip: "Ruído, calor, químicos; EPI ineficaz." }
+        { t: "Exposição a agentes nocivos acima dos limites da NR-15.", tip: "Ruído, calor, químicos; EPI ineficaz." },
+        { t: "Falta de treinamentos e de monitoramento periódico (PCMSO/PPRA).", tip: "ASOs inconsistentes." }
       ],
       narrativa: [
         { t: "Atuava em setor com ruído elevado; EPIs fornecidos eram insuficientes/ineficazes.", tip: "Indicar ASOs/PPRA/PCMSO." }
@@ -89,7 +92,7 @@
       nome: "Rescisão Indireta / Verbas Rescisórias",
       fatos: [
         { t: "Atrasos reiterados/ausência de salários/FGTS.", tip: "Incidência do art. 483 CLT." },
-        { t: "Descumprimento contratual grave.", tip: "Ex.: supressão de adicionais; jornadas extenuantes." }
+        { t: "Descumprimento contratual grave.", tip: "Supressão de adicionais; jornadas extenuantes." }
       ],
       narrativa: [
         { t: "O empregador deixou de adimplir obrigações essenciais, tornando inviável a continuidade do vínculo.", tip: "Detalhar ocorrências e datas." }
@@ -174,9 +177,9 @@
       ]
     },
 
-    // =============== HORAS IN ITINERE (pré/pos reforma) ===============
+    // =============== HORAS IN ITINERE (pré/pós reforma) ===============
     horas_in_itinere: {
-      nome: "Horas in itinere (pré/pos-reforma)",
+      nome: "Horas in itinere (pré/pós-reforma)",
       fatos: [
         { t: "Deslocamento em condução fornecida p/ local de difícil acesso.", tip: "Somente até 10/11/2017 regra antiga." }
       ],
