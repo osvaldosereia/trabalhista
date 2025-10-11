@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Editor Jurídico – Relação Fato / Fundamento / Pedido</title>
+  <title>Editor Jurídico – Fato, Fundamento e Pedido</title>
   <style>
     :root {
-      --bg: #f7f7f7;
-      --card: #ffffff;
-      --line: #ddd;
-      --ink: #222;
-      --accent: #0044cc;
+      --bg: #f6f7fb;
+      --card: #fff;
+      --line: #d0d0d0;
+      --ink: #111;
+      --accent: #0050d0;
+      --radius: 8px;
     }
     body {
       margin: 0;
@@ -20,11 +21,12 @@
     }
     header {
       background: var(--accent);
-      color: white;
-      padding: 10px 20px;
+      color: #fff;
       text-align: center;
-      font-weight: bold;
+      padding: 14px;
+      font-weight: 600;
       font-size: 1.2rem;
+      letter-spacing: 0.5px;
     }
     main {
       display: flex;
@@ -39,14 +41,14 @@
       min-width: 300px;
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: var(--radius);
       padding: 15px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     }
     h2, h3 {
       margin-top: 0;
       color: var(--accent);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
     }
     button {
       display: block;
@@ -55,27 +57,43 @@
       color: white;
       border: none;
       padding: 10px;
-      border-radius: 6px;
+      border-radius: var(--radius);
       margin: 6px 0;
       cursor: pointer;
       font-size: 0.95rem;
+      transition: 0.2s;
     }
-    button:hover { background: #0033aa; }
-    p { margin: 6px 0; }
+    button:hover {
+      background: #003b9e;
+    }
     .item {
-      background: #f2f2f2;
+      background: #f1f1f1;
       border-radius: 5px;
-      padding: 6px 8px;
+      padding: 8px 10px;
       margin: 4px 0;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .item:hover {
+      background: #e0e0e0;
     }
     textarea {
       width: 100%;
-      height: 200px;
+      height: 220px;
       margin-top: 10px;
       font-family: monospace;
       padding: 10px;
-      border-radius: 6px;
+      border-radius: var(--radius);
       border: 1px solid var(--line);
+      resize: vertical;
+    }
+    #acoes {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 700px) {
+      main { flex-direction: column; }
     }
   </style>
 </head>
@@ -102,10 +120,16 @@
   <section style="max-width:1200px;margin:20px auto;">
     <h2>Prompt Final</h2>
     <textarea id="editor" placeholder="Os blocos selecionados aparecerão aqui..."></textarea>
-    <button onclick="copiarPrompt()">Copiar Prompt</button>
+    <div id="acoes">
+      <button onclick="gerarPeticaoCompleta()">Gerar Petição Completa</button>
+      <button onclick="copiarPrompt()">Copiar Prompt</button>
+      <button onclick="limpar()">Limpar</button>
+    </div>
   </section>
 
   <script>
+  let dadosGlobais = [];
+
   async function carregarFatos() {
     const listaFatos = document.getElementById("lista-fatos");
     const fundamentosDiv = document.getElementById("fundamentos");
@@ -116,6 +140,7 @@
       const res = await fetch("data/fatos-fundamentos-pedidos.json");
       if (!res.ok) throw new Error("Arquivo não encontrado");
       const dados = await res.json();
+      dadosGlobais = dados;
 
       listaFatos.innerHTML = "";
       dados.forEach((item) => {
@@ -158,10 +183,26 @@
     }
   }
 
+  function gerarPeticaoCompleta() {
+    const editor = document.getElementById("editor");
+    editor.value = "";
+    dadosGlobais.forEach(item => {
+      editor.value += `[Fato] ${item.fato}\n`;
+      item.fundamentos.forEach(f => editor.value += `[Fundamento] ${f}\n`);
+      item.pedidos.forEach(p => editor.value += `[Pedido] ${p}\n`);
+      editor.value += "\n";
+    });
+    alert("Petição completa gerada com todos os blocos!");
+  }
+
   function copiarPrompt() {
     const texto = document.getElementById("editor").value;
     navigator.clipboard.writeText(texto);
     alert("Prompt copiado para a área de transferência!");
+  }
+
+  function limpar() {
+    document.getElementById("editor").value = "";
   }
 
   carregarFatos();
