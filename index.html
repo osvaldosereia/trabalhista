@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Peças Trabalhistas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>🧠 Editor de Peças Trabalhistas</h1>
+    <p>Monte petições iniciais completas com blocos inteligentes e IA integrada</p>
+  </header>
+
+  <!-- Navegação das abas -->
+  <nav class="tabs">
+    <button data-tab="qualificacao" class="active">1️⃣ Qualificação</button>
+    <button data-tab="preliminares">2️⃣ Preliminares</button>
+    <button data-tab="contrato">3️⃣ Contrato</button>
+    <button data-tab="fatos">4️⃣ Fatos</button>
+    <button data-tab="fundamentos">5️⃣ Fundamentos</button>
+    <button data-tab="pedidos">6️⃣ Pedidos</button>
+    <button data-tab="calculos">7️⃣ Cálculos</button>
+    <button data-tab="provas">8️⃣ Provas</button>
+    <button data-tab="valor">9️⃣ Valor da Causa</button>
+    <button data-tab="final">🔟 Visualizador Final</button>
+  </nav>
+
+  <!-- Conteúdo das abas -->
+  <main>
+
+    <section id="qualificacao" class="tab-content active">
+      <h2>Qualificação das Partes</h2>
+      <p>Preencha os dados do reclamante e da reclamada. Clique em “Gerar com IA” para criar o texto da qualificação.</p>
+      <form id="form-qualificacao">
+        <label>Nome do Reclamante <input type="text" name="reclamante"></label>
+        <label>CPF <input type="text" name="cpf"></label>
+        <label>Profissão <input type="text" name="profissao"></label>
+        <label>Endereço <input type="text" name="endereco"></label>
+        <label>Nome da Reclamada <input type="text" name="reclamada"></label>
+        <label>CNPJ <input type="text" name="cnpj"></label>
+        <label>Endereço <input type="text" name="endereco_reclamada"></label>
+      </form>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="preliminares" class="tab-content">
+      <h2>Preliminares</h2>
+      <p>Inclua argumentos sobre justiça gratuita, competência ou valor da causa.</p>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="contrato" class="tab-content">
+      <h2>Contrato de Trabalho</h2>
+      <p>Descreva os dados contratuais: cargo, função, período, remuneração.</p>
+      <form id="form-contrato">
+        <label>Data de admissão <input type="date" name="admissao"></label>
+        <label>Data de saída <input type="date" name="saida"></label>
+        <label>Função <input type="text" name="funcao"></label>
+        <label>Salário mensal (R$) <input type="number" name="salario" step="0.01"></label>
+      </form>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="fatos" class="tab-content">
+      <h2>Fatos</h2>
+      <p>Selecione ou descreva os acontecimentos que motivam a ação. Você pode adicionar vários fatos.</p>
+
+      <label for="select-fato">Escolha um fato:</label>
+      <select id="select-fato">
+        <option value="">Selecione um fato</option>
+      </select>
+      <button id="add-fato" type="button">Adicionar Fato</button>
+
+      <div id="fatos-list"></div>
+
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+
+      <div class="viewer"></div>
+    </section>
+
+    <section id="fundamentos" class="tab-content">
+      <h2>Fundamentos Jurídicos</h2>
+      <p>Fundamentos carregados automaticamente com base nos fatos adicionados. Clique para adicionar ao editor.</p>
+      <ul id="fundamentos-box"></ul>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="pedidos" class="tab-content">
+      <h2>Pedidos</h2>
+      <p>Pedidos correspondentes aos fatos e fundamentos escolhidos. Clique para adicionar ao editor.</p>
+      <ul id="pedidos-box"></ul>
+      <div class="actions">
+        <button class="btn-ia">Gerar com IA</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="calculos" class="tab-content">
+      <h2>Cálculos e Tabelas</h2>
+      <p>A tabela é gerada com base nos pedidos e valores informados e é editável.</p>
+      <div id="tabela-wrap">
+        <table id="tabela-calculos">
+          <thead>
+            <tr><th>Item</th><th>Base (R$)</th><th>Qtd</th><th>%</th><th>Total (R$)</th></tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr><td colspan="4" style="text-align:right"><strong>Total Geral</strong></td><td id="total-geral">0,00</td></tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="actions">
+        <button id="btn-add-linha" type="button">+ Linha</button>
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="provas" class="tab-content">
+      <h2>Provas e Documentos</h2>
+      <p>Selecione as provas que acompanharão a inicial.</p>
+      <div id="provas-box">
+        <!-- gerado por JS -->
+      </div>
+      <div class="actions">
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="valor" class="tab-content">
+      <h2>Valor da Causa</h2>
+      <p>Valor calculado automaticamente com base na tabela. Editável.</p>
+      <input type="number" id="valorCausa" placeholder="Valor total em R$" step="0.01">
+      <div class="actions">
+        <button class="btn-save">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
+
+    <section id="final" class="tab-content">
+      <h2>Visualizador Final / Prompt Completo</h2>
+      <p>Revise todo o texto gerado pelas abas anteriores. Edite, copie ou exporte.</p>
+      <div id="editor-final" contenteditable="true" class="editor"></div>
+      <div class="actions">
+        <button id="btn-gerar-final">Gerar Petição Completa</button>
+        <button id="btn-copiar">Copiar Prompt</button>
+        <button id="btn-baixar">Baixar .txt</button>
+        <button id="btn-pdf">📄 Exportar PDF</button>
+        <button id="btn-google-ia">🌐 Abrir no Google IA</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
