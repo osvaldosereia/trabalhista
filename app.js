@@ -1,5 +1,5 @@
 // app.js completo
-import { FFP } from './data/fatos-fundamentos-pedidos.js';
+import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
 (() => {
   'use strict';
