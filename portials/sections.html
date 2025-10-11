@@ -32,15 +32,9 @@
     <fieldset class="step card">
       <legend>Juízo</legend>
       <div class="grid">
-        <label>Nº da Vara (opcional)
-          <input type="text" id="juizoNum" placeholder="Ex.: 5ª"/>
-        </label>
-        <label>Cidade
-          <input type="text" id="cidade" placeholder="Ex.: São Paulo" required/>
-        </label>
-        <label>UF
-          <input type="text" id="uf" maxlength="2" placeholder="SP" required/>
-        </label>
+        <label>Nº da Vara (opcional) <input type="text" id="juizoNum" placeholder="Ex.: 5ª"/></label>
+        <label>Cidade <input type="text" id="cidade" placeholder="Ex.: São Paulo" required/></label>
+        <label>UF <input type="text" id="uf" maxlength="2" placeholder="SP" required/></label>
       </div>
     </fieldset>
 
@@ -93,71 +87,39 @@
       </div>
     </fieldset>
 
-    <!-- 3 Fatos (manual com catálogo amplo) -->
+    <!-- 3 Fatos (UX nova com multi-temas e checklist de inclusão) -->
     <fieldset class="step card hidden">
       <legend>Fatos</legend>
 
       <div class="row gap">
-        <label style="min-width:260px">Tema principal
-          <select id="temaSelect"></select>
+        <label style="min-width:260px;flex:1">Temas de interesse (múltiplos)
+          <select id="temaSelect" multiple size="8"></select>
         </label>
-        <button type="button" class="mini" id="btnSugFatos">Inserir sugestões de Fatos</button>
-        <button type="button" class="mini" id="btnSugNarr">Inserir sugestões de Narrativa</button>
+        <div class="stack" style="min-width:240px">
+          <button type="button" class="mini" id="btnBuildSug">Carregar sugestões</button>
+          <button type="button" class="mini" id="btnAddSelFatos">Adicionar selecionados → Fatos</button>
+          <button type="button" class="mini" id="btnAddSelFund">Adicionar selecionados → Fundamentos</button>
+          <button type="button" class="mini" id="btnAddSelPedidos">Adicionar selecionados → Pedidos</button>
+        </div>
       </div>
 
-      <div class="grid">
-        <label>Sugestões rápidas (selecione e dê duplo clique para inserir)
+      <!-- checklists por tema (gerado via catalog.js) -->
+      <div id="sugWrap" class="stack" style="margin-top:10px"></div>
+
+      <div class="grid" style="margin-top:10px">
+        <label>Sugestões rápidas (multi; duplo clique insere em Fatos)
           <select id="fatosSug" multiple size="10"></select>
         </label>
         <label>Narrativa (edição manual)
           <textarea id="fatos" rows="12" placeholder="Descreva a narrativa fática..."></textarea>
         </label>
       </div>
-
-      <details class="card subtle" style="margin-top:8px">
-        <summary>Catálogo adicional de sugestões de fatos (rápido)</summary>
-        <div class="grid">
-          <label>Horas extras
-            <textarea rows="6" readonly class="mono">• Jornada superior a 8h/44h sem pagamento integral.
-• Intervalo intrajornada suprimido total/parcial.
-• Ponto britânico/por exceção não reflete a realidade.
-• Compensação/banco de horas inválidos.
-• Labor em domingos/feriados sem folga compensatória.</textarea>
-          </label>
-          <label>Intervalos
-            <textarea rows="6" readonly class="mono">• Concessão parcial do intervalo intrajornada (20–30min).
-• Intervalo interjornada (11h) descumprido em escalas.
-• Intervalos semanais suprimidos/irregulares.</textarea>
-          </label>
-          <label>Adicional noturno
-            <textarea rows="6" readonly class="mono">• Labor após 22h sem adicional devido.
-• Hora noturna reduzida não observada (52m30s).
-• Prorrogação do noturno em período diurno sem adicional correto.</textarea>
-          </label>
-          <label>Rescisão/FGTS
-            <textarea rows="6" readonly class="mono">• Atrasos reiterados de salários.
-• Ausência de depósitos de FGTS.
-• Descumprimento contratual grave (art. 483 CLT).</textarea>
-          </label>
-          <label>Insalubridade/Periculosidade
-            <textarea rows="6" readonly class="mono">• Exposição a agentes nocivos acima dos limites (NR-15).
-• Contato com inflamáveis/eletricidade sem proteção (NR-16).
-• EPIs insuficientes/ineficazes; treinamentos ausentes.</textarea>
-          </label>
-          <label>Teletrabalho/Sobreaviso
-            <textarea rows="6" readonly class="mono">• Disponibilidade constante via celular/app fora do expediente.
-• Respostas obrigatórias em janelas de plantão (restrição real).</textarea>
-          </label>
-        </div>
-        <small class="muted">Dica: copie trechos e cole na narrativa ao lado, ajustando datas, horários e períodos.</small>
-      </details>
     </fieldset>
 
     <!-- 4 Pedidos -->
     <fieldset class="step card hidden">
       <legend>Pedidos</legend>
       <div class="row gap">
-        <button type="button" class="mini" id="btnSugPedidos">Inserir sugestões de Pedidos</button>
         <button id="addPedido" type="button" class="mini">+ pedido</button>
       </div>
       <div id="pedidoChips" class="chips"></div>
@@ -169,30 +131,20 @@
       <legend>Fundamentos & Provas</legend>
       <div class="grid-2">
         <div>
-          <div class="row gap">
-            <button type="button" class="mini" id="btnSugFund">Inserir sugestões de Fundamentos</button>
-          </div>
           <label>Fundamentos (um por linha)
             <textarea id="fundamentos" rows="12" placeholder="Ex.: CLT art. 58; CF/88 art. 7º; Súmula x/TST; OJ y/SDI-I..."></textarea>
           </label>
         </div>
         <div>
-          <div class="row between">
-            <label>Provas (lista manual)</label>
-            <!-- Upload removido -->
-          </div>
-          <div id="provasWrap" class="stack"></div>
-          <div class="row">
-            <button id="addProva" type="button" class="mini">+ prova</button>
-          </div>
-          <div class="muted">
-            Descreva apenas as provas que pretende juntar (ex.: holerites, cartões de ponto, contrato, comunicações).
-          </div>
+          <label>Provas (lista manual)
+            <div id="provasWrap" class="stack"></div>
+          </label>
+          <div class="row"><button id="addProva" type="button" class="mini">+ prova</button></div>
         </div>
       </div>
     </fieldset>
 
-    <!-- 6 Blocos (apenas checkboxes; sem template PDF) -->
+    <!-- 6 Blocos -->
     <fieldset class="step card hidden">
       <legend>Blocos</legend>
       <div class="grid">
@@ -214,10 +166,9 @@
         <label class="check"><input type="checkbox" class="blk" value="multa_477"> Multa 477 CLT</label>
         <label class="check"><input type="checkbox" class="blk" value="fgts40"> FGTS + 40%</label>
       </div>
-      <small class="muted">Use os blocos para lembrar dos pedidos acessórios mais comuns.</small>
     </fieldset>
 
-    <!-- 7 Valores (manual) -->
+    <!-- 7 Valores -->
     <fieldset class="step card hidden">
       <legend>Valores</legend>
       <div class="muted" style="margin-bottom:8px">Insira os valores estimados por pedido. O total será somado automaticamente.</div>
@@ -248,7 +199,6 @@
     </div>
     <div class="row gap">
       <button id="btnGerar" class="primary">Gerar Prompt</button>
-      <!-- Removido: Gerar com ChatGPT -->
     </div>
   </div>
 </section>
@@ -285,12 +235,11 @@
 </section>
 
 <script>
-  // binds apenas para sugestões (sem IA/sem upload/sem jurisprudência)
+  // binds mínimos; a lógica é feita em js/catalog.js
   document.addEventListener('click', (e)=>{
-    if (e.target?.id==='btnSugFatos') window.Clara.catalog?.pushSuggestions('fatos');
-    if (e.target?.id==='btnSugNarr') window.Clara.catalog?.pushSuggestions('narrativa');
-    if (e.target?.id==='btnSugFund') window.Clara.catalog?.pushSuggestions('fundamentos');
-    if (e.target?.id==='btnSugPedidos') window.Clara.catalog?.pushSuggestions('pedidos');
+    if (e.target?.id==='btnBuildSug') window.Clara.catalog?.renderChecklist();
+    if (e.target?.id==='btnAddSelFatos') window.Clara.catalog?.applyChecked('fatos');
+    if (e.target?.id==='btnAddSelFund') window.Clara.catalog?.applyChecked('fundamentos');
+    if (e.target?.id==='btnAddSelPedidos') window.Clara.catalog?.applyChecked('pedidos');
   });
-  // lista múltipla com duplo clique é tratada em catalog.js
 </script>
