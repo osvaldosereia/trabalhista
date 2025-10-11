@@ -68,3 +68,7 @@ ul li.ativo { background: #2563eb; color: white; border-radius: 6px; padding-lef
   .tabs { gap: .3rem; }
   .tabs button { padding: .4rem .8rem; font-size: .8rem; }
 }
+#fundamentos-box li.ativo,
+#pedidos-box li.ativo {
+  background: #eef;
+}
