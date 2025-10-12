@@ -1,4 +1,4 @@
-// app.js completo (ajustado)
+// app.js completo (corrigido)
 import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
 (() => {
@@ -18,6 +18,13 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     'Testemunhas', 'Extratos do FGTS', 'TRCT e guias', 'Laudos e atestados'
   ];
   const STORAGE_KEY = 'editorTrabalhista:v2';
+
+  // ===== Orientação base para a IA =====
+  const ORIENTACAO_IA =
+    "Atue como ADVOGADO TRABALHISTA experiente. Redija em linguagem forense, clara, coesa e impessoal, " +
+    "citando CLT, CF/88, CPC e súmulas/OJs do TST quando cabível. " +
+    "Use APENAS as informações fornecidas (sem criar fatos). Estruture por tópicos com títulos, " +
+    "alinhe pedidos e cálculos às regras trabalhistas e mantenha português do Brasil.";
 
   // ===== Abas =====
   const tabs = $$('.tabs button');
@@ -169,12 +176,9 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
     // salvar manual por aba
     toolbar.querySelector('.btn-save-local').addEventListener('click', () => {
-      // Para qualificação/contrato, gerar a partir dos formulários:
-      if (sectionId === 'qualificacao') {
-        gerarQualificacao();
-      } else if (sectionId === 'contrato') {
-        gerarContrato();
-      }
+      if (sectionId === 'qualificacao') gerarQualificacao();
+      else if (sectionId === 'contrato') gerarContrato();
+
       trechos[sectionId] = editor.innerHTML;
       atualizarFinal();
       persist();
@@ -226,7 +230,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     const editor = sectionEditor('preliminares');
     if (!sel || !btn || !lista || !editor || !Array.isArray(PRELIMINARES)) return;
 
-    // preenche o select
     sel.innerHTML = '<option value="">Selecione…</option>';
     PRELIMINARES.forEach((p, i) => {
       const opt = document.createElement('option');
@@ -235,13 +238,11 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       sel.appendChild(opt);
     });
 
-    // adiciona a preliminar ao clicar no botão
     btn.addEventListener('click', () => {
       const idx = parseInt(sel.value, 10);
       if (isNaN(idx)) return;
       const item = PRELIMINARES[idx];
 
-      // cria linha clicável na lista (toggle no editor)
       const li = document.createElement('li');
       li.textContent = `${item.titulo} — ${item.fundamentoCurto}`;
       li.style.cursor = 'pointer';
@@ -249,13 +250,11 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       lista.appendChild(li);
 
       const bloco = `<p><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
-      // insere no editor ao adicionar
       editor.innerHTML += bloco;
       trechos['preliminares'] = editor.innerHTML;
       atualizarFinal();
       persist();
 
-      // toggle por clique na linha
       li.addEventListener('click', () => {
         if (editor.innerHTML.includes(bloco)) {
           editor.innerHTML = editor.innerHTML.replace(bloco, '');
@@ -464,6 +463,17 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     URL.revokeObjectURL(url);
   });
 
+  // ===== Botão "Abrir no Google IA" (prompt base restaurado) =====
+  $('#btn-google-ia')?.addEventListener('click', () => {
+    const texto = $('#editor-final').textContent.trim();
+    const contexto =
+      `${ORIENTACAO_IA}\n\n` +
+      `TAREFA: Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do conteúdo a seguir.\n\n` +
+      `CONTEÚDO:\n${texto}`;
+    const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
+    window.open(url, '_blank');
+  });
+
   // ===== Botões "Gerar com IA" das ações de cada aba =====
   $$('.tab-content .btn-ia').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -480,7 +490,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       const sec = btn.closest('.tab-content')?.id;
       if (!sec) return;
 
-      // gerar textos das seções com formulário antes de salvar
       if (sec === 'qualificacao') gerarQualificacao();
       if (sec === 'contrato') gerarContrato();
 
@@ -493,13 +502,22 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   });
 
-  // ===== Google IA por seção =====
+  // ===== Google IA por seção (com prompt base) =====
   function openGoogleIAForSection(sectionId, editorEl) {
     const titulo = document.getElementById(sectionId).querySelector('h2').textContent;
     const inputs = document.getElementById(sectionId).querySelectorAll('input, textarea, select');
-    const dados = Array.from(inputs).map(el => `${el.name || el.id}: ${el.value}`).filter(s => !s.endsWith(': ')).join(' | ');
+    const dados = Array.from(inputs)
+      .map(el => `${el.name || el.id}: ${el.value}`)
+      .filter(s => !s.endsWith(': '))
+      .join(' | ');
     const texto = editorEl.innerText?.trim?.() || '';
-    const contexto = `Redija o trecho "${titulo}" de uma Reclamação Trabalhista. Use linguagem técnica forense. Dados: ${dados}. Texto atual: ${texto}`;
+
+    const contexto =
+      `${ORIENTACAO_IA}\n\n` +
+      `TAREFA: Redigir o trecho "${titulo}" de uma Reclamação Trabalhista.\n` +
+      `DADOS ESTRUTURADOS: ${dados || '[sem dados adicionais]'}\n` +
+      `TEXTO ATUAL (se houver): ${texto || '[vazio]'}\n`;
+
     const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
     window.open(url, '_blank');
   }
@@ -531,7 +549,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       // fatos
       (data.fatosSelecionados || []).forEach(uiAddFato);
 
-      // listas selecionadas — aplicar após rebuild
+      // aplicar seleção de listas após rebuild
       setTimeout(() => {
         $$('ul#fundamentos-box li').forEach(li => {
           if ((data.fundamentosSelecionados || []).includes(li.textContent)) {
@@ -588,7 +606,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   restore();
   recalcTabela();
 
-  // ===== Estilo ativo (dica CSS a ser usada no style.css) =====
+  // ===== Dica de estilo (adicione ao style.css) =====
   // #fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
 
 })();
