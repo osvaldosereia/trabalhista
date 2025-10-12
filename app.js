@@ -340,20 +340,23 @@ function renderCamposFato(nomeFato, mountEl){
 
     // onChange -> grava no estado
     input.addEventListener('change', () => {
-      let val;
-      if (def.type === 'checkbox') {
-        val = input.checked;
-      } else if (def.type === 'select' && def.multiple) {
-        val = Array.from(input.selectedOptions).map(o => o.value);
-      } else if (def.type === 'upload') {
-        val = Array.from(input.files || []).map(f => f.name);
-      } else {
-        val = input.value;
-      }
-      if (!dadosPorFato[nomeFato]) dadosPorFato[nomeFato] = {};
-      dadosPorFato[nomeFato][def.id] = val;
-      persist();
-    });
+  let val;
+  if (def.type === 'checkbox') {
+    val = input.checked;
+  } else if (def.type === 'select' && def.multiple) {
+    val = Array.from(input.selectedOptions).map(o => o.value);
+  } else if (def.type === 'upload') {
+    val = Array.from(input.files || []).map(f => f.name);
+  } else {
+    val = input.value;
+  }
+  if (!dadosPorFato[nomeFato]) dadosPorFato[nomeFato] = {};
+  dadosPorFato[nomeFato][def.id] = val;
+  persist();
+  syncFatosEditor();   // atualiza a aba Fatos
+  atualizarFinal();    // reflete no visualizador final
+});
+
 
     wrap.appendChild(lbl);
     wrap.appendChild(input);
@@ -435,11 +438,30 @@ function renderCamposFato(nomeFato, mountEl){
   }
 
   function syncFatosEditor() {
-    const editor = sectionEditor('fatos');
-    if (!editor) return;
-    editor.innerHTML = fatosSelecionados.map(f => `<p><strong>${f}:</strong> [Descrever fatos com base nos documentos anexados]</p>`).join('');
-    trechos['fatos'] = editor.innerHTML;
-  }
+  const editor = sectionEditor('fatos');
+  if (!editor) return;
+
+  const html = fatosSelecionados.map(f => {
+    const extras = dadosPorFato[f] || {};
+    const defs = FFP_CAMPOS?.[f] || [];
+    const linhas = Object.entries(extras).map(([id,val]) => {
+      const def = defs.find(d => d.id === id);
+      const label = def?.label || id;
+      let texto = Array.isArray(val) ? val.join(', ') : (typeof val === 'boolean' ? (val ? 'sim' : 'não') : String(val||''));
+      return `<li><strong>${label}:</strong> ${texto}</li>`;
+    }).join('');
+
+    const blocoExtras = linhas ? `<ul class="extras-fato">${linhas}</ul>` : '';
+    return `<div class="fato-item">
+      <p><strong>${f}:</strong></p>
+      ${blocoExtras || '<p class="sem-extras">[Sem dados adicionais]</p>'}
+    </div>`;
+  }).join('');
+
+  editor.innerHTML = html || '<p>[Nenhum fato adicionado]</p>';
+  trechos['fatos'] = editor.innerHTML; // vai para o visualizador final
+}
+
 
   function syncFundamentosEditor() {
     const editor = sectionEditor('fundamentos');
@@ -785,21 +807,23 @@ const num = (s) => parseFloat(String(s).replace(',', '.')) || 0;
 
   // ===== Botões "Salvar Trecho" gerais =====
   $$('.tab-content .btn-save').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const sec = btn.closest('.tab-content')?.id;
-      if (!sec) return;
+  btn.addEventListener('click', () => {
+    const sec = btn.closest('.tab-content')?.id;
+    if (!sec) return;
 
-      if (sec === 'qualificacao') gerarQualificacao();
-      if (sec === 'contrato') gerarContrato();
+    if (sec === 'qualificacao') gerarQualificacao();
+    if (sec === 'contrato') gerarContrato();
+    if (sec === 'fatos') syncFatosEditor(); // garante que extras entram
 
-      const ed = sectionEditor(sec);
-      if (!ed) return;
-      trechos[sec] = ed.innerHTML;
-      atualizarFinal();
-      persist();
-      alert('Trecho salvo.');
-    });
+    const ed = sectionEditor(sec);
+    if (!ed) return;
+    trechos[sec] = ed.innerHTML;
+    atualizarFinal();
+    persist();
+    alert('Trecho salvo.');
   });
+});
+
 
   // ===== Botões "Limpar Seção" (opcional: .btn-clear se existir no HTML) =====
   $$('.tab-content .btn-clear').forEach(btn => {
