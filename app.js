@@ -1,5 +1,5 @@
-// app.js completo (v3 final) — import corrigido
-import { FFP, PRELIMINARES } from './fatos-fundamentos-pedidos.js';
+// app.js completo (v3 final)
+import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
 (() => {
   'use strict';
