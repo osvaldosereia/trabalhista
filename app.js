@@ -59,21 +59,39 @@ function makeGoogleIAUrl(prompt) {
 
   // ===== Inicialização FFP (Fatos no <select>) =====
   function carregarFFP() {
-    if (!Array.isArray(FFP) || !FFP.length) {
-      console.error('FFP não carregado.');
-      return;
-    }
-    const sel = $('#select-fato');
-    if (!sel) return;
-
-    sel.innerHTML = '<option value="">Selecione um fato</option>';
-    FFP.filter(x => x.fato).forEach(item => {
-      const op = document.createElement('option');
-      op.value = item.fato;
-      op.textContent = item.fato;
-      sel.appendChild(op);
-    });
+  if (!Array.isArray(FFP) || !FFP.length) {
+    console.error('FFP não carregado.');
+    return;
   }
+  const sel = $('#select-fato');
+  if (!sel) return;
+
+  sel.innerHTML = '<option value="">Selecione um fato</option>';
+
+  // agrupar por categoria (fallback: 'Outros')
+  const grupos = new Map();
+  FFP.filter(x => x.fato).forEach(item => {
+    const cat = (item.categoria || 'Outros').trim();
+    if (!grupos.has(cat)) grupos.set(cat, []);
+    grupos.get(cat).push(item);
+  });
+
+  // criar optgroups em ordem alfabética
+  Array.from(grupos.keys()).sort().forEach(cat => {
+    const og = document.createElement('optgroup');
+    og.label = cat;
+    grupos.get(cat)
+      .sort((a,b) => a.fato.localeCompare(b.fato, 'pt-BR'))
+      .forEach(item => {
+        const op = document.createElement('option');
+        op.value = item.fato;
+        op.textContent = item.fato;
+        og.appendChild(op);
+      });
+    sel.appendChild(og);
+  });
+}
+
 
   // ===== Adicionar múltiplos Fatos =====
   function uiAddFato(nomeFato) {
