@@ -1,6 +1,6 @@
 // data/ffp_campos.js
 // Mapeia "fato" -> campos personalizados para coleta de dados adicionais.
-// Próximo passo: a aba "Fatos" já renderiza estes campos ao selecionar cada fato.
+// Cada fato tem, no mínimo, o campo "Observações".
 
 export const FFP_CAMPOS = {
 /* ===================== VÍNCULO E REGISTRO ===================== */
@@ -323,7 +323,7 @@ export const FFP_CAMPOS = {
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 
-/* ===================== OUTROS Fatos Adicionais recomendados ===================== */
+/* ===================== OUTROS E ESPECIAIS ===================== */
 "Teletrabalho/home office": [
   { id:"periodo_ini",  label:"Início", type:"date" },
   { id:"periodo_fim",  label:"Fim", type:"date" },
@@ -484,5 +484,78 @@ export const FFP_CAMPOS = {
   { id:"periodo_ini",  label:"Início", type:"date" },
   { id:"periodo_fim",  label:"Fim", type:"date" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
+]
+
+/* ====== Entradas adicionadas automaticamente para todos os fatos que não existiam no arquivo original ======
+   Cada uma contém ao menos "Observações".
+   Se quiser enriquecer algum fato específico, basta substituir a entrada por um array com os campos desejados.
+*/
+,
+/* —— A PARTIR DAQUI: fatos que não tinham definição receberam apenas "Observações" —— */
+"Salário por fora / extrafolha": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Salário complessivo": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Alteração contratual lesiva": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Descontos indevidos": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Falta de depósito de multas normativas": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Fraude na admissão": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Abandono de emprego inexistente": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Reversão de justa causa": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Intervalo para amamentação não concedido": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Tempo de deslocamento (itinerário) – in itinere": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Adicional de penosidade": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Assédio organizacional": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Quebra de sigilo de dados do empregado": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Violação de intervalo para repouso e alimentação": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Cumulação de jornada em outro vínculo": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Concessão de férias fora do prazo": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Férias não pagas corretamente": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Décimo terceiro não pago corretamente": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Desrespeito a adicional de transferência (itinerante)": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Revista íntima vexatória": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Negativa de intervalo do art. 384 (mulheres)": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
+],
+"Outros": [
+  { id:"observacoes", label:"Observações", type:"textarea" }
 ]
 };
