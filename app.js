@@ -6,6 +6,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
   const $ = (q, el = document) => el.querySelector(q);
   const $$ = (q, el = document) => Array.from(el.querySelectorAll(q));
+  const live = (sel) => document.getElementById('tabela-wrap')?.querySelector(sel);
 
   // ===== Estado =====
   const trechos = {};                 // HTML por seção
@@ -358,14 +359,14 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
   // ===== Tabela de cálculos =====
   function limparTabela() {
-    const tbody = $('#tabela-calculos tbody');
+ const tbody = live('#tabela-calculos tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    $('#total-geral') && ($('#total-geral').textContent = '0,00');
+const tg = live('#total-geral'); if (tg) tg.textContent = '0,00';
   }
 
   function ensurePedidoOnTabela() {
-    const tbody = $('#tabela-calculos tbody');
+const tbody = live('#tabela-calculos tbody');
     if (!tbody) return;
 
     // chaves esperadas com base nos pedidos selecionados
@@ -405,7 +406,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   }
 
   $('#btn-add-linha')?.addEventListener('click', () => {
-    const tbody = $('#tabela-calculos tbody');
+const tbody = live('#tabela-calculos tbody');
     if (!tbody) return;
     const tr = document.createElement('tr');
     tr.dataset.key = 'manual_' + Date.now();
@@ -424,21 +425,35 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   $('#btn-recalcular')?.addEventListener('click', () => recalcTabela());
 
   function recalcTabela() {
-    const tbody = $('#tabela-calculos tbody');
+const tbody = live('#tabela-calculos tbody');
+const num = (s) => parseFloat(String(s).replace(',', '.')) || 0;
+
     if (!tbody) return;
     let totalGeral = 0;
     tbody.querySelectorAll('tr').forEach(tr => {
-      const base = parseFloat(tr.children[1].querySelector('input').value || '0');
-      const qtd  = parseFloat(tr.children[2].querySelector('input').value || '0');
-      const perc = parseFloat(tr.children[3].querySelector('input').value || '0');
+      const base = num(tr.children[1].querySelector('input').value);
+      const qtd  = num(tr.children[2].querySelector('input').value);
+      const perc = num(tr.children[3].querySelector('input').value);
       const total = base * qtd * (1 + perc/100);
       tr.querySelector('.total').textContent = total.toFixed(2).replace('.', ',');
       totalGeral += total;
     });
-    $('#total-geral') && ($('#total-geral').textContent = totalGeral.toFixed(2).replace('.', ','));
+    const tg = live('#total-geral'); if (tg) tg.textContent = totalGeral.toFixed(2).replace('.', ',');
     const vc = $('#valorCausa');
     if (vc && !vc.matches(':focus')) vc.value = totalGeral.toFixed(2);
-    trechos['calculos'] = $('#tabela-wrap')?.outerHTML || '';
+{
+  const wrap = document.getElementById('tabela-wrap');
+  if (wrap) {
+    const snap = wrap.cloneNode(true);
+    snap.removeAttribute('id');
+    snap.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    const tmp = document.createElement('div');
+    tmp.appendChild(snap);
+    trechos['calculos'] = tmp.innerHTML;
+  } else {
+    trechos['calculos'] = '';
+  }
+}
     trechos['valor'] = `<p><strong>Valor da Causa: R$ ${totalGeral.toFixed(2).replace('.', ',')}</strong></p>`;
     atualizarFinal();
     persist();
@@ -751,7 +766,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       if ($('#valorCausa')) $('#valorCausa').value = data.valorCausa || '';
 
       // religar eventos da tabela
-      $('#tabela-calculos tbody')?.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
+ live('#tabela-calculos tbody')?.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
 
       // provas
       (data.provas || []).forEach(v => {
