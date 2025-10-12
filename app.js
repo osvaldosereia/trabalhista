@@ -1,13 +1,15 @@
-// app.js completo (corrigido)
+// app.js completo (corrigido e pronto para uso)
 import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
 (() => {
   'use strict';
 
-  const $ = (q, el = document) => el.querySelector(q);
+  // ========= Helpers =========
+  const $  = (q, el = document) => el.querySelector(q);
   const $$ = (q, el = document) => Array.from(el.querySelectorAll(q));
+  const debounce = (fn, ms = 200) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
-  // ===== Estado =====
+  // ========= Estado =========
   const trechos = {};                 // HTML por seção
   const fatosSelecionados = [];       // lista de fatos adicionados
   const fundamentosSelecionados = []; // itens clicados para incluir
@@ -19,14 +21,14 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   ];
   const STORAGE_KEY = 'editorTrabalhista:v2';
 
-  // ===== Orientação base para a IA =====
+  // ========= Orientação base para IA =========
   const ORIENTACAO_IA =
-    "Atue como ADVOGADO TRABALHISTA experiente. Redija em linguagem forense, clara, coesa e impessoal, " +
-    "citando CLT, CF/88, CPC e súmulas/OJs do TST quando cabível. " +
-    "Use APENAS as informações fornecidas (sem criar fatos). Estruture por tópicos com títulos, " +
-    "alinhe pedidos e cálculos às regras trabalhistas e mantenha português do Brasil.";
+    'Atue como ADVOGADO TRABALHISTA experiente. Redija em linguagem forense, clara, coesa e impessoal, ' +
+    'citando CLT, CF/88, CPC e súmulas/OJs do TST quando cabível. ' +
+    'Use APENAS as informações fornecidas (sem criar fatos). Estruture por tópicos com títulos, ' +
+    'alinhe pedidos e cálculos às regras trabalhistas e mantenha português do Brasil.';
 
-  // ===== Abas =====
+  // ========= Abas =========
   const tabs = $$('.tabs button');
   const sections = $$('.tab-content');
   tabs.forEach(btn => {
@@ -38,7 +40,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   });
 
-  // ===== Inicialização FFP (Fatos no <select>) =====
+  // ========= Inicialização Fatos (FFP) =========
   function carregarFFP() {
     if (!Array.isArray(FFP) || !FFP.length) {
       console.error('FFP não carregado.');
@@ -46,7 +48,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     }
     const sel = $('#select-fato');
     if (!sel) return;
-
     sel.innerHTML = '<option value="">Selecione um fato</option>';
     FFP.filter(x => x.fato).forEach(item => {
       const op = document.createElement('option');
@@ -56,17 +57,18 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   }
 
-  // ===== Adicionar múltiplos Fatos =====
+  // ========= Fatos: adicionar/remover =========
   function uiAddFato(nomeFato) {
     if (!nomeFato) return;
     if (fatosSelecionados.includes(nomeFato)) return;
     fatosSelecionados.push(nomeFato);
 
     const wrap = $('#fatos-list');
+    if (!wrap) return;
     const box = document.createElement('div');
     box.className = 'fato-bloco';
     box.dataset.fato = nomeFato;
-    box.innerHTML = `<span class="titulo">${nomeFato}</span><button class="remover" title="remover">✖</button>`;
+    box.innerHTML = `<span class="titulo">${nomeFato}</span><button class="remover" title="Remover">✖</button>`;
     wrap.appendChild(box);
 
     box.querySelector('.remover').addEventListener('click', () => {
@@ -85,20 +87,22 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     persist();
   }
 
-  $('#add-fato').addEventListener('click', () => {
-    const val = $('#select-fato').value;
+  $('#add-fato')?.addEventListener('click', () => {
+    const val = $('#select-fato')?.value;
     uiAddFato(val);
   });
 
-  // ===== Fundamentos & Pedidos derivados dos Fatos =====
+  // ========= Fundamentos & Pedidos (derivados dos Fatos) =========
   function rebuildFundamentosPedidos() {
     const fundUL = $('#fundamentos-box');
-    const pedUL = $('#pedidos-box');
+    const pedUL  = $('#pedidos-box');
+    if (!fundUL || !pedUL) return;
+
     fundUL.innerHTML = '';
-    pedUL.innerHTML = '';
+    pedUL.innerHTML  = '';
 
     const itensFund = new Set();
-    const itensPed = new Set();
+    const itensPed  = new Set();
 
     fatosSelecionados.forEach(f => {
       const row = FFP.find(x => x.fato === f);
@@ -108,7 +112,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       }
     });
 
-    // Render fundamentos
     Array.from(itensFund).forEach(txt => {
       const li = document.createElement('li');
       li.textContent = txt;
@@ -117,7 +120,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       fundUL.appendChild(li);
     });
 
-    // Render pedidos
     Array.from(itensPed).forEach(txt => {
       const li = document.createElement('li');
       li.textContent = txt;
@@ -142,23 +144,28 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     persist();
   }
 
-  // ===== Mini editores por seção =====
+  // ========= Mini-editores por seção =========
+  const flush = debounce(() => { atualizarFinal(); persist(); }, 150);
+
   $$('.viewer').forEach(view => {
     const wrapper = document.createElement('div');
     wrapper.className = 'editor-area';
+
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     toolbar.innerHTML = `
-      <button data-cmd="bold"><b>B</b></button>
-      <button data-cmd="italic"><i>I</i></button>
-      <button data-cmd="insertUnorderedList">• Lista</button>
-      <button data-cmd="removeFormat">🧹 Limpar</button>
-      <button class="btn-ia-local" title="Gerar com Google IA">🌐 IA</button>
+      <button data-cmd="bold" title="Negrito"><b>B</b></button>
+      <button data-cmd="italic" title="Itálico"><i>I</i></button>
+      <button data-cmd="insertUnorderedList" title="Lista">• Lista</button>
+      <button data-cmd="removeFormat" title="Limpar">🧹 Limpar</button>
+      <button class="btn-ia-local" title="Gerar com IA">🌐 IA</button>
       <button class="btn-save-local" title="Salvar trecho">💾</button>
     `;
+
     const editor = document.createElement('div');
     editor.className = 'editor-mini';
     editor.contentEditable = true;
+
     const sectionId = view.closest('.tab-content').id;
     editor.dataset.section = sectionId;
 
@@ -167,38 +174,40 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     view.replaceWith(wrapper);
 
     toolbar.addEventListener('click', e => {
-      const cmd = e.target.dataset.cmd;
+      const cmd = e.target.dataset?.cmd;
       if (cmd) document.execCommand(cmd, false, null);
     });
 
-    // IA local por aba
     toolbar.querySelector('.btn-ia-local').addEventListener('click', () => openGoogleIAForSection(sectionId, editor));
 
-    // salvar manual por aba
     toolbar.querySelector('.btn-save-local').addEventListener('click', () => {
       if (sectionId === 'qualificacao') gerarQualificacao();
       else if (sectionId === 'contrato') gerarContrato();
-
       trechos[sectionId] = editor.innerHTML;
       atualizarFinal();
       persist();
       alert('Trecho salvo.');
     });
 
-    // salvar e sincronizar ao digitar
     editor.addEventListener('input', () => {
       trechos[sectionId] = editor.innerHTML;
       if (sectionId === 'calculos') recalcTabela();
-      atualizarFinal();
-      persist();
+      flush();
     });
   });
 
-  // ===== Sincronizações específicas =====
+  // ========= Syncs específicos =========
+  function sectionEditor(id) {
+    const sec = document.getElementById(id);
+    return sec ? sec.querySelector('.editor-mini') : null;
+  }
+
   function syncFatosEditor() {
     const editor = sectionEditor('fatos');
     if (!editor) return;
-    editor.innerHTML = fatosSelecionados.map(f => `<p><strong>${f}:</strong> [Descrever fatos com base nos documentos anexados]</p>`).join('');
+    editor.innerHTML = fatosSelecionados
+      .map(f => `<p><strong>${f}:</strong> [Descrever fatos com base nos documentos anexados]</p>`)
+      .join('');
     trechos['fatos'] = editor.innerHTML;
   }
 
@@ -217,12 +226,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     ensurePedidoOnTabela();
   }
 
-  function sectionEditor(id) {
-    const sec = document.getElementById(id);
-    return sec ? sec.querySelector('.editor-mini') : null;
-  }
-
-  // ================== PRELIMINARES (popular e adicionar) ==================
+  // ========= PRELIMINARES =========
   function popularPreliminares() {
     const sel   = document.getElementById('preliminares-select');
     const btn   = document.getElementById('add-preliminar');
@@ -242,19 +246,22 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       const idx = parseInt(sel.value, 10);
       if (isNaN(idx)) return;
       const item = PRELIMINARES[idx];
+      const bloco = `<p><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
 
+      // cria linha clicável
       const li = document.createElement('li');
       li.textContent = `${item.titulo} — ${item.fundamentoCurto}`;
       li.style.cursor = 'pointer';
       li.title = 'Clique para inserir/remover no editor';
       lista.appendChild(li);
 
-      const bloco = `<p><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
+      // insere
       editor.innerHTML += bloco;
       trechos['preliminares'] = editor.innerHTML;
       atualizarFinal();
       persist();
 
+      // toggle
       li.addEventListener('click', () => {
         if (editor.innerHTML.includes(bloco)) {
           editor.innerHTML = editor.innerHTML.replace(bloco, '');
@@ -270,9 +277,10 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   }
 
-  // ===== Provas catálogo =====
+  // ========= Provas =========
   function buildProvas() {
     const box = $('#provas-box');
+    if (!box) return;
     box.innerHTML = '';
     provasCatalogo.forEach(nome => {
       const id = 'pv_' + nome.replace(/\W+/g, '_');
@@ -281,11 +289,16 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       box.appendChild(wrap);
     });
   }
+  const collectProvasSelecionadas = () =>
+    Array.from($('#provas-box')?.querySelectorAll('input[type="checkbox"]:checked') || [])
+      .map(i => i.value);
 
-  // ===== Tabela de cálculos =====
+  // ========= Tabela de Cálculos =========
   function ensurePedidoOnTabela() {
     const tbody = $('#tabela-calculos tbody');
+    if (!tbody) return;
     const rowKeys = Array.from(tbody.querySelectorAll('tr')).map(r => r.dataset.key);
+
     pedidosSelecionados.forEach(p => {
       const key = 'p_' + p.slice(0, 40);
       if (!rowKeys.includes(key)) {
@@ -305,8 +318,9 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     recalcTabela();
   }
 
-  $('#btn-add-linha').addEventListener('click', () => {
+  $('#btn-add-linha')?.addEventListener('click', () => {
     const tbody = $('#tabela-calculos tbody');
+    if (!tbody) return;
     const tr = document.createElement('tr');
     tr.dataset.key = 'manual_' + Date.now();
     tr.innerHTML = `
@@ -323,33 +337,37 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
   function recalcTabela() {
     const tbody = $('#tabela-calculos tbody');
+    if (!tbody) return;
     let totalGeral = 0;
+
     tbody.querySelectorAll('tr').forEach(tr => {
       const base = parseFloat(tr.children[1].querySelector('input').value || '0');
       const qtd  = parseFloat(tr.children[2].querySelector('input').value || '0');
       const perc = parseFloat(tr.children[3].querySelector('input').value || '0');
-      const total = base * qtd * (1 + perc/100);
+      const total = base * qtd * (1 + perc / 100);
       tr.querySelector('.total').textContent = total.toFixed(2).replace('.', ',');
       totalGeral += total;
     });
-    $('#total-geral').textContent = totalGeral.toFixed(2).replace('.', ',');
+
+    $('#total-geral') && ($('#total-geral').textContent = totalGeral.toFixed(2).replace('.', ','));
+
     const vc = $('#valorCausa');
     if (vc && !vc.matches(':focus')) vc.value = totalGeral.toFixed(2);
-    trechos['calculos'] = $('#tabela-wrap').outerHTML;
+
+    const wrap = $('#tabela-wrap');
+    if (wrap) trechos['calculos'] = wrap.outerHTML;
     trechos['valor'] = `<p><strong>Valor da Causa: R$ ${totalGeral.toFixed(2).replace('.', ',')}</strong></p>`;
     atualizarFinal();
     persist();
   }
 
-  // ===== Builders de texto (Qualificação e Contrato) =====
+  // ========= Builders (Qualificação & Contrato) =========
   function gerarQualificacao() {
     const ed = sectionEditor('qualificacao');
-    if (!ed) return;
+    const f  = $('#form-qualificacao');
+    if (!ed || !f) return;
 
-    const f = $('#form-qualificacao');
-    if (!f) return;
-
-    const get = (name) => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+    const get = name => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
 
     // Reclamante
     const rc = {
@@ -400,12 +418,10 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
   function gerarContrato() {
     const ed = sectionEditor('contrato');
-    if (!ed) return;
+    const f  = $('#form-contrato');
+    if (!ed || !f) return;
 
-    const f = $('#form-contrato');
-    if (!f) return;
-
-    const get = (name) => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+    const get = name => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
     const adm = get('admissao');
     const sai = get('saida');
     const funcao = get('funcao');
@@ -426,9 +442,10 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     persist();
   }
 
-  // ===== Visualizador Final =====
+  // ========= Visualizador Final =========
   function atualizarFinal() {
     const editorFinal = $('#editor-final');
+    if (!editorFinal) return;
     const ordem = ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'];
     const partes = ordem
       .filter(id => trechos[id])
@@ -436,24 +453,24 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       .join('<hr>');
     editorFinal.innerHTML = partes || '<p>Nenhum trecho adicionado ainda.</p>';
   }
+  const capitalize = s => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
-  function capitalize(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
-
-  // ===== Ações finais =====
-  $('#btn-gerar-final').addEventListener('click', () => {
+  // ========= Ações finais =========
+  $('#btn-gerar-final')?.addEventListener('click', () => {
     const editor = $('#editor-final');
+    if (!editor) return;
     const plain = editor.innerText.trim();
-    editor.textContent = plain; // garante texto limpo para copiar
+    editor.textContent = plain;
   });
 
-  $('#btn-copiar').addEventListener('click', () => {
-    const text = $('#editor-final').textContent;
+  $('#btn-copiar')?.addEventListener('click', () => {
+    const text = $('#editor-final')?.textContent || '';
     navigator.clipboard.writeText(text);
     alert('Prompt copiado.');
   });
 
-  $('#btn-baixar').addEventListener('click', () => {
-    const text = $('#editor-final').textContent;
+  $('#btn-baixar')?.addEventListener('click', () => {
+    const text = $('#editor-final')?.textContent || '';
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -463,9 +480,8 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     URL.revokeObjectURL(url);
   });
 
-  // ===== Botão "Abrir no Google IA" (prompt base restaurado) =====
   $('#btn-google-ia')?.addEventListener('click', () => {
-    const texto = $('#editor-final').textContent.trim();
+    const texto = $('#editor-final')?.textContent.trim() || '';
     const contexto =
       `${ORIENTACAO_IA}\n\n` +
       `TAREFA: Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do conteúdo a seguir.\n\n` +
@@ -474,7 +490,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     window.open(url, '_blank');
   });
 
-  // ===== Botões "Gerar com IA" das ações de cada aba =====
+  // ========= Botões de cada aba (IA / Salvar) =========
   $$('.tab-content .btn-ia').forEach(btn => {
     btn.addEventListener('click', () => {
       const sec = btn.closest('.tab-content')?.id;
@@ -484,15 +500,12 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   });
 
-  // ===== Botões "Salvar Trecho" das ações de cada aba =====
   $$('.tab-content .btn-save').forEach(btn => {
     btn.addEventListener('click', () => {
       const sec = btn.closest('.tab-content')?.id;
       if (!sec) return;
-
       if (sec === 'qualificacao') gerarQualificacao();
       if (sec === 'contrato') gerarContrato();
-
       const ed = sectionEditor(sec);
       if (!ed) return;
       trechos[sec] = ed.innerHTML;
@@ -502,15 +515,17 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   });
 
-  // ===== Google IA por seção (com prompt base) =====
+  // ========= Google IA por seção (com orientação base) =========
   function openGoogleIAForSection(sectionId, editorEl) {
-    const titulo = document.getElementById(sectionId).querySelector('h2').textContent;
-    const inputs = document.getElementById(sectionId).querySelectorAll('input, textarea, select');
+    const secEl  = document.getElementById(sectionId);
+    if (!secEl) return;
+    const titulo = secEl.querySelector('h2')?.textContent || sectionId;
+    const inputs = secEl.querySelectorAll('input, textarea, select');
     const dados = Array.from(inputs)
       .map(el => `${el.name || el.id}: ${el.value}`)
       .filter(s => !s.endsWith(': '))
       .join(' | ');
-    const texto = editorEl.innerText?.trim?.() || '';
+    const texto = editorEl?.innerText?.trim?.() || '';
 
     const contexto =
       `${ORIENTACAO_IA}\n\n` +
@@ -522,22 +537,22 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     window.open(url, '_blank');
   }
 
-  // ===== Persistência =====
-  function collectProvasSelecionadas() {
-    return Array.from($('#provas-box').querySelectorAll('input[type="checkbox"]:checked')).map(i => i.value);
-  }
-
+  // ========= Persistência =========
   function persist() {
     const payload = {
       trechos,
       fatosSelecionados,
       fundamentosSelecionados,
       pedidosSelecionados,
-      tabela: $('#tabela-wrap').innerHTML,
+      tabela: $('#tabela-wrap')?.innerHTML || '',
       provas: collectProvasSelecionadas(),
       valorCausa: $('#valorCausa')?.value || ''
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch (e) {
+      console.warn('Falha ao salvar no localStorage', e);
+    }
   }
 
   function restore() {
@@ -546,10 +561,36 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       if (!raw) return;
       const data = JSON.parse(raw);
 
-      // fatos
+      // Fatos selecionados anteriores
       (data.fatosSelecionados || []).forEach(uiAddFato);
 
-      // aplicar seleção de listas após rebuild
+      // Tabela e valor
+      if (data.tabela && $('#tabela-wrap')) $('#tabela-wrap').innerHTML = data.tabela;
+      if ($('#valorCausa')) $('#valorCausa').value = data.valorCausa || '';
+
+      // Reativar inputs da tabela
+      $('#tabela-calculos tbody')?.querySelectorAll('input')
+        .forEach(i => i.addEventListener('input', recalcTabela));
+
+      // Provas marcadas
+      (data.provas || []).forEach(v => {
+        const id = 'pv_' + v.replace(/\W+/g, '_');
+        const el = document.getElementById(id);
+        if (el) el.checked = true;
+      });
+
+      // Trechos
+      Object.assign(trechos, data.trechos || {});
+
+      // Repintar editores já salvos
+      ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'].forEach(id => {
+        if (trechos[id]) {
+          const ed = sectionEditor(id);
+          if (ed) ed.innerHTML = trechos[id];
+        }
+      });
+
+      // Reaplicar estado visual de fundamentos/pedidos após rebuild
       setTimeout(() => {
         $$('ul#fundamentos-box li').forEach(li => {
           if ((data.fundamentosSelecionados || []).includes(li.textContent)) {
@@ -567,46 +608,21 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
         syncPedidosEditor();
       }, 100);
 
-      // trechos HTML
-      Object.assign(trechos, data.trechos || {});
-      // recarregar tabela e valor
-      if (data.tabela) $('#tabela-wrap').innerHTML = data.tabela;
-      $('#valorCausa').value = data.valorCausa || '';
-
-      // religar eventos da tabela
-      $('#tabela-calculos tbody').querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
-
-      // provas
-      (data.provas || []).forEach(v => {
-        const id = 'pv_' + v.replace(/\W+/g, '_');
-        const el = document.getElementById(id);
-        if (el) el.checked = true;
-      });
-
-      // repintar editores já salvos
-      const ids = ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'];
-      ids.forEach(id => {
-        if (trechos[id]) {
-          const ed = sectionEditor(id);
-          if (ed) ed.innerHTML = trechos[id];
-        }
-      });
-
       atualizarFinal();
       recalcTabela();
-    } catch(e) {
+    } catch (e) {
       console.warn('Falha ao restaurar', e);
     }
   }
 
-  // ===== Provas e inicialização =====
+  // ========= Boot =========
   buildProvas();
   carregarFFP();
   popularPreliminares();
   restore();
   recalcTabela();
 
-  // ===== Dica de estilo (adicione ao style.css) =====
+  // ========= Dica CSS (adicione ao style.css) =========
   // #fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
 
 })();
