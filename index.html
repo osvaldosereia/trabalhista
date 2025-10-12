@@ -40,34 +40,37 @@
       <fieldset>
         <legend>Reclamante</legend>
         <form id="form-qualificacao">
-          <label>Nome <input type="text" name="reclamante_nome"></label>
-          <label>CPF <input type="text" name="reclamante_cpf"></label>
-          <label>RG <input type="text" name="reclamante_rg"></label>
-          <label>CTPS <input type="text" name="reclamante_ctps"></label>
-          <label>Série <input type="text" name="reclamante_ctps_serie"></label>
-          <label>Profissão <input type="text" name="reclamante_profissao"></label>
-          <label>Endereço <input type="text" name="reclamante_endereco"></label>
-          <label>Bairro <input type="text" name="reclamante_bairro"></label>
-          <label>Cidade <input type="text" name="reclamante_cidade"></label>
-          <label>UF <input type="text" name="reclamante_uf" maxlength="2"></label>
-          <label>CEP <input type="text" name="reclamante_cep"></label>
-          <label>Telefone <input type="text" name="reclamante_fone"></label>
-          <label>E-mail <input type="email" name="reclamante_email"></label>
+  <fieldset>
+    <legend>Reclamante</legend>
+    <label>Nome <input type="text"    name="reclamante_nome"></label>
+    <label>CPF <input type="text"     name="reclamante_cpf"></label>
+    <label>RG <input type="text"      name="reclamante_rg"></label>
+    <label>CTPS <input type="text"    name="reclamante_ctps"></label>
+    <label>Série <input type="text"   name="reclamante_ctps_serie"></label>
+    <label>Profissão <input type="text" name="reclamante_profissao"></label>
+    <label>Endereço <input type="text"  name="reclamante_endereco"></label>
+    <label>Bairro <input type="text"    name="reclamante_bairro"></label>
+    <label>Cidade <input type="text"    name="reclamante_cidade"></label>
+    <label>UF <input type="text"        name="reclamante_uf" maxlength="2"></label>
+    <label>CEP <input type="text"       name="reclamante_cep"></label>
+    <label>Telefone <input type="text"  name="reclamante_fone"></label>
+    <label>E-mail <input type="email"   name="reclamante_email"></label>
+  </fieldset>
 
-          <hr>
+  <fieldset>
+    <legend>Reclamada</legend>
+    <label>Razão Social <input type="text" name="reclamada_nome"></label>
+    <label>CNPJ <input type="text"         name="reclamada_cnpj"></label>
+    <label>Endereço <input type="text"     name="reclamada_endereco"></label>
+    <label>Bairro <input type="text"       name="reclamada_bairro"></label>
+    <label>Cidade <input type="text"       name="reclamada_cidade"></label>
+    <label>UF <input type="text"           name="reclamada_uf" maxlength="2"></label>
+    <label>CEP <input type="text"          name="reclamada_cep"></label>
+    <label>Telefone <input type="text"     name="reclamada_fone"></label>
+    <label>E-mail <input type="email"      name="reclamada_email"></label>
+  </fieldset>
+</form>
 
-          <legend>Reclamada</legend>
-          <label>Razão Social <input type="text" name="reclamada_nome"></label>
-          <label>CNPJ <input type="text" name="reclamada_cnpj"></label>
-          <label>Endereço <input type="text" name="reclamada_endereco"></label>
-          <label>Bairro <input type="text" name="reclamada_bairro"></label>
-          <label>Cidade <input type="text" name="reclamada_cidade"></label>
-          <label>UF <input type="text" name="reclamada_uf" maxlength="2"></label>
-          <label>CEP <input type="text" name="reclamada_cep"></label>
-          <label>Telefone <input type="text" name="reclamada_fone"></label>
-          <label>E-mail <input type="email" name="reclamada_email"></label>
-        </form>
-      </fieldset>
 
       <div class="actions">
         <button class="btn-ia">Gerar com IA</button>
@@ -98,33 +101,34 @@
     </section>
 
     <!-- CONTRATO -->
-    <section id="contrato" class="tab-content">
-      <h2>Contrato de Trabalho</h2>
-      <p>Descreva os dados contratuais.</p>
-      <form id="form-contrato">
-        <label>Data de admissão <input type="date" name="admissao"></label>
-        <label>Data de saída <input type="date" name="saida"></label>
-        <label>Função <input type="text" name="funcao"></label>
-        <label>Salário mensal (R$) <input type="number" name="salario" step="0.01"></label>
-        <label>Tipo de contrato
-          <select name="tipo_contrato">
-            <option value="">Selecione…</option>
-            <option>Prazo indeterminado</option>
-            <option>Prazo determinado</option>
-            <option>Experiência</option>
-            <option>Intermitente</option>
-            <option>Aprendiz</option>
-          </select>
-        </label>
-        <label>Jornada (ex.: 44h semanais, 220h/mês) <input type="text" name="jornada"></label>
-        <label>Local de trabalho <input type="text" name="local_trabalho"></label>
-      </form>
-      <div class="actions">
-        <button class="btn-ia">Gerar com IA</button>
-        <button class="btn-save">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
+<section id="contrato" class="tab-content">
+  <h2>Contrato de Trabalho</h2>
+  <p>Descreva os dados contratuais.</p>
+  <form id="form-contrato">
+    <label>Data de admissão <input type="date" name="admissao"></label>
+    <label>Data de saída <input type="date" name="saida"></label>
+    <label>Função <input type="text" name="funcao"></label>
+    <label>Salário mensal (R$) <input type="number" name="salario" step="0.01"></label>
+    <label>Tipo de contrato
+      <select name="tipo_contrato">
+        <option value="">Selecione…</option>
+        <option value="indeterminado">Prazo indeterminado</option>
+        <option value="determinado">Prazo determinado</option>
+        <option value="experiencia">Experiência</option>
+        <option value="intermitente">Intermitente</option>
+        <option value="aprendiz">Aprendiz</option>
+      </select>
+    </label>
+    <label>Jornada (ex.: 44h semanais, 220h/mês) <input type="text" name="jornada"></label>
+    <label>Local de trabalho <input type="text" name="local_trabalho"></label>
+  </form>
+  <div class="actions">
+    <button class="btn-ia">Gerar com IA</button>
+    <button class="btn-save">Salvar Trecho</button>
+  </div>
+  <div class="viewer"></div>
+</section>
+
 
     <!-- FATOS -->
     <section id="fatos" class="tab-content">
