@@ -31,6 +31,20 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     "Use APENAS as informações fornecidas (sem criar fatos). Estruture por tópicos com títulos, " +
     "alinhe pedidos e cálculos às regras trabalhistas e mantenha português do Brasil.";
 
+  // ADICIONAR ABAIXO DE ORIENTACAO_IA
+function getPromptIA() {
+  const texto = $('#editor-final')?.textContent.trim() || '';
+  return (
+    `${ORIENTACAO_IA}\n\n` +
+    `TAREFA: Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do conteúdo a seguir.\n\n` +
+    `CONTEÚDO:\n${texto}`
+  );
+}
+
+function makeGoogleIAUrl(prompt) {
+  return `https://www.google.com/search?q=${encodeURIComponent(prompt)}&udm=50`;
+}
+
   // ===== Abas =====
   const tabs = $$('.tabs button');
   const sections = $$('.tab-content');
@@ -559,29 +573,13 @@ const num = (s) => parseFloat(String(s).replace(',', '.')) || 0;
   function capitalize(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
   // ===== Ações finais =====
-  $('#btn-gerar-final')?.addEventListener('click', () => {
-    const editor = $('#editor-final');
-    if (!editor) return;
-    const plain = editor.innerText.trim();
-    editor.textContent = plain;
-  });
+ 
+ $('#btn-copiar')?.addEventListener('click', async () => {
+  const p = getPromptIA();
+  try { await navigator.clipboard.writeText(p); } catch {}
+  alert('Prompt copiado.');
+});
 
-  $('#btn-copiar')?.addEventListener('click', () => {
-    const text = $('#editor-final')?.textContent || '';
-    navigator.clipboard.writeText(text);
-    alert('Prompt copiado.');
-  });
-
-  $('#btn-baixar')?.addEventListener('click', () => {
-    const text = $('#editor-final')?.textContent || '';
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'peticao_trabalhista.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
 
   // Reiniciar tudo (global)
   $('#btn-reiniciar')?.addEventListener('click', () => {
@@ -610,14 +608,15 @@ const num = (s) => parseFloat(String(s).replace(',', '.')) || 0;
 
   // ===== Botão "Abrir no Google IA" (prompt base) =====
   $('#btn-google-ia')?.addEventListener('click', () => {
-    const texto = $('#editor-final')?.textContent.trim() || '';
-    const contexto =
-      `${ORIENTACAO_IA}\n\n` +
-      `TAREFA: Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do conteúdo a seguir.\n\n` +
-      `CONTEÚDO:\n${texto}`;
-    const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
-    window.open(url, '_blank');
-  });
+  const texto = $('#editor-final')?.textContent.trim() || '';
+  const contexto =
+    `${ORIENTACAO_IA}\n\n` +
+    `TAREFA: Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do conteúdo a seguir.\n\n` +
+    `CONTEÚDO:\n${texto}`;
+  const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
+  window.open(url, '_blank');
+});
+
 
   // ===== Botões "Gerar com IA" gerais =====
   $$('.tab-content .btn-ia').forEach(btn => {
