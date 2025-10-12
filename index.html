@@ -6,11 +6,22 @@
   <title>Editor de Peças Trabalhistas</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* destaque de seleção nas listas */
-    #fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
-    header .actions { margin-top:.5rem; }
-    header .actions button { margin-right:.5rem; }
-  </style>
+  /* destaque de seleção nas listas */
+  #fundamentos-box li.ativo,
+  #pedidos-box li.ativo { background:#eef; }
+
+  header .actions { margin-top:.5rem; }
+  header .actions button { margin-right:.5rem; }
+
+  /* campos dinâmicos por fato — opcional */
+  .fato-bloco .fato-campos-form label { margin:6px 0; display:block; }
+  .fato-bloco .fato-campos-form textarea { width:100%; }
+  .fato-bloco .fato-campos-form input[type="text"],
+  .fato-bloco .fato-campos-form input[type="number"],
+  .fato-bloco .fato-campos-form input[type="date"],
+  .fato-bloco .fato-campos-form select { max-width:520px; }
+</style>
+
 </head>
 <body>
 
