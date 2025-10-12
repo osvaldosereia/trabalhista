@@ -1,4 +1,4 @@
-// app.js completo
+// app.js completo (ajustado)
 import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
 (() => {
@@ -8,8 +8,8 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   const $$ = (q, el = document) => Array.from(el.querySelectorAll(q));
 
   // ===== Estado =====
-  const trechos = {};                // HTML por seção
-  const fatosSelecionados = [];      // lista de fatos adicionados
+  const trechos = {};                 // HTML por seção
+  const fatosSelecionados = [];       // lista de fatos adicionados
   const fundamentosSelecionados = []; // itens clicados para incluir
   const pedidosSelecionados = [];     // itens clicados para incluir
   const provasCatalogo = [
@@ -31,24 +31,23 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   });
 
-  // ===== Inicialização FFP =====
+  // ===== Inicialização FFP (Fatos no <select>) =====
   function carregarFFP() {
-  if (!Array.isArray(FFP) || !FFP.length) {
-    console.error('FFP não carregado.');
-    return;
+    if (!Array.isArray(FFP) || !FFP.length) {
+      console.error('FFP não carregado.');
+      return;
+    }
+    const sel = $('#select-fato');
+    if (!sel) return;
+
+    sel.innerHTML = '<option value="">Selecione um fato</option>';
+    FFP.filter(x => x.fato).forEach(item => {
+      const op = document.createElement('option');
+      op.value = item.fato;
+      op.textContent = item.fato;
+      sel.appendChild(op);
+    });
   }
-  const sel = $('#select-fato');
-  if (!sel) return; // <-- guarda extra
-
-  sel.innerHTML = '<option value="">Selecione um fato</option>';
-  FFP.filter(x => x.fato).forEach(item => {
-    const op = document.createElement('option');
-    op.value = item.fato;
-    op.textContent = item.fato;
-    sel.appendChild(op);
-  });
-}
-
 
   // ===== Adicionar múltiplos Fatos =====
   function uiAddFato(nomeFato) {
@@ -84,6 +83,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     uiAddFato(val);
   });
 
+  // ===== Fundamentos & Pedidos derivados dos Fatos =====
   function rebuildFundamentosPedidos() {
     const fundUL = $('#fundamentos-box');
     const pedUL = $('#pedidos-box');
@@ -105,7 +105,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     Array.from(itensFund).forEach(txt => {
       const li = document.createElement('li');
       li.textContent = txt;
-      li.title = 'Clique para incluir no editor';
+      li.title = 'Clique para incluir/remover no editor';
       li.addEventListener('click', () => toggleItem(li, fundamentosSelecionados, txt));
       fundUL.appendChild(li);
     });
@@ -114,7 +114,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     Array.from(itensPed).forEach(txt => {
       const li = document.createElement('li');
       li.textContent = txt;
-      li.title = 'Clique para incluir no editor';
+      li.title = 'Clique para incluir/remover no editor';
       li.addEventListener('click', () => toggleItem(li, pedidosSelecionados, txt));
       pedUL.appendChild(li);
     });
@@ -169,6 +169,12 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
     // salvar manual por aba
     toolbar.querySelector('.btn-save-local').addEventListener('click', () => {
+      // Para qualificação/contrato, gerar a partir dos formulários:
+      if (sectionId === 'qualificacao') {
+        gerarQualificacao();
+      } else if (sectionId === 'contrato') {
+        gerarContrato();
+      }
       trechos[sectionId] = editor.innerHTML;
       atualizarFinal();
       persist();
@@ -211,58 +217,59 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     const sec = document.getElementById(id);
     return sec ? sec.querySelector('.editor-mini') : null;
   }
-// ================== PRELIMINARES (popular e adicionar) ==================
-function popularPreliminares() {
-  const sel   = document.getElementById('preliminares-select');
-  const btn   = document.getElementById('add-preliminar');
-  const lista = document.getElementById('preliminares-list');
-  const editor = sectionEditor('preliminares');
-  if (!sel || !btn || !lista || !editor || !Array.isArray(PRELIMINARES)) return;
 
-  // preenche o select
-  sel.innerHTML = '<option value="">Selecione…</option>';
-  PRELIMINARES.forEach((p, i) => {
-    const opt = document.createElement('option');
-    opt.value = String(i);
-    opt.textContent = `${p.titulo} — ${p.fundamentoCurto}`;
-    sel.appendChild(opt);
-  });
+  // ================== PRELIMINARES (popular e adicionar) ==================
+  function popularPreliminares() {
+    const sel   = document.getElementById('preliminares-select');
+    const btn   = document.getElementById('add-preliminar');
+    const lista = document.getElementById('preliminares-list');
+    const editor = sectionEditor('preliminares');
+    if (!sel || !btn || !lista || !editor || !Array.isArray(PRELIMINARES)) return;
 
-  // adiciona a preliminar ao clicar no botão
-  btn.addEventListener('click', () => {
-    const idx = parseInt(sel.value, 10);
-    if (isNaN(idx)) return;
-    const item = PRELIMINARES[idx];
+    // preenche o select
+    sel.innerHTML = '<option value="">Selecione…</option>';
+    PRELIMINARES.forEach((p, i) => {
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      opt.textContent = `${p.titulo} — ${p.fundamentoCurto}`;
+      sel.appendChild(opt);
+    });
 
-    // cria linha clicável na lista (toggle no editor)
-    const li = document.createElement('li');
-    li.textContent = `${item.titulo} — ${item.fundamentoCurto}`;
-    li.style.cursor = 'pointer';
-    li.title = 'Clique para inserir/remover no editor';
-    lista.appendChild(li);
+    // adiciona a preliminar ao clicar no botão
+    btn.addEventListener('click', () => {
+      const idx = parseInt(sel.value, 10);
+      if (isNaN(idx)) return;
+      const item = PRELIMINARES[idx];
 
-    const bloco = `<p><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
-    // insere no editor ao adicionar
-    editor.innerHTML += bloco;
-    trechos['preliminares'] = editor.innerHTML;
-    atualizarFinal();
-    persist();
+      // cria linha clicável na lista (toggle no editor)
+      const li = document.createElement('li');
+      li.textContent = `${item.titulo} — ${item.fundamentoCurto}`;
+      li.style.cursor = 'pointer';
+      li.title = 'Clique para inserir/remover no editor';
+      lista.appendChild(li);
 
-    // toggle por clique na linha
-    li.addEventListener('click', () => {
-      if (editor.innerHTML.includes(bloco)) {
-        editor.innerHTML = editor.innerHTML.replace(bloco, '');
-      } else {
-        editor.innerHTML += bloco;
-      }
+      const bloco = `<p><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
+      // insere no editor ao adicionar
+      editor.innerHTML += bloco;
       trechos['preliminares'] = editor.innerHTML;
       atualizarFinal();
       persist();
-    });
 
-    sel.value = '';
-  });
-}
+      // toggle por clique na linha
+      li.addEventListener('click', () => {
+        if (editor.innerHTML.includes(bloco)) {
+          editor.innerHTML = editor.innerHTML.replace(bloco, '');
+        } else {
+          editor.innerHTML += bloco;
+        }
+        trechos['preliminares'] = editor.innerHTML;
+        atualizarFinal();
+        persist();
+      });
+
+      sel.value = '';
+    });
+  }
 
   // ===== Provas catálogo =====
   function buildProvas() {
@@ -335,6 +342,91 @@ function popularPreliminares() {
     persist();
   }
 
+  // ===== Builders de texto (Qualificação e Contrato) =====
+  function gerarQualificacao() {
+    const ed = sectionEditor('qualificacao');
+    if (!ed) return;
+
+    const f = $('#form-qualificacao');
+    if (!f) return;
+
+    const get = (name) => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+
+    // Reclamante
+    const rc = {
+      nome: get('reclamante_nome') || get('reclamante'),
+      cpf: get('reclamante_cpf') || get('cpf'),
+      rg: get('reclamante_rg'),
+      ctps: get('reclamante_ctps'),
+      serie: get('reclamante_ctps_serie'),
+      prof: get('reclamante_profissao') || get('profissao'),
+      end: get('reclamante_endereco') || get('endereco'),
+      bairro: get('reclamante_bairro'),
+      cidade: get('reclamante_cidade'),
+      uf: get('reclamante_uf'),
+      cep: get('reclamante_cep'),
+      fone: get('reclamante_fone'),
+      email: get('reclamante_email')
+    };
+
+    // Reclamada
+    const rd = {
+      nome: get('reclamada_nome') || get('reclamada'),
+      cnpj: get('reclamada_cnpj') || get('cnpj'),
+      end: get('reclamada_endereco') || get('endereco_reclamada'),
+      bairro: get('reclamada_bairro'),
+      cidade: get('reclamada_cidade'),
+      uf: get('reclamada_uf'),
+      cep: get('reclamada_cep'),
+      fone: get('reclamada_fone'),
+      email: get('reclamada_email')
+    };
+
+    const reclamanteTxt = `
+      <p><strong>Reclamante:</strong> ${rc.nome || '[NOME]'}, ${rc.prof || '[PROFISSÃO]'},
+      portador do CPF ${rc.cpf || '[CPF]'}${rc.rg ? `, RG ${rc.rg}` : ''}${rc.ctps ? `, CTPS ${rc.ctps}${rc.serie ? `, série ${rc.serie}` : ''}` : ''},
+      residente na ${rc.end || '[ENDEREÇO]'}${rc.bairro ? `, ${rc.bairro}` : ''}, ${rc.cidade || ''}-${rc.uf || ''}${rc.cep ? `, CEP ${rc.cep}` : ''}${rc.fone ? `, Tel. ${rc.fone}` : ''}${rc.email ? `, E-mail: ${rc.email}` : ''}.</p>
+    `.trim();
+
+    const reclamadaTxt = `
+      <p><strong>Reclamada:</strong> ${rd.nome || '[RAZÃO SOCIAL]'}, inscrita no CNPJ ${rd.cnpj || '[CNPJ]'},
+      com endereço na ${rd.end || '[ENDEREÇO]'}${rd.bairro ? `, ${rd.bairro}` : ''}, ${rd.cidade || ''}-${rd.uf || ''}${rd.cep ? `, CEP ${rd.cep}` : ''}${rd.fone ? `, Tel. ${rd.fone}` : ''}${rd.email ? `, E-mail: ${rd.email}` : ''}.</p>
+    `.trim();
+
+    ed.innerHTML = `<div>${reclamanteTxt}${reclamadaTxt}</div>`;
+    trechos['qualificacao'] = ed.innerHTML;
+    atualizarFinal();
+    persist();
+  }
+
+  function gerarContrato() {
+    const ed = sectionEditor('contrato');
+    if (!ed) return;
+
+    const f = $('#form-contrato');
+    if (!f) return;
+
+    const get = (name) => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+    const adm = get('admissao');
+    const sai = get('saida');
+    const funcao = get('funcao');
+    const salario = get('salario');
+    const tipo = get('tipo_contrato');
+    const jornada = get('jornada');
+    const local = get('local_trabalho');
+
+    const contratoTxt = `
+      <p><strong>Contrato de Trabalho:</strong> Admissão em ${adm || '[DATA ADMISSÃO]'}${sai ? `, desligamento em ${sai}` : ''}.
+      Função exercida: ${funcao || '[FUNÇÃO]'}, salário mensal de R$ ${salario || '[0,00]'}.
+      Regime contratual: ${tipo || '[TIPO]'}, jornada: ${jornada || '[JORNADA]'}${local ? `, local de trabalho: ${local}` : ''}.</p>
+    `.trim();
+
+    ed.innerHTML = contratoTxt;
+    trechos['contrato'] = ed.innerHTML;
+    atualizarFinal();
+    persist();
+  }
+
   // ===== Visualizador Final =====
   function atualizarFinal() {
     const editorFinal = $('#editor-final');
@@ -372,20 +464,51 @@ function popularPreliminares() {
     URL.revokeObjectURL(url);
   });
 
-  // Google IA no FINAL
-  $('#btn-google-ia').addEventListener('click', () => {
-    const texto = $('#editor-final').textContent.trim();
-    const contexto = `Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do seguinte conteúdo estruturado: ${texto}`;
-    const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
-    window.open(url, '_blank');
+  // ===== Botões "Gerar com IA" das ações de cada aba =====
+  $$('.tab-content .btn-ia').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sec = btn.closest('.tab-content')?.id;
+      if (!sec) return;
+      const ed = sectionEditor(sec);
+      openGoogleIAForSection(sec, ed || { innerText: '' });
+    });
   });
 
-  // ===== Provas salvar =====
+  // ===== Botões "Salvar Trecho" das ações de cada aba =====
+  $$('.tab-content .btn-save').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sec = btn.closest('.tab-content')?.id;
+      if (!sec) return;
+
+      // gerar textos das seções com formulário antes de salvar
+      if (sec === 'qualificacao') gerarQualificacao();
+      if (sec === 'contrato') gerarContrato();
+
+      const ed = sectionEditor(sec);
+      if (!ed) return;
+      trechos[sec] = ed.innerHTML;
+      atualizarFinal();
+      persist();
+      alert('Trecho salvo.');
+    });
+  });
+
+  // ===== Google IA por seção =====
+  function openGoogleIAForSection(sectionId, editorEl) {
+    const titulo = document.getElementById(sectionId).querySelector('h2').textContent;
+    const inputs = document.getElementById(sectionId).querySelectorAll('input, textarea, select');
+    const dados = Array.from(inputs).map(el => `${el.name || el.id}: ${el.value}`).filter(s => !s.endsWith(': ')).join(' | ');
+    const texto = editorEl.innerText?.trim?.() || '';
+    const contexto = `Redija o trecho "${titulo}" de uma Reclamação Trabalhista. Use linguagem técnica forense. Dados: ${dados}. Texto atual: ${texto}`;
+    const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
+    window.open(url, '_blank');
+  }
+
+  // ===== Persistência =====
   function collectProvasSelecionadas() {
     return Array.from($('#provas-box').querySelectorAll('input[type="checkbox"]:checked')).map(i => i.value);
   }
 
-  // ===== Persistência =====
   function persist() {
     const payload = {
       trechos,
@@ -408,9 +531,8 @@ function popularPreliminares() {
       // fatos
       (data.fatosSelecionados || []).forEach(uiAddFato);
 
-      // listas selecionadas não renderizam OK antes do rebuild, então aplicar após rebuild
+      // listas selecionadas — aplicar após rebuild
       setTimeout(() => {
-        // marcar fundamentos e pedidos antigos como ativos
         $$('ul#fundamentos-box li').forEach(li => {
           if ((data.fundamentosSelecionados || []).includes(li.textContent)) {
             li.classList.add('ativo');
@@ -443,6 +565,15 @@ function popularPreliminares() {
         if (el) el.checked = true;
       });
 
+      // repintar editores já salvos
+      const ids = ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'];
+      ids.forEach(id => {
+        if (trechos[id]) {
+          const ed = sectionEditor(id);
+          if (ed) ed.innerHTML = trechos[id];
+        }
+      });
+
       atualizarFinal();
       recalcTabela();
     } catch(e) {
@@ -450,37 +581,14 @@ function popularPreliminares() {
     }
   }
 
- // Botões "Salvar Trecho" das ações de cada aba
-$$('.tab-content .btn-save').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const sec = btn.closest('.tab-content')?.id;
-    if (!sec) return;
-    const ed = sectionEditor(sec);
-    if (!ed) return;
-    trechos[sec] = ed.innerHTML;
-    atualizarFinal();
-    persist();
-    alert('Trecho salvo.');
-  });
-});
-
-
-  // ===== Google IA por seção =====
-  function openGoogleIAForSection(sectionId, editorEl) {
-    const titulo = document.getElementById(sectionId).querySelector('h2').textContent;
-    const inputs = document.getElementById(sectionId).querySelectorAll('input, textarea, select');
-    const dados = Array.from(inputs).map(el => `${el.name || el.id}: ${el.value}`).filter(s => !s.endsWith(': ')).join(' | ');
-    const texto = editorEl.innerText.trim();
-    const contexto = `Redija o trecho "${titulo}" de uma Reclamação Trabalhista. Use linguagem técnica forense. Dados: ${dados}. Texto atual: ${texto}`;
-    const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
-    window.open(url, '_blank');
-  }
-
   // ===== Provas e inicialização =====
   buildProvas();
   carregarFFP();
-  popularPreliminares();   // <— adicione esta linha
+  popularPreliminares();
   restore();
   recalcTabela();
+
+  // ===== Estilo ativo (dica CSS a ser usada no style.css) =====
+  // #fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
 
 })();
