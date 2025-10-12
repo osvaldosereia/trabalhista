@@ -25,19 +25,19 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
   // ===== Orientação base para a IA =====
   const ORIENTACAO_IA =
-    "Atue como ADVOGADO TRABALHISTA experiente. Redija em linguagem forense, clara, coesa e impessoal, " +
-    "citando CLT, CF/88, CPC e súmulas/OJs do TST quando cabível. " +
-    "Use APENAS as informações fornecidas (sem criar fatos). Estruture por tópicos com títulos, " +
-    "alinhe pedidos e cálculos às regras trabalhistas e mantenha português do Brasil.";
+    "Atue como ADVOGADO TRABALHISTA experiente. Redija trechos fiéis à prática forense da JT, " +
+    "fundamente com CLT, CF/88, leis correlatas, Súmulas/OJs do TST e precedentes. " +
+    "Se necessário, pesquise em fontes oficiais (Planalto, LexML, CNJ, TST, TRTs, INSS, Gov.br) " +
+    "e em fonte consolidada (JusBrasil). Mantenha linguagem técnica, concisa e estruturada.";
 
-  // ===== Abas =====
-  const tabs = $$('.tabs button');
+  // ===== Tabs =====
+  const tabs = $$('.tabs .tab');
   const sections = $$('.tab-content');
-  tabs.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabs.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const id = btn.dataset.tab;
+  tabs.forEach(t => {
+    t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      const id = t.dataset.tab;
       sections.forEach(s => s.classList.toggle('active', s.id === id));
     });
   });
@@ -52,20 +52,28 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     if (!sel) return;
 
     sel.innerHTML = '<option value="">Selecione um fato</option>';
-    FFP.filter(x => x.fato).forEach(item => {
-      const op = document.createElement('option');
-      op.value = item.fato;
-      op.textContent = item.fato;
-      sel.appendChild(op);
+    FFP.forEach(grupo => {
+      const optgroup = document.createElement('optgroup');
+      optgroup.label = grupo.categoria;
+      grupo.itens.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f.nome;
+        opt.textContent = f.nome;
+        optgroup.appendChild(opt);
+      });
+      sel.appendChild(optgroup);
+    });
+
+    $('#btn-add-fato')?.addEventListener('click', () => {
+      const nome = sel.value;
+      if (!nome) return;
+      if (fatosSelecionados.includes(nome)) return;
+      fatosSelecionados.push(nome);
+      addFatoUI(nome);
     });
   }
 
-  // ===== Adicionar múltiplos Fatos =====
-  function uiAddFato(nomeFato) {
-    if (!nomeFato) return;
-    if (fatosSelecionados.includes(nomeFato)) return;
-    fatosSelecionados.push(nomeFato);
-
+  function addFatoUI(nomeFato) {
     const wrap = $('#fatos-list');
     if (!wrap) return;
 
@@ -97,20 +105,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     persist();
   }
 
-  $('#add-fato')?.addEventListener('click', () => {
-    const val = $('#select-fato')?.value;
-    uiAddFato(val);
-  });
-
-  // ===== Helpers seleção =====
-  const getFundSelecionadosFlat = () =>
-    Object.entries(selecaoPorFato.fundamentos)
-      .flatMap(([_, set]) => Array.from(set || []));
-  const getPedSelecionadosFlat = () =>
-    Object.entries(selecaoPorFato.pedidos)
-      .flatMap(([_, set]) => Array.from(set || []));
-
-  // ===== Fundamentos & Pedidos — UI categorizada por Fato =====
+  // ===== Montagem Fundamentos/Pedidos por fato =====
   function rebuildFundamentosPedidos() {
     const fundBox = $('#fundamentos-box');
     const pedBox  = $('#pedidos-box');
@@ -120,22 +115,18 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     pedBox.innerHTML  = '';
 
     fatosSelecionados.forEach(fato => {
-      const row = FFP.find(x => x.fato === fato);
-      if (!row) return;
+      const f = acharFato(fato);
+      if (!f) return;
 
-      // garantir sets no estado
       if (!selecaoPorFato.fundamentos[fato]) selecaoPorFato.fundamentos[fato] = new Set();
       if (!selecaoPorFato.pedidos[fato])     selecaoPorFato.pedidos[fato]     = new Set();
 
-      // FUNDAMENTOS
+      // Fundamentos
       const detF = document.createElement('details');
       detF.open = true;
-      const sumF = document.createElement('summary');
-      sumF.textContent = `Fato: ${fato}`;
-      detF.appendChild(sumF);
-
+      detF.innerHTML = `<summary><strong>${fato}</strong></summary>`;
       const ulF = document.createElement('ul');
-      (row.fundamentos || []).forEach(txt => {
+      f.fundamentos.forEach(txt => {
         const li = document.createElement('li');
         li.textContent = txt;
         li.dataset.fato = fato;
@@ -149,15 +140,12 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       detF.appendChild(ulF);
       fundBox.appendChild(detF);
 
-      // PEDIDOS
+      // Pedidos
       const detP = document.createElement('details');
       detP.open = true;
-      const sumP = document.createElement('summary');
-      sumP.textContent = `Fato: ${fato}`;
-      detP.appendChild(sumP);
-
+      detP.innerHTML = `<summary><strong>${fato}</strong></summary>`;
       const ulP = document.createElement('ul');
-      (row.pedidos || []).forEach(txt => {
+      f.pedidos.forEach(txt => {
         const li = document.createElement('li');
         li.textContent = txt;
         li.dataset.fato = fato;
@@ -174,7 +162,8 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   }
 
   function toggleCategorizado(tipo, fato, valor, li) {
-    const bucket = tipo === 'fund' ? selecaoPorFato.fundamentos : selecaoPorFato.pedidos;
+    const bucket = tipo === 'fund' 
+      ? selecaoPorFato.fundamentos : selecaoPorFato.pedidos;
     if (!bucket[fato]) bucket[fato] = new Set();
     if (bucket[fato].has(valor)) {
       bucket[fato].delete(valor);
@@ -191,69 +180,14 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     persist();
   }
 
-  // ===== Mini editores por seção =====
-  $$('.viewer').forEach(view => {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'editor-area';
-    const toolbar = document.createElement('div');
-    toolbar.className = 'toolbar';
-    toolbar.innerHTML = `
-      <button data-cmd="bold" title="Negrito"><b>B</b></button>
-      <button data-cmd="italic" title="Itálico"><i>I</i></button>
-      <button data-cmd="insertUnorderedList" title="Lista">• Lista</button>
-      <button data-cmd="removeFormat" title="Limpar editor">🧹 Limpar</button>
-      <button class="btn-ia-local" title="Gerar com Google IA">🌐 IA</button>
-      <button class="btn-save-local" title="Salvar trecho">💾</button>
-    `;
-    const editor = document.createElement('div');
-    editor.className = 'editor-mini';
-    editor.contentEditable = true;
-    const sectionId = view.closest('.tab-content').id;
-    editor.dataset.section = sectionId;
-
-    wrapper.appendChild(toolbar);
-    wrapper.appendChild(editor);
-    view.replaceWith(wrapper);
-
-    toolbar.addEventListener('click', e => {
-      const cmd = e.target.dataset.cmd;
-      if (!cmd) return;
-      if (cmd === 'removeFormat') {
-        // limpar de forma previsível
-        editor.innerHTML = '';
-        trechos[sectionId] = '';
-        if (sectionId === 'calculos') {
-          limparTabela();
-          recalcTabela();
-        }
-        atualizarFinal();
-        persist();
-      } else {
-        document.execCommand(cmd, false, null);
+  function acharFato(nome) {
+    for (const g of FFP) {
+      for (const f of g.itens) {
+        if (f.nome === nome) return f;
       }
-    });
-
-    // IA local por aba
-    toolbar.querySelector('.btn-ia-local').addEventListener('click', () => openGoogleIAForSection(sectionId, editor));
-
-    // salvar manual por aba
-    toolbar.querySelector('.btn-save-local').addEventListener('click', () => {
-      if (sectionId === 'qualificacao') gerarQualificacao();
-      else if (sectionId === 'contrato') gerarContrato();
-      trechos[sectionId] = editor.innerHTML;
-      atualizarFinal();
-      persist();
-      alert('Trecho salvo.');
-    });
-
-    // salvar e sincronizar ao digitar
-    editor.addEventListener('input', () => {
-      trechos[sectionId] = editor.innerHTML;
-      if (sectionId === 'calculos') recalcTabela();
-      atualizarFinal();
-      persist();
-    });
-  });
+    }
+    return null;
+  }
 
   // ===== Sincronizações específicas =====
   function sectionEditor(id) {
@@ -264,7 +198,8 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   function syncFatosEditor() {
     const editor = sectionEditor('fatos');
     if (!editor) return;
-    editor.innerHTML = fatosSelecionados.map(f => `<p><strong>${f}:</strong> [Descrever fatos com base nos documentos anexados]</p>`).join('');
+    editor.innerHTML = fatosSelecionados
+      .map(f => `<p><strong>${f}:</strong> [Descrever fatos com base nos documentos anexados]</p>`).join('');
     trechos['fatos'] = editor.innerHTML;
   }
 
@@ -290,55 +225,70 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     }).filter(Boolean).join('');
     editor.innerHTML = html || '<p>[Selecione pedidos]</p>';
     trechos['pedidos'] = editor.innerHTML;
-    ensurePedidoOnTabela();
   }
 
-  // ================== PRELIMINARES (popular e adicionar) ==================
-  function popularPreliminares() {
-    const sel   = document.getElementById('preliminares-select');
-    const btn   = document.getElementById('add-preliminar');
-    const lista = document.getElementById('preliminares-list');
-    const editor = sectionEditor('preliminares');
-    if (!sel || !btn || !lista || !editor || !Array.isArray(PRELIMINARES)) return;
+  // ===== Garantir que pedidos marcados virem linhas na tabela =====
+  function ensurePedidoOnTabela() {
+    const tbody = $('#tabela-calculos tbody');
+    if (!tbody) return;
+    const atuais = new Set(Array.from(tbody.querySelectorAll('tr')).map(tr => tr.dataset.item));
+    const marcados = [];
+    fatosSelecionados.forEach(f => {
+      Array.from(selecaoPorFato.pedidos[f] || []).forEach(p => marcados.push(p));
+    });
+    // incluir os que não existem
+    marcados.forEach(nome => {
+      if (atuais.has(nome)) return;
+      const tr = document.createElement('tr');
+      tr.dataset.item = nome;
+      tr.innerHTML = `
+        <td>${nome}</td>
+        <td><input type="number" step="0.01" value="0"></td>
+        <td><input type="number" step="0.01" value="1"></td>
+        <td><input type="number" step="0.01" value="0"></td>
+        <td class="total">0,00</td>
+      `;
+      tbody.appendChild(tr);
+      tr.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
+    });
+    // remover linhas que não estão mais marcadas
+    tbody.querySelectorAll('tr').forEach(tr => {
+      const nome = tr.dataset.item;
+      if (!marcados.includes(nome) && nome !== 'Item manual') tr.remove();
+    });
+  }
 
-    sel.innerHTML = '<option value="">Selecione…</option>';
-    PRELIMINARES.forEach((p, i) => {
+  // ===== Preliminares (catálogo) =====
+  function popularPreliminares() {
+    const sel = $('#select-preliminar');
+    const editor = sectionEditor('preliminares');
+    if (!sel || !editor) return;
+
+    sel.innerHTML = '<option value="">Adicionar preliminar</option>';
+    PRELIMINARES.forEach(p => {
       const opt = document.createElement('option');
-      opt.value = String(i);
-      opt.textContent = `${p.titulo} — ${p.fundamentoCurto}`;
+      opt.value = p.id;
+      opt.textContent = p.titulo;
       sel.appendChild(opt);
     });
 
-    btn.addEventListener('click', () => {
-      const idx = parseInt(sel.value, 10);
-      if (isNaN(idx)) return;
-      const item = PRELIMINARES[idx];
-
-      const li = document.createElement('li');
-      li.textContent = `${item.titulo} — ${item.fundamentoCurto}`;
-      li.style.cursor = 'pointer';
-      li.title = 'Clique para inserir/remover no editor';
-      lista.appendChild(li);
-
-      const blocoId = `pre_${idx}_${Date.now()}`;
-      const bloco = `<p data-pre-id="${blocoId}"><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
-      editor.insertAdjacentHTML('beforeend', bloco);
+    $('#btn-add-preliminar')?.addEventListener('click', () => {
+      const id = sel.value;
+      if (!id) return;
+      const p = PRELIMINARES.find(x => x.id === id);
+      if (!p) return;
+      const bloco = `
+        <h4>${p.titulo}</h4>
+        <p>${p.texto}</p>
+      `;
+      if (editor.innerHTML.includes(`<h4>${p.titulo}</h4>`)) {
+        alert('Essa preliminar já foi incluída.');
+      } else {
+        editor.insertAdjacentHTML('beforeend', bloco);
+      }
       trechos['preliminares'] = editor.innerHTML;
       atualizarFinal();
       persist();
-
-      li.addEventListener('click', () => {
-        const el = editor.querySelector(`[data-pre-id="${blocoId}"]`);
-        if (el) {
-          el.remove();
-        } else {
-          editor.insertAdjacentHTML('beforeend', bloco);
-        }
-        trechos['preliminares'] = editor.innerHTML;
-        atualizarFinal();
-        persist();
-      });
-
       sel.value = '';
     });
   }
@@ -361,56 +311,27 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     const tbody = $('#tabela-calculos tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    $('#total-geral') && ($('#total-geral').textContent = '0,00');
-  }
-
-  function ensurePedidoOnTabela() {
-    const tbody = $('#tabela-calculos tbody');
-    if (!tbody) return;
-
-    // chaves esperadas com base nos pedidos selecionados
-    const selectedKeys = new Set(
-      getPedSelecionadosFlat().map(p => 'p_' + p.slice(0, 40))
-    );
-
-    // remover linhas de pedidos que não estão mais selecionados
-    Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-      const k = tr.dataset.key || '';
-      if (k.startsWith('p_') && !selectedKeys.has(k)) tr.remove();
-    });
-
-    // adicionar linhas que faltam
-    const rowKeys = new Set(
-      Array.from(tbody.querySelectorAll('tr')).map(r => r.dataset.key)
-    );
-
-    selectedKeys.forEach(key => {
-      if (!rowKeys.has(key)) {
-        const p = key.slice(2);
-        const tr = document.createElement('tr');
-        tr.dataset.key = key;
-        tr.innerHTML = `
-          <td contenteditable="true">${p}</td>
-          <td><input type="number" step="0.01" value="0"></td>
-          <td><input type="number" step="0.01" value="1"></td>
-          <td><input type="number" step="0.01" value="0"></td>
-          <td class="total">0,00</td>
-        `;
-        tbody.appendChild(tr);
-        tr.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
-      }
-    });
-
-    recalcTabela();
+    // linha manual inicial
+    const tr = document.createElement('tr');
+    tr.dataset.item = 'Item manual';
+    tr.innerHTML = `
+      <td>Item manual</td>
+      <td><input type="number" step="0.01" value="0"></td>
+      <td><input type="number" step="0.01" value="1"></td>
+      <td><input type="number" step="0.01" value="0"></td>
+      <td class="total">0,00</td>
+    `;
+    tbody.appendChild(tr);
+    tr.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
   }
 
   $('#btn-add-linha')?.addEventListener('click', () => {
     const tbody = $('#tabela-calculos tbody');
     if (!tbody) return;
     const tr = document.createElement('tr');
-    tr.dataset.key = 'manual_' + Date.now();
+    tr.dataset.item = 'Item manual';
     tr.innerHTML = `
-      <td contenteditable="true">Item manual</td>
+      <td>Item manual</td>
       <td><input type="number" step="0.01" value="0"></td>
       <td><input type="number" step="0.01" value="1"></td>
       <td><input type="number" step="0.01" value="0"></td>
@@ -444,6 +365,14 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     persist();
   }
 
+  // Valor da Causa manual em tempo real
+  document.getElementById('valorCausa')?.addEventListener('input', (e) => {
+    const v = parseFloat(e.target.value || '0');
+    trechos['valor'] = `<p><strong>Valor da Causa: R$ ${v.toFixed(2).replace('.', ',')}</strong></p>`;
+    atualizarFinal();
+    persist();
+  });
+
   // ===== Builders de texto (Qualificação e Contrato) =====
   function gerarQualificacao() {
     const ed = sectionEditor('qualificacao');
@@ -456,43 +385,45 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
     // Reclamante
     const rc = {
-      nome: get('reclamante_nome') || get('reclamante'),
-      cpf: get('reclamante_cpf') || get('cpf'),
-      rg: get('reclamante_rg'),
-      ctps: get('reclamante_ctps'),
-      serie: get('reclamante_ctps_serie'),
-      prof: get('reclamante_profissao') || get('profissao'),
-      end: get('reclamante_endereco') || get('endereco'),
-      bairro: get('reclamante_bairro'),
-      cidade: get('reclamante_cidade'),
-      uf: get('reclamante_uf'),
-      cep: get('reclamante_cep'),
-      fone: get('reclamante_fone'),
-      email: get('reclamante_email')
+      nome: get('reclamante_nome') || get('rec_nome'),
+      cpf: get('reclamante_cpf') || get('rec_cpf'),
+      rg: get('reclamante_rg') || get('rec_rg'),
+      orgao: get('reclamante_orgao') || get('rec_orgao'),
+      ctps: get('reclamante_ctps') || get('rec_ctps'),
+      serie: get('reclamante_serie') || get('rec_serie'),
+      prof: get('reclamante_profissao') || get('rec_profissao'),
+      estado: get('reclamante_estado_civil') || get('rec_estado_civil'),
+      end: get('reclamante_endereco') || get('rec_endereco'),
+      bairro: get('reclamante_bairro') || '',
+      cidade: get('reclamante_cidade') || '',
+      uf: get('reclamante_uf') || '',
+      cep: get('reclamante_cep') || '',
+      fone: get('reclamante_fone') || '',
+      email: get('reclamante_email') || ''
     };
 
     // Reclamada
     const rd = {
-      nome: get('reclamada_nome') || get('reclamada'),
-      cnpj: get('reclamada_cnpj') || get('cnpj'),
-      end: get('reclamada_endereco') || get('endereco_reclamada'),
-      bairro: get('reclamada_bairro'),
-      cidade: get('reclamada_cidade'),
-      uf: get('reclamada_uf'),
-      cep: get('reclamada_cep'),
-      fone: get('reclamada_fone'),
-      email: get('reclamada_email')
+      nome: get('reclamada_nome') || get('emp_nome'),
+      cnpj: get('reclamada_cnpj') || get('emp_cnpj'),
+      end: get('reclamada_endereco') || get('emp_endereco'),
+      bairro: get('reclamada_bairro') || '',
+      cidade: get('reclamada_cidade') || '',
+      uf: get('reclamada_uf') || '',
+      cep: get('reclamada_cep') || '',
+      fone: get('reclamada_fone') || '',
+      email: get('reclamada_email') || ''
     };
 
     const reclamanteTxt = `
       <p><strong>Reclamante:</strong> ${rc.nome || '[NOME]'}, ${rc.prof || '[PROFISSÃO]'},
-      portador do CPF ${rc.cpf || '[CPF]'}${rc.rg ? `, RG ${rc.rg}` : ''}${rc.ctps ? `, CTPS ${rc.ctps}${rc.serie ? `, série ${rc.serie}` : ''}` : ''},
-      residente na ${rc.end || '[ENDEREÇO]'}${rc.bairro ? `, ${rc.bairro}` : ''}, ${rc.cidade || ''}-${rc.uf || ''}${rc.cep ? `, CEP ${rc.cep}` : ''}${rc.fone ? `, Tel. ${rc.fone}` : ''}${rc.email ? `, E-mail: ${rc.email}` : ''}.</p>
+      portador do CPF ${rc.cpf || '[CPF]'}${rc.rg ? `, RG ${rc.rg}${rc.orgao ? `/${rc.orgao}` : ''}` : ''}${rc.ctps ? `, CTPS ${rc.ctps}${rc.serie ? `, série ${rc.serie}` : ''}` : ''},
+      residente na ${rc.end || '[ENDEREÇO]'}${rc.bairro ? `, ${rc.bairro}` : ''}${rc.cidade ? `, ${rc.cidade}` : ''}${rc.uf ? `/${rc.uf}` : ''}${rc.cep ? `, CEP ${rc.cep}` : ''}${rc.fone ? `, Tel.: ${rc.fone}` : ''}${rc.email ? `, E-mail: ${rc.email}` : ''}.</p>
     `.trim();
 
     const reclamadaTxt = `
       <p><strong>Reclamada:</strong> ${rd.nome || '[RAZÃO SOCIAL]'}, inscrita no CNPJ ${rd.cnpj || '[CNPJ]'},
-      com endereço na ${rd.end || '[ENDEREÇO]'}${rd.bairro ? `, ${rd.bairro}` : ''}, ${rd.cidade || ''}-${rd.uf || ''}${rd.cep ? `, CEP ${rd.cep}` : ''}${rd.fone ? `, Tel. ${rd.fone}` : ''}${rd.email ? `, E-mail: ${rd.email}` : ''}.</p>
+      com endereço na ${rd.end || '[ENDEREÇO]'}${rd.bairro ? `, ${rd.bairro}` : ''}${rd.cidade ? `, ${rd.cidade}` : ''}${rd.uf ? `/${rd.uf}` : ''}${rd.cep ? `, CEP ${rd.cep}` : ''}${rd.fone ? `, Tel.: ${rd.fone}` : ''}${rd.email ? `, E-mail: ${rd.email}` : ''}.</p>
     `.trim();
 
     ed.innerHTML = `<div>${reclamanteTxt}${reclamadaTxt}</div>`;
@@ -515,12 +446,13 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     const salario = get('salario');
     const tipo = get('tipo_contrato');
     const jornada = get('jornada');
-    const local = get('local_trabalho');
 
     const contratoTxt = `
-      <p><strong>Contrato de Trabalho:</strong> Admissão em ${adm || '[DATA ADMISSÃO]'}${sai ? `, desligamento em ${sai}` : ''}.
-      Função exercida: ${funcao || '[FUNÇÃO]'}, salário mensal de R$ ${salario || '[0,00]'}.
-      Regime contratual: ${tipo || '[TIPO]'}, jornada: ${jornada || '[JORNADA]'}${local ? `, local de trabalho: ${local}` : ''}.</p>
+      <p>O reclamante foi admitido em <strong>${adm || '[DATA DE ADMISSÃO]'}</strong>,
+      para exercer a função de <strong>${funcao || '[FUNÇÃO]'}</strong>,
+      percebendo salário de <strong>R$ ${salario || '[SALÁRIO]'}</strong>, sob regime
+      <strong>${tipo || '[TIPO DE CONTRATO]'}</strong>, com jornada <strong>${jornada || '[JORNADA]'}</strong>.
+      ${sai ? `A rescisão ocorreu em <strong>${sai}</strong>.` : ''}</p>
     `.trim();
 
     ed.innerHTML = contratoTxt;
@@ -531,90 +463,53 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
   // ===== Visualizador Final =====
   function atualizarFinal() {
-    const editorFinal = $('#editor-final');
-    if (!editorFinal) return;
-    const ordem = ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'];
-    const partes = ordem
-      .filter(id => trechos[id])
-      .map(id => `<h3>${capitalize(id)}</h3>${trechos[id]}`)
-      .join('<hr>');
-    editorFinal.innerHTML = partes || '<p>Nenhum trecho adicionado ainda.</p>';
+    const final = $('#editor-final');
+    if (!final) return;
+    const parts = [
+      trechos['qualificacao'],
+      trechos['preliminares'],
+      trechos['contrato'],
+      trechos['fatos'],
+      trechos['fundamentos'],
+      '<h3>Pedidos</h3>',
+      trechos['pedidos'],
+      '<h3>Calculos</h3>',
+      trechos['calculos'],
+      '<h3>Valor</h3>',
+      trechos['valor']
+    ].filter(Boolean);
+    final.innerHTML = parts.join('\n<hr>\n');
   }
 
-  function capitalize(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  // ===== Toolbar genérica dos editores =====
+  $$('.editor-toolbar').forEach(toolbar => {
+    const sectionId = toolbar.dataset.for;
+    const editor = sectionEditor(sectionId);
 
-  // ===== Ações finais =====
-  $('#btn-gerar-final')?.addEventListener('click', () => {
-    const editor = $('#editor-final');
-    if (!editor) return;
-    const plain = editor.innerText.trim();
-    editor.textContent = plain;
-  });
-
-  $('#btn-copiar')?.addEventListener('click', () => {
-    const text = $('#editor-final')?.textContent || '';
-    navigator.clipboard.writeText(text);
-    alert('Prompt copiado.');
-  });
-
-  $('#btn-baixar')?.addEventListener('click', () => {
-    const text = $('#editor-final')?.textContent || '';
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'peticao_trabalhista.txt';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  // Reiniciar tudo (global)
-  $('#btn-reiniciar')?.addEventListener('click', () => {
-    if (!confirm('Deseja realmente reiniciar todo o formulário? Esta ação apagará os dados salvos.')) return;
-    localStorage.removeItem(STORAGE_KEY);
-    Object.keys(trechos).forEach(k => delete trechos[k]);
-    fatosSelecionados.splice(0);
-    selecaoPorFato.fundamentos = {};
-    selecaoPorFato.pedidos = {};
-    $('#form-qualificacao')?.reset();
-    $('#form-contrato')?.reset();
-    $('#fatos-list') && ($('#fatos-list').innerHTML = '');
-    $('#fundamentos-box') && ($('#fundamentos-box').innerHTML = '');
-    $('#pedidos-box') && ($('#pedidos-box').innerHTML = '');
-    $('#preliminares-list') && ($('#preliminares-list').innerHTML = '');
-    $$('#provas-box input[type="checkbox"]').forEach(chk => chk.checked = false);
-    limparTabela();
-    ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'].forEach(id => {
-      const ed = sectionEditor(id);
-      if (ed) ed.innerHTML = '';
+    toolbar.querySelector('.btn-bold')?.addEventListener('click', () => document.execCommand('bold'));
+    toolbar.querySelector('.btn-italic')?.addEventListener('click', () => document.execCommand('italic'));
+    toolbar.querySelector('.btn-li')?.addEventListener('click', () => document.execCommand('insertUnorderedList'));
+    toolbar.querySelector('.btn-clear')?.addEventListener('click', () => {
+      if (confirm('Limpar conteúdo desta seção?')) {
+        if (editor) editor.innerHTML = '';
+        trechos[sectionId] = '';
+        if (sectionId === 'calculos') {
+          limparTabela();
+          recalcTabela();
+        }
+        atualizarFinal();
+        persist();
+      }
     });
-    atualizarFinal();
-    recalcTabela();
-    alert('Formulário reiniciado.');
-  });
-
-  // ===== Botão "Abrir no Google IA" (prompt base) =====
-  $('#btn-google-ia')?.addEventListener('click', () => {
-    const texto = $('#editor-final')?.textContent.trim() || '';
-    const contexto =
-      `${ORIENTACAO_IA}\n\n` +
-      `TAREFA: Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do conteúdo a seguir.\n\n` +
-      `CONTEÚDO:\n${texto}`;
-    const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
-    window.open(url, '_blank');
-  });
-
-  // ===== Botões "Gerar com IA" gerais =====
-  $$('.tab-content .btn-ia').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const sec = btn.closest('.tab-content')?.id;
-      if (!sec) return;
-      const ed = sectionEditor(sec);
-      openGoogleIAForSection(sec, ed || { innerText: '' });
+    toolbar.querySelector('.btn-ia-local')?.addEventListener('click', () => openGoogleIAForSection(sectionId, editor));
+    toolbar.querySelector('.btn-save')?.addEventListener('click', () => {
+      // atalho local de salvar pela toolbar
+      const btn = document.querySelector(`#${sectionId} .btn-save`);
+      btn?.click();
     });
   });
 
-  // ===== Botões "Salvar Trecho" gerais =====
+  // ===== Botão "Salvar Trecho" por seção (ajustado p/ Cálculos e Valor) =====
   $$('.tab-content .btn-save').forEach(btn => {
     btn.addEventListener('click', () => {
       const sec = btn.closest('.tab-content')?.id;
@@ -624,8 +519,18 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       if (sec === 'contrato') gerarContrato();
 
       const ed = sectionEditor(sec);
-      if (!ed) return;
-      trechos[sec] = ed.innerHTML;
+
+      if (sec === 'calculos') {
+        recalcTabela();
+        // recalcTabela já atualiza trechos['calculos'] e trechos['valor']
+      } else if (sec === 'valor') {
+        const vc = document.getElementById('valorCausa');
+        const v  = vc ? parseFloat(vc.value || '0') : 0;
+        trechos['valor'] = `<p><strong>Valor da Causa: R$ ${v.toFixed(2).replace('.', ',')}</strong></p>`;
+      } else if (ed) {
+        trechos[sec] = ed.innerHTML;
+      }
+
       atualizarFinal();
       persist();
       alert('Trecho salvo.');
@@ -645,10 +550,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       if (sec === 'pedidos') {
         selecaoPorFato.pedidos = {};
         $('#pedidos-box') && ($('#pedidos-box').innerHTML = '');
-        limparTabela();
-      }
-      if (sec === 'calculos') {
-        limparTabela();
+        ensurePedidoOnTabela();
         recalcTabela();
       }
 
@@ -683,86 +585,76 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   }
 
   // ===== Persistência =====
-  function collectProvasSelecionadas() {
-    const box = $('#provas-box');
-    if (!box) return [];
-    return Array.from(box.querySelectorAll('input[type="checkbox"]:checked')).map(i => i.value);
-  }
-
-  function serializeSelecaoPorFato(mapSets) {
-    return {
-      fundamentos: Object.fromEntries(Object.entries(mapSets.fundamentos).map(([k, v]) => [k, Array.from(v || [])])),
-      pedidos:     Object.fromEntries(Object.entries(mapSets.pedidos).map(([k, v]) => [k, Array.from(v || [])]))
-    };
-  }
-  function deserializeSelecaoPorFato(obj) {
-    selecaoPorFato.fundamentos = {};
-    selecaoPorFato.pedidos = {};
-    Object.entries(obj?.fundamentos || {}).forEach(([k, arr]) => selecaoPorFato.fundamentos[k] = new Set(arr || []));
-    Object.entries(obj?.pedidos || {}).forEach(([k, arr]) => selecaoPorFato.pedidos[k] = new Set(arr || []));
-  }
-
   function persist() {
-    const payload = {
+    const data = {
       trechos,
       fatosSelecionados,
-      selecaoPorFato: serializeSelecaoPorFato(selecaoPorFato),
-      tabela: $('#tabela-wrap')?.innerHTML || '',
-      provas: collectProvasSelecionadas(),
-      valorCausa: $('#valorCausa')?.value || ''
+      selecaoPorFato: {
+        fundamentos: Object.fromEntries(Object.entries(selecaoPorFato.fundamentos).map(([k, v]) => [k, Array.from(v)])),
+        pedidos: Object.fromEntries(Object.entries(selecaoPorFato.pedidos).map(([k, v]) => [k, Array.from(v)])),
+      },
+      tabelaHTML: $('#tabela-calculos tbody')?.innerHTML || '',
+      valorCausa: $('#valorCausa')?.value || '',
+      campos: {
+        qualificacao: Object.fromEntries(Array.from($('#form-qualificacao')?.querySelectorAll('input,select,textarea') || []).map(i => [i.name || i.id, i.value])),
+        contrato: Object.fromEntries(Array.from($('#form-contrato')?.querySelectorAll('input,select,textarea') || []).map(i => [i.name || i.id, i.value])),
+      }
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }
 
   function restore() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
       const data = JSON.parse(raw);
 
+      // trechos
+      Object.assign(trechos, data.trechos || {});
       // fatos
-      (data.fatosSelecionados || []).forEach(uiAddFato);
-
-      // seleção categorizada
+      (data.fatosSelecionados || []).forEach(addFatoUI);
+      // seleções categorizadas
+      selecaoPorFato.fundamentos = {};
+      selecaoPorFato.pedidos = {};
       if (data.selecaoPorFato) {
-        deserializeSelecaoPorFato(data.selecaoPorFato);
+        for (const [k, arr] of Object.entries(data.selecaoPorFato.fundamentos || {})) {
+          selecaoPorFato.fundamentos[k] = new Set(arr);
+        }
+        for (const [k, arr] of Object.entries(data.selecaoPorFato.pedidos || {})) {
+          selecaoPorFato.pedidos[k] = new Set(arr);
+        }
       }
-
-      // reconstruir UI categorizada e pintar ativos
       rebuildFundamentosPedidos();
-
-      // sincronizar editores dependentes e tabela
       syncFundamentosEditor();
       syncPedidosEditor();
-      ensurePedidoOnTabela();
 
-      // trechos HTML
-      Object.assign(trechos, data.trechos || {});
-      // repintar editores já salvos
-      ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'].forEach(id => {
-        if (trechos[id]) {
-          const ed = sectionEditor(id);
-          if (ed) ed.innerHTML = trechos[id];
+      // tabela
+      if (data.tabelaHTML && $('#tabela-calculos tbody')) {
+        $('#tabela-calculos tbody').innerHTML = data.tabelaHTML;
+        $('#tabela-calculos tbody').querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
+      }
+      // valor
+      if (data.valorCausa && $('#valorCausa')) $('#valorCausa').value = data.valorCausa;
+
+      // campos de forms
+      for (const [id, obj] of Object.entries(data.campos || {})) {
+        const form = document.getElementById(`form-${id}`);
+        if (!form) continue;
+        for (const [name, val] of Object.entries(obj)) {
+          const el = form.querySelector(`[name="${name}"], #${name}`);
+          if (el) el.value = val;
         }
-      });
+      }
 
-      // recarregar tabela e valor
-      if (data.tabela && $('#tabela-wrap')) $('#tabela-wrap').innerHTML = data.tabela;
-      if ($('#valorCausa')) $('#valorCausa').value = data.valorCausa || '';
-
-      // religar eventos da tabela
-      $('#tabela-calculos tbody')?.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
-
-      // provas
-      (data.provas || []).forEach(v => {
-        const id = 'pv_' + v.replace(/\W+/g, '_');
-        const el = document.getElementById(id);
-        if (el) el.checked = true;
+      // aplicar trechos restaurados nos editores
+      ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos'].forEach(id => {
+        const ed = sectionEditor(id);
+        if (ed && trechos[id]) ed.innerHTML = trechos[id];
       });
 
       atualizarFinal();
       recalcTabela();
-    } catch(e) {
+    } catch (e) {
       console.warn('Falha ao restaurar', e);
     }
   }
@@ -774,6 +666,45 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   restore();
   recalcTabela();
 
-  // Dica CSS:
-  // #fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
+  // ===== Ações globais =====
+  // Reiniciar tudo
+  $('#btn-reiniciar')?.addEventListener('click', () => {
+    if (!confirm('Deseja realmente reiniciar todo o formulário? Esta ação apagará os dados salvos.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    Object.keys(trechos).forEach(k => delete trechos[k]);
+    fatosSelecionados.splice(0);
+    selecaoPorFato.fundamentos = {};
+    selecaoPorFato.pedidos = {};
+    $('#form-qualificacao')?.reset();
+    $('#form-contrato')?.reset();
+    $('#fatos-list') && ($('#fatos-list').innerHTML = '');
+    $('#fundamentos-box') && ($('#fundamentos-box').innerHTML = '');
+    $('#pedidos-box') && ($('#pedidos-box').innerHTML = '');
+    $('#preliminares-list') && ($('#preliminares-list').innerHTML = '');
+    $$('#provas-box input[type="checkbox"]').forEach(chk => chk.checked = false);
+    limparTabela();
+    ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'].forEach(id => {
+      const ed = sectionEditor(id);
+      if (ed) ed.innerHTML = '';
+    });
+    atualizarFinal();
+    recalcTabela();
+    alert('Formulário reiniciado.');
+  });
+
+  // Botão "Abrir no Google IA" a partir do Final
+  $('#btn-google-ia')?.addEventListener('click', () => {
+    const texto = $('#editor-final')?.textContent.trim() || '';
+    if (!texto) {
+      alert('O visualizador final está vazio.');
+      return;
+    }
+    const contexto =
+      `${ORIENTACAO_IA}\n\n` +
+      `TAREFA: Gerar a peça completa a partir do rascunho a seguir.\n\n` +
+      texto;
+    const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
+    window.open(url, '_blank');
+  });
+
 })();
