@@ -1,5 +1,7 @@
 // app.js completo (v3 final)
 import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
+import { FFP_CAMPOS } from './data/ffp_campos.js';
+
 
 (() => {
   'use strict';
@@ -8,7 +10,9 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   const $$ = (q, el = document) => Array.from(el.querySelectorAll(q));
   const live = (sel) => document.getElementById('tabela-wrap')?.querySelector(sel);
 
-  // ===== Estado =====
+  
+   // ===== Estado =====
+  
   const trechos = {};                 // HTML por seção
   const fatosSelecionados = [];       // lista de fatos adicionados
   // seleção categorizada por fato
@@ -16,6 +20,8 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     fundamentos: {}, // { [fato]: Set<string> }
     pedidos: {}      // { [fato]: Set<string> }
   };
+  const dadosPorFato = {};           // { [fato]: { campoId: valor } }
+
 
   const provasCatalogo = [
     'CTPS', 'Holerites', 'Contrato de Trabalho', 'Comunicações internas',
@@ -34,12 +40,32 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   // ADICIONAR ABAIXO DE ORIENTACAO_IA
 function getPromptIA() {
   const texto = $('#editor-final')?.textContent.trim() || '';
+  const extras = formatDadosExtrasPorFato();
   return (
     `${ORIENTACAO_IA}\n\n` +
     `TAREFA: Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do conteúdo a seguir.\n\n` +
-    `CONTEÚDO:\n${texto}`
+    `CONTEÚDO:\n${texto}\n\n` +
+    `DADOS ADICIONAIS POR FATO:\n${extras || '[nenhum]'}`
   );
 }
+
+function formatDadosExtrasPorFato(){
+  // Gera bloco de linhas por fato, a partir de dadosPorFato
+  const linhas = [];
+  fatosSelecionados.forEach(fato => {
+    const obj = dadosPorFato[fato];
+    if (!obj || !Object.keys(obj).length) return;
+    linhas.push(`- ${fato}:`);
+    Object.entries(obj).forEach(([k, v]) => {
+      let val = v;
+      if (Array.isArray(v)) val = v.join(', ');
+      if (typeof v === 'boolean') val = v ? 'sim' : 'não';
+      linhas.push(`  • ${k}: ${val}`);
+    });
+  });
+  return linhas.join('\n');
+}
+
 
 function makeGoogleIAUrl(prompt) {
   return `https://www.google.com/search?q=${encodeURIComponent(prompt)}&udm=50`;
@@ -108,21 +134,30 @@ function makeGoogleIAUrl(prompt) {
     box.innerHTML = `<span class="titulo">${nomeFato}</span><button class="remover" title="Remover fato">✖</button>`;
     wrap.appendChild(box);
 
-    box.querySelector('.remover').addEventListener('click', () => {
-      const idx = fatosSelecionados.indexOf(nomeFato);
-      if (idx >= 0) fatosSelecionados.splice(idx, 1);
-      // limpar seleções relacionadas a este fato
-      delete selecaoPorFato.fundamentos[nomeFato];
-      delete selecaoPorFato.pedidos[nomeFato];
-      box.remove();
-      rebuildFundamentosPedidos();
-      syncFatosEditor();
-      syncFundamentosEditor();
-      syncPedidosEditor();
-      recalcTabela();
-      atualizarFinal();
-      persist();
-    });
+   // contêiner dos campos dinâmicos
+const campos = document.createElement('div');
+campos.className = 'campos-fato';
+campos.style.marginTop = '6px';
+box.appendChild(campos);
+renderCamposFato(nomeFato, campos);
+
+box.querySelector('.remover').addEventListener('click', () => {
+  const idx = fatosSelecionados.indexOf(nomeFato);
+  if (idx >= 0) fatosSelecionados.splice(idx, 1);
+  // limpar seleções relacionadas a este fato
+  delete selecaoPorFato.fundamentos[nomeFato];
+  delete selecaoPorFato.pedidos[nomeFato];
+  delete dadosPorFato[nomeFato]; // limpa dados extras do fato
+  box.remove();
+  rebuildFundamentosPedidos();
+  syncFatosEditor();
+  syncFundamentosEditor();
+  syncPedidosEditor();
+  recalcTabela();
+  atualizarFinal();
+  persist();
+});
+
 
     rebuildFundamentosPedidos();
     syncFatosEditor();
@@ -223,6 +258,111 @@ function makeGoogleIAUrl(prompt) {
     atualizarFinal();
     persist();
   }
+
+function renderCamposFato(nomeFato, mountEl){
+  mountEl.innerHTML = ''; // limpa e recria
+  const defs = FFP_CAMPOS?.[nomeFato];
+  if (!Array.isArray(defs) || !defs.length) {
+    mountEl.style.display = 'none';
+    return;
+  }
+  mountEl.style.display = '';
+
+  // estado inicial
+  if (!dadosPorFato[nomeFato]) dadosPorFato[nomeFato] = {};
+
+  const form = document.createElement('div');
+  form.className = 'fato-campos-form';
+
+  defs.forEach(def => {
+    const wrap = document.createElement('label');
+    wrap.style.display = 'block';
+    wrap.style.margin = '4px 0';
+
+    const lbl = document.createElement('span');
+    lbl.textContent = def.label + (def.required ? ' *' : '');
+    lbl.style.display = 'block';
+    lbl.style.fontWeight = '600';
+
+    let input;
+    const nameAttr = `fato:${nomeFato}:${def.id}`;
+
+    switch (def.type) {
+      case 'textarea':
+        input = document.createElement('textarea');
+        input.rows = 3;
+        break;
+      case 'select':
+        input = document.createElement('select');
+        if (def.multiple) input.multiple = true;
+        (def.options || []).forEach(opt => {
+          const o = document.createElement('option');
+          o.value = String(opt);
+          o.textContent = String(opt);
+          input.appendChild(o);
+        });
+        break;
+      case 'checkbox':
+        input = document.createElement('input');
+        input.type = 'checkbox';
+        break;
+      case 'number':
+        input = document.createElement('input');
+        input.type = 'number';
+        if (def.step) input.step = def.step;
+        break;
+      case 'date':
+        input = document.createElement('input');
+        input.type = 'date';
+        break;
+      case 'upload':
+        input = document.createElement('input');
+        input.type = 'file';
+        input.multiple = true;
+        break;
+      default:
+        input = document.createElement('input');
+        input.type = 'text';
+    }
+
+    input.name = nameAttr;
+    input.id = nameAttr;
+
+    // valor salvo
+    const saved = dadosPorFato[nomeFato][def.id];
+    if (def.type === 'checkbox') {
+      input.checked = !!saved;
+    } else if (def.type === 'select' && def.multiple && Array.isArray(saved)) {
+      Array.from(input.options).forEach(opt => opt.selected = saved.includes(opt.value));
+    } else if (saved != null) {
+      input.value = String(saved);
+    }
+
+    // onChange -> grava no estado
+    input.addEventListener('change', () => {
+      let val;
+      if (def.type === 'checkbox') {
+        val = input.checked;
+      } else if (def.type === 'select' && def.multiple) {
+        val = Array.from(input.selectedOptions).map(o => o.value);
+      } else if (def.type === 'upload') {
+        val = Array.from(input.files || []).map(f => f.name);
+      } else {
+        val = input.value;
+      }
+      if (!dadosPorFato[nomeFato]) dadosPorFato[nomeFato] = {};
+      dadosPorFato[nomeFato][def.id] = val;
+      persist();
+    });
+
+    wrap.appendChild(lbl);
+    wrap.appendChild(input);
+    form.appendChild(wrap);
+  });
+
+  mountEl.appendChild(form);
+}
+
 
   // ===== Mini editores por seção =====
   $$('.viewer').forEach(view => {
@@ -731,26 +871,32 @@ const num = (s) => parseFloat(String(s).replace(',', '.')) || 0;
     Object.entries(obj?.pedidos || {}).forEach(([k, arr]) => selecaoPorFato.pedidos[k] = new Set(arr || []));
   }
 
-  function persist() {
-    const payload = {
-      trechos,
-      fatosSelecionados,
-      selecaoPorFato: serializeSelecaoPorFato(selecaoPorFato),
-      tabela: $('#tabela-wrap')?.innerHTML || '',
-      provas: collectProvasSelecionadas(),
-      valorCausa: $('#valorCausa')?.value || ''
-    };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  }
+ function persist() {
+  const payload = {
+    trechos,
+    fatosSelecionados,
+    selecaoPorFato: serializeSelecaoPorFato(selecaoPorFato),
+    dadosPorFato, // inclui os dados extras
+    tabela: $('#tabela-wrap')?.innerHTML || '',
+    provas: collectProvasSelecionadas(),
+    valorCausa: $('#valorCausa')?.value || ''
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+}
+
 
   function restore() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const data = JSON.parse(raw);
+     const raw = localStorage.getItem(STORAGE_KEY);
+if (!raw) return;
+const data = JSON.parse(raw);
 
-      // fatos
-      (data.fatosSelecionados || []).forEach(uiAddFato);
+// restaura dados extras ANTES de recriar os fatos
+Object.assign(dadosPorFato, data.dadosPorFato || {});
+
+// fatos
+(data.fatosSelecionados || []).forEach(uiAddFato);
+
 
       // seleção categorizada
       if (data.selecaoPorFato) {
