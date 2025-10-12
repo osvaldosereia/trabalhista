@@ -1,3 +1,12 @@
+Aqui está o HTML **corrigido e completo**, pronto para colar. Incluí:
+
+* **Botão global “Reiniciar”** no cabeçalho (`#btn-reiniciar`)
+* **Botão “Recalcular”** na aba Cálculos (`#btn-recalcular`)
+* Estrutura da **Qualificação** corrigida (form contém os dois fieldsets; removi o fieldset aberto fora do form)
+* Contêineres de **Fundamentos** e **Pedidos** trocados para `<div>` (o JS monta `<details>` dentro deles)
+* Mantive o destaque `.ativo` e ids/class conforme o `app.js` revisado
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -8,6 +17,8 @@
   <style>
     /* destaque de seleção nas listas */
     #fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
+    header .actions { margin-top: .5rem; }
+    header .actions button { margin-right: .5rem; }
   </style>
 </head>
 <body>
@@ -15,6 +26,9 @@
   <header>
     <h1>🧠 Editor de Peças Trabalhistas</h1>
     <p>Monte petições iniciais completas com blocos inteligentes e IA integrada</p>
+    <div class="actions">
+      <button id="btn-reiniciar" type="button">🔄 Reiniciar</button>
+    </div>
   </header>
 
   <nav class="tabs">
@@ -37,44 +51,41 @@
       <h2>Qualificação das Partes</h2>
       <p>Preencha os dados do reclamante e da reclamada. Use “Salvar Trecho” para enviar ao visualizador.</p>
 
-      <fieldset>
-        <legend>Reclamante</legend>
-        <form id="form-qualificacao">
-  <fieldset>
-    <legend>Reclamante</legend>
-    <label>Nome <input type="text"    name="reclamante_nome"></label>
-    <label>CPF <input type="text"     name="reclamante_cpf"></label>
-    <label>RG <input type="text"      name="reclamante_rg"></label>
-    <label>CTPS <input type="text"    name="reclamante_ctps"></label>
-    <label>Série <input type="text"   name="reclamante_ctps_serie"></label>
-    <label>Profissão <input type="text" name="reclamante_profissao"></label>
-    <label>Endereço <input type="text"  name="reclamante_endereco"></label>
-    <label>Bairro <input type="text"    name="reclamante_bairro"></label>
-    <label>Cidade <input type="text"    name="reclamante_cidade"></label>
-    <label>UF <input type="text"        name="reclamante_uf" maxlength="2"></label>
-    <label>CEP <input type="text"       name="reclamante_cep"></label>
-    <label>Telefone <input type="text"  name="reclamante_fone"></label>
-    <label>E-mail <input type="email"   name="reclamante_email"></label>
-  </fieldset>
+      <form id="form-qualificacao">
+        <fieldset>
+          <legend>Reclamante</legend>
+          <label>Nome <input type="text"    name="reclamante_nome"></label>
+          <label>CPF <input type="text"     name="reclamante_cpf"></label>
+          <label>RG <input type="text"      name="reclamante_rg"></label>
+          <label>CTPS <input type="text"    name="reclamante_ctps"></label>
+          <label>Série <input type="text"   name="reclamante_ctps_serie"></label>
+          <label>Profissão <input type="text" name="reclamante_profissao"></label>
+          <label>Endereço <input type="text"  name="reclamante_endereco"></label>
+          <label>Bairro <input type="text"    name="reclamante_bairro"></label>
+          <label>Cidade <input type="text"    name="reclamante_cidade"></label>
+          <label>UF <input type="text"        name="reclamante_uf" maxlength="2"></label>
+          <label>CEP <input type="text"       name="reclamante_cep"></label>
+          <label>Telefone <input type="text"  name="reclamante_fone"></label>
+          <label>E-mail <input type="email"   name="reclamante_email"></label>
+        </fieldset>
 
-  <fieldset>
-    <legend>Reclamada</legend>
-    <label>Razão Social <input type="text" name="reclamada_nome"></label>
-    <label>CNPJ <input type="text"         name="reclamada_cnpj"></label>
-    <label>Endereço <input type="text"     name="reclamada_endereco"></label>
-    <label>Bairro <input type="text"       name="reclamada_bairro"></label>
-    <label>Cidade <input type="text"       name="reclamada_cidade"></label>
-    <label>UF <input type="text"           name="reclamada_uf" maxlength="2"></label>
-    <label>CEP <input type="text"          name="reclamada_cep"></label>
-    <label>Telefone <input type="text"     name="reclamada_fone"></label>
-    <label>E-mail <input type="email"      name="reclamada_email"></label>
-  </fieldset>
-</form>
-
+        <fieldset>
+          <legend>Reclamada</legend>
+          <label>Razão Social <input type="text" name="reclamada_nome"></label>
+          <label>CNPJ <input type="text"         name="reclamada_cnpj"></label>
+          <label>Endereço <input type="text"     name="reclamada_endereco"></label>
+          <label>Bairro <input type="text"       name="reclamada_bairro"></label>
+          <label>Cidade <input type="text"       name="reclamada_cidade"></label>
+          <label>UF <input type="text"           name="reclamada_uf" maxlength="2"></label>
+          <label>CEP <input type="text"          name="reclamada_cep"></label>
+          <label>Telefone <input type="text"     name="reclamada_fone"></label>
+          <label>E-mail <input type="email"      name="reclamada_email"></label>
+        </fieldset>
+      </form>
 
       <div class="actions">
-        <button class="btn-ia">Gerar com IA</button>
-        <button class="btn-save">Salvar Trecho</button>
+        <button class="btn-ia"  type="button">Gerar com IA</button>
+        <button class="btn-save" type="button">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
@@ -94,41 +105,40 @@
       </div>
 
       <div class="actions">
-        <button class="btn-ia">Gerar com IA</button>
-        <button class="btn-save">Salvar Trecho</button>
+        <button class="btn-ia"  type="button">Gerar com IA</button>
+        <button class="btn-save" type="button">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
 
     <!-- CONTRATO -->
-<section id="contrato" class="tab-content">
-  <h2>Contrato de Trabalho</h2>
-  <p>Descreva os dados contratuais.</p>
-  <form id="form-contrato">
-    <label>Data de admissão <input type="date" name="admissao"></label>
-    <label>Data de saída <input type="date" name="saida"></label>
-    <label>Função <input type="text" name="funcao"></label>
-    <label>Salário mensal (R$) <input type="number" name="salario" step="0.01"></label>
-    <label>Tipo de contrato
-      <select name="tipo_contrato">
-        <option value="">Selecione…</option>
-        <option value="indeterminado">Prazo indeterminado</option>
-        <option value="determinado">Prazo determinado</option>
-        <option value="experiencia">Experiência</option>
-        <option value="intermitente">Intermitente</option>
-        <option value="aprendiz">Aprendiz</option>
-      </select>
-    </label>
-    <label>Jornada (ex.: 44h semanais, 220h/mês) <input type="text" name="jornada"></label>
-    <label>Local de trabalho <input type="text" name="local_trabalho"></label>
-  </form>
-  <div class="actions">
-    <button class="btn-ia">Gerar com IA</button>
-    <button class="btn-save">Salvar Trecho</button>
-  </div>
-  <div class="viewer"></div>
-</section>
-
+    <section id="contrato" class="tab-content">
+      <h2>Contrato de Trabalho</h2>
+      <p>Descreva os dados contratuais.</p>
+      <form id="form-contrato">
+        <label>Data de admissão <input type="date" name="admissao"></label>
+        <label>Data de saída <input type="date" name="saida"></label>
+        <label>Função <input type="text" name="funcao"></label>
+        <label>Salário mensal (R$) <input type="number" name="salario" step="0.01"></label>
+        <label>Tipo de contrato
+          <select name="tipo_contrato">
+            <option value="">Selecione…</option>
+            <option value="indeterminado">Prazo indeterminado</option>
+            <option value="determinado">Prazo determinado</option>
+            <option value="experiencia">Experiência</option>
+            <option value="intermitente">Intermitente</option>
+            <option value="aprendiz">Aprendiz</option>
+          </select>
+        </label>
+        <label>Jornada (ex.: 44h semanais, 220h/mês) <input type="text" name="jornada"></label>
+        <label>Local de trabalho <input type="text" name="local_trabalho"></label>
+      </form>
+      <div class="actions">
+        <button class="btn-ia"  type="button">Gerar com IA</button>
+        <button class="btn-save" type="button">Salvar Trecho</button>
+      </div>
+      <div class="viewer"></div>
+    </section>
 
     <!-- FATOS -->
     <section id="fatos" class="tab-content">
@@ -144,8 +154,8 @@
       <div id="fatos-list"></div>
 
       <div class="actions">
-        <button class="btn-ia">Gerar com IA</button>
-        <button class="btn-save">Salvar Trecho</button>
+        <button class="btn-ia"  type="button">Gerar com IA</button>
+        <button class="btn-save" type="button">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
@@ -154,10 +164,10 @@
     <section id="fundamentos" class="tab-content">
       <h2>Fundamentos Jurídicos</h2>
       <p>Carregados com base nos fatos. Clique para incluir/remover.</p>
-      <ul id="fundamentos-box"></ul>
+      <div id="fundamentos-box"></div>
       <div class="actions">
-        <button class="btn-ia">Gerar com IA</button>
-        <button class="btn-save">Salvar Trecho</button>
+        <button class="btn-ia"  type="button">Gerar com IA</button>
+        <button class="btn-save" type="button">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
@@ -166,10 +176,10 @@
     <section id="pedidos" class="tab-content">
       <h2>Pedidos</h2>
       <p>Correspondentes aos fatos/fundamentos. Clique para incluir/remover.</p>
-      <ul id="pedidos-box"></ul>
+      <div id="pedidos-box"></div>
       <div class="actions">
-        <button class="btn-ia">Gerar com IA</button>
-        <button class="btn-save">Salvar Trecho</button>
+        <button class="btn-ia"  type="button">Gerar com IA</button>
+        <button class="btn-save" type="button">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
@@ -190,8 +200,9 @@
         </table>
       </div>
       <div class="actions">
-        <button id="btn-add-linha" type="button">+ Linha</button>
-        <button class="btn-save">Salvar Trecho</button>
+        <button id="btn-add-linha"   type="button">+ Linha</button>
+        <button id="btn-recalcular"  type="button">Recalcular</button>
+        <button class="btn-save"     type="button">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
@@ -202,7 +213,7 @@
       <p>Selecione as provas que acompanharão a inicial.</p>
       <div id="provas-box"></div>
       <div class="actions">
-        <button class="btn-save">Salvar Trecho</button>
+        <button class="btn-save" type="button">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
@@ -213,7 +224,7 @@
       <p>Calculado automaticamente com base na tabela (editável).</p>
       <input type="number" id="valorCausa" placeholder="Valor total em R$" step="0.01">
       <div class="actions">
-        <button class="btn-save">Salvar Trecho</button>
+        <button class="btn-save" type="button">Salvar Trecho</button>
       </div>
       <div class="viewer"></div>
     </section>
@@ -224,11 +235,11 @@
       <p>Revise todo o texto gerado. Edite, copie ou exporte.</p>
       <div id="editor-final" contenteditable="true" class="editor"></div>
       <div class="actions">
-        <button id="btn-gerar-final">Gerar Petição Completa</button>
-        <button id="btn-copiar">Copiar Prompt</button>
-        <button id="btn-baixar">Baixar .txt</button>
-        <button id="btn-pdf">📄 Exportar PDF</button>
-        <button id="btn-google-ia">🌐 Abrir no Google IA</button>
+        <button id="btn-gerar-final" type="button">Gerar Petição Completa</button>
+        <button id="btn-copiar"      type="button">Copiar Prompt</button>
+        <button id="btn-baixar"      type="button">Baixar .txt</button>
+        <button id="btn-pdf"         type="button">📄 Exportar PDF</button>
+        <button id="btn-google-ia"   type="button">🌐 Abrir no Google IA</button>
       </div>
     </section>
 
@@ -238,3 +249,4 @@
   <script type="module" src="app.js"></script>
 </body>
 </html>
+```
