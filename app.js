@@ -1,4 +1,4 @@
-// app.js completo (revisado)
+// app.js completo (v3 final)
 import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
 (() => {
@@ -21,7 +21,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     'Escalas e cartões de ponto', 'CAT', 'ASO/PPP/LTCAT', 'Mensagens e e-mails',
     'Testemunhas', 'Extratos do FGTS', 'TRCT e guias', 'Laudos e atestados'
   ];
-  const STORAGE_KEY = 'editorTrabalhista:v3'; // bump na versão para separar armazenamento antigo
+  const STORAGE_KEY = 'editorTrabalhista:v3';
 
   // ===== Orientação base para a IA =====
   const ORIENTACAO_IA =
@@ -105,10 +105,10 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   // ===== Helpers seleção =====
   const getFundSelecionadosFlat = () =>
     Object.entries(selecaoPorFato.fundamentos)
-      .flatMap(([f, set]) => Array.from(set || []));
+      .flatMap(([_, set]) => Array.from(set || []));
   const getPedSelecionadosFlat = () =>
     Object.entries(selecaoPorFato.pedidos)
-      .flatMap(([f, set]) => Array.from(set || []));
+      .flatMap(([_, set]) => Array.from(set || []));
 
   // ===== Fundamentos & Pedidos — UI categorizada por Fato =====
   function rebuildFundamentosPedidos() {
@@ -271,7 +271,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   function syncFundamentosEditor() {
     const editor = sectionEditor('fundamentos');
     if (!editor) return;
-    // render no editor categorizado por fato
     const html = fatosSelecionados.map(f => {
       const itens = Array.from(selecaoPorFato.fundamentos[f] || []);
       if (!itens.length) return '';
@@ -369,10 +368,25 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     const tbody = $('#tabela-calculos tbody');
     if (!tbody) return;
 
-    const rowKeys = new Set(Array.from(tbody.querySelectorAll('tr')).map(r => r.dataset.key));
-    getPedSelecionadosFlat().forEach(p => {
-      const key = 'p_' + p.slice(0, 40);
+    // chaves esperadas com base nos pedidos selecionados
+    const selectedKeys = new Set(
+      getPedSelecionadosFlat().map(p => 'p_' + p.slice(0, 40))
+    );
+
+    // remover linhas de pedidos que não estão mais selecionados
+    Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+      const k = tr.dataset.key || '';
+      if (k.startsWith('p_') && !selectedKeys.has(k)) tr.remove();
+    });
+
+    // adicionar linhas que faltam
+    const rowKeys = new Set(
+      Array.from(tbody.querySelectorAll('tr')).map(r => r.dataset.key)
+    );
+
+    selectedKeys.forEach(key => {
       if (!rowKeys.has(key)) {
+        const p = key.slice(2);
         const tr = document.createElement('tr');
         tr.dataset.key = key;
         tr.innerHTML = `
@@ -386,6 +400,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
         tr.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
       }
     });
+
     recalcTabela();
   }
 
@@ -533,7 +548,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     const editor = $('#editor-final');
     if (!editor) return;
     const plain = editor.innerText.trim();
-    editor.textContent = plain; // normaliza texto para copiar
+    editor.textContent = plain;
   });
 
   $('#btn-copiar')?.addEventListener('click', () => {
@@ -557,12 +572,10 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   $('#btn-reiniciar')?.addEventListener('click', () => {
     if (!confirm('Deseja realmente reiniciar todo o formulário? Esta ação apagará os dados salvos.')) return;
     localStorage.removeItem(STORAGE_KEY);
-    // reset estado em memória
     Object.keys(trechos).forEach(k => delete trechos[k]);
     fatosSelecionados.splice(0);
     selecaoPorFato.fundamentos = {};
     selecaoPorFato.pedidos = {};
-    // reset UI básica
     $('#form-qualificacao')?.reset();
     $('#form-contrato')?.reset();
     $('#fatos-list') && ($('#fatos-list').innerHTML = '');
@@ -625,7 +638,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       const sec = btn.closest('.tab-content')?.id;
       if (!sec) return;
 
-      // limpar estado específico
       if (sec === 'fundamentos') {
         selecaoPorFato.fundamentos = {};
         $('#fundamentos-box') && ($('#fundamentos-box').innerHTML = '');
@@ -678,7 +690,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   }
 
   function serializeSelecaoPorFato(mapSets) {
-    // converte Set -> array para guardar
     return {
       fundamentos: Object.fromEntries(Object.entries(mapSets.fundamentos).map(([k, v]) => [k, Array.from(v || [])])),
       pedidos:     Object.fromEntries(Object.entries(mapSets.pedidos).map(([k, v]) => [k, Array.from(v || [])]))
@@ -720,6 +731,11 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       // reconstruir UI categorizada e pintar ativos
       rebuildFundamentosPedidos();
 
+      // sincronizar editores dependentes e tabela
+      syncFundamentosEditor();
+      syncPedidosEditor();
+      ensurePedidoOnTabela();
+
       // trechos HTML
       Object.assign(trechos, data.trechos || {});
       // repintar editores já salvos
@@ -758,7 +774,6 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   restore();
   recalcTabela();
 
-  // ===== Dica de estilo (adicione ao style.css) =====
+  // Dica CSS:
   // #fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
-
 })();
