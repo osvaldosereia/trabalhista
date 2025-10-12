@@ -1,34 +1,36 @@
-// app.js completo (corrigido e pronto para uso)
+// app.js completo (revisado)
 import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
 (() => {
   'use strict';
 
-  // ========= Helpers =========
-  const $  = (q, el = document) => el.querySelector(q);
+  const $ = (q, el = document) => el.querySelector(q);
   const $$ = (q, el = document) => Array.from(el.querySelectorAll(q));
-  const debounce = (fn, ms = 200) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
-  // ========= Estado =========
+  // ===== Estado =====
   const trechos = {};                 // HTML por seção
   const fatosSelecionados = [];       // lista de fatos adicionados
-  const fundamentosSelecionados = []; // itens clicados para incluir
-  const pedidosSelecionados = [];     // itens clicados para incluir
+  // seleção categorizada por fato
+  const selecaoPorFato = {
+    fundamentos: {}, // { [fato]: Set<string> }
+    pedidos: {}      // { [fato]: Set<string> }
+  };
+
   const provasCatalogo = [
     'CTPS', 'Holerites', 'Contrato de Trabalho', 'Comunicações internas',
     'Escalas e cartões de ponto', 'CAT', 'ASO/PPP/LTCAT', 'Mensagens e e-mails',
     'Testemunhas', 'Extratos do FGTS', 'TRCT e guias', 'Laudos e atestados'
   ];
-  const STORAGE_KEY = 'editorTrabalhista:v2';
+  const STORAGE_KEY = 'editorTrabalhista:v3'; // bump na versão para separar armazenamento antigo
 
-  // ========= Orientação base para IA =========
+  // ===== Orientação base para a IA =====
   const ORIENTACAO_IA =
-    'Atue como ADVOGADO TRABALHISTA experiente. Redija em linguagem forense, clara, coesa e impessoal, ' +
-    'citando CLT, CF/88, CPC e súmulas/OJs do TST quando cabível. ' +
-    'Use APENAS as informações fornecidas (sem criar fatos). Estruture por tópicos com títulos, ' +
-    'alinhe pedidos e cálculos às regras trabalhistas e mantenha português do Brasil.';
+    "Atue como ADVOGADO TRABALHISTA experiente. Redija em linguagem forense, clara, coesa e impessoal, " +
+    "citando CLT, CF/88, CPC e súmulas/OJs do TST quando cabível. " +
+    "Use APENAS as informações fornecidas (sem criar fatos). Estruture por tópicos com títulos, " +
+    "alinhe pedidos e cálculos às regras trabalhistas e mantenha português do Brasil.";
 
-  // ========= Abas =========
+  // ===== Abas =====
   const tabs = $$('.tabs button');
   const sections = $$('.tab-content');
   tabs.forEach(btn => {
@@ -40,7 +42,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   });
 
-  // ========= Inicialização Fatos (FFP) =========
+  // ===== Inicialização FFP (Fatos no <select>) =====
   function carregarFFP() {
     if (!Array.isArray(FFP) || !FFP.length) {
       console.error('FFP não carregado.');
@@ -48,6 +50,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     }
     const sel = $('#select-fato');
     if (!sel) return;
+
     sel.innerHTML = '<option value="">Selecione um fato</option>';
     FFP.filter(x => x.fato).forEach(item => {
       const op = document.createElement('option');
@@ -57,7 +60,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   }
 
-  // ========= Fatos: adicionar/remover =========
+  // ===== Adicionar múltiplos Fatos =====
   function uiAddFato(nomeFato) {
     if (!nomeFato) return;
     if (fatosSelecionados.includes(nomeFato)) return;
@@ -65,18 +68,25 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
     const wrap = $('#fatos-list');
     if (!wrap) return;
+
     const box = document.createElement('div');
     box.className = 'fato-bloco';
     box.dataset.fato = nomeFato;
-    box.innerHTML = `<span class="titulo">${nomeFato}</span><button class="remover" title="Remover">✖</button>`;
+    box.innerHTML = `<span class="titulo">${nomeFato}</span><button class="remover" title="Remover fato">✖</button>`;
     wrap.appendChild(box);
 
     box.querySelector('.remover').addEventListener('click', () => {
       const idx = fatosSelecionados.indexOf(nomeFato);
       if (idx >= 0) fatosSelecionados.splice(idx, 1);
+      // limpar seleções relacionadas a este fato
+      delete selecaoPorFato.fundamentos[nomeFato];
+      delete selecaoPorFato.pedidos[nomeFato];
       box.remove();
       rebuildFundamentosPedidos();
       syncFatosEditor();
+      syncFundamentosEditor();
+      syncPedidosEditor();
+      recalcTabela();
       atualizarFinal();
       persist();
     });
@@ -92,80 +102,112 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     uiAddFato(val);
   });
 
-  // ========= Fundamentos & Pedidos (derivados dos Fatos) =========
+  // ===== Helpers seleção =====
+  const getFundSelecionadosFlat = () =>
+    Object.entries(selecaoPorFato.fundamentos)
+      .flatMap(([f, set]) => Array.from(set || []));
+  const getPedSelecionadosFlat = () =>
+    Object.entries(selecaoPorFato.pedidos)
+      .flatMap(([f, set]) => Array.from(set || []));
+
+  // ===== Fundamentos & Pedidos — UI categorizada por Fato =====
   function rebuildFundamentosPedidos() {
-    const fundUL = $('#fundamentos-box');
-    const pedUL  = $('#pedidos-box');
-    if (!fundUL || !pedUL) return;
+    const fundBox = $('#fundamentos-box');
+    const pedBox  = $('#pedidos-box');
+    if (!fundBox || !pedBox) return;
 
-    fundUL.innerHTML = '';
-    pedUL.innerHTML  = '';
+    fundBox.innerHTML = '';
+    pedBox.innerHTML  = '';
 
-    const itensFund = new Set();
-    const itensPed  = new Set();
+    fatosSelecionados.forEach(fato => {
+      const row = FFP.find(x => x.fato === fato);
+      if (!row) return;
 
-    fatosSelecionados.forEach(f => {
-      const row = FFP.find(x => x.fato === f);
-      if (row) {
-        (row.fundamentos || []).forEach(it => itensFund.add(it));
-        (row.pedidos || []).forEach(it => itensPed.add(it));
-      }
-    });
+      // garantir sets no estado
+      if (!selecaoPorFato.fundamentos[fato]) selecaoPorFato.fundamentos[fato] = new Set();
+      if (!selecaoPorFato.pedidos[fato])     selecaoPorFato.pedidos[fato]     = new Set();
 
-    Array.from(itensFund).forEach(txt => {
-      const li = document.createElement('li');
-      li.textContent = txt;
-      li.title = 'Clique para incluir/remover no editor';
-      li.addEventListener('click', () => toggleItem(li, fundamentosSelecionados, txt));
-      fundUL.appendChild(li);
-    });
+      // FUNDAMENTOS
+      const detF = document.createElement('details');
+      detF.open = true;
+      const sumF = document.createElement('summary');
+      sumF.textContent = `Fato: ${fato}`;
+      detF.appendChild(sumF);
 
-    Array.from(itensPed).forEach(txt => {
-      const li = document.createElement('li');
-      li.textContent = txt;
-      li.title = 'Clique para incluir/remover no editor';
-      li.addEventListener('click', () => toggleItem(li, pedidosSelecionados, txt));
-      pedUL.appendChild(li);
+      const ulF = document.createElement('ul');
+      (row.fundamentos || []).forEach(txt => {
+        const li = document.createElement('li');
+        li.textContent = txt;
+        li.dataset.fato = fato;
+        li.dataset.tipo = 'fund';
+        if (selecaoPorFato.fundamentos[fato].has(txt)) li.classList.add('ativo');
+        li.addEventListener('click', () => {
+          toggleCategorizado('fund', fato, txt, li);
+        });
+        ulF.appendChild(li);
+      });
+      detF.appendChild(ulF);
+      fundBox.appendChild(detF);
+
+      // PEDIDOS
+      const detP = document.createElement('details');
+      detP.open = true;
+      const sumP = document.createElement('summary');
+      sumP.textContent = `Fato: ${fato}`;
+      detP.appendChild(sumP);
+
+      const ulP = document.createElement('ul');
+      (row.pedidos || []).forEach(txt => {
+        const li = document.createElement('li');
+        li.textContent = txt;
+        li.dataset.fato = fato;
+        li.dataset.tipo = 'ped';
+        if (selecaoPorFato.pedidos[fato].has(txt)) li.classList.add('ativo');
+        li.addEventListener('click', () => {
+          toggleCategorizado('ped', fato, txt, li);
+        });
+        ulP.appendChild(li);
+      });
+      detP.appendChild(ulP);
+      pedBox.appendChild(detP);
     });
   }
 
-  function toggleItem(li, bucket, value) {
-    const i = bucket.indexOf(value);
-    if (i >= 0) {
-      bucket.splice(i, 1);
+  function toggleCategorizado(tipo, fato, valor, li) {
+    const bucket = tipo === 'fund' ? selecaoPorFato.fundamentos : selecaoPorFato.pedidos;
+    if (!bucket[fato]) bucket[fato] = new Set();
+    if (bucket[fato].has(valor)) {
+      bucket[fato].delete(valor);
       li.classList.remove('ativo');
     } else {
-      bucket.push(value);
+      bucket[fato].add(valor);
       li.classList.add('ativo');
     }
     syncFundamentosEditor();
     syncPedidosEditor();
+    ensurePedidoOnTabela();
+    recalcTabela();
     atualizarFinal();
     persist();
   }
 
-  // ========= Mini-editores por seção =========
-  const flush = debounce(() => { atualizarFinal(); persist(); }, 150);
-
+  // ===== Mini editores por seção =====
   $$('.viewer').forEach(view => {
     const wrapper = document.createElement('div');
     wrapper.className = 'editor-area';
-
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
     toolbar.innerHTML = `
       <button data-cmd="bold" title="Negrito"><b>B</b></button>
       <button data-cmd="italic" title="Itálico"><i>I</i></button>
       <button data-cmd="insertUnorderedList" title="Lista">• Lista</button>
-      <button data-cmd="removeFormat" title="Limpar">🧹 Limpar</button>
-      <button class="btn-ia-local" title="Gerar com IA">🌐 IA</button>
+      <button data-cmd="removeFormat" title="Limpar editor">🧹 Limpar</button>
+      <button class="btn-ia-local" title="Gerar com Google IA">🌐 IA</button>
       <button class="btn-save-local" title="Salvar trecho">💾</button>
     `;
-
     const editor = document.createElement('div');
     editor.className = 'editor-mini';
     editor.contentEditable = true;
-
     const sectionId = view.closest('.tab-content').id;
     editor.dataset.section = sectionId;
 
@@ -174,12 +216,27 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     view.replaceWith(wrapper);
 
     toolbar.addEventListener('click', e => {
-      const cmd = e.target.dataset?.cmd;
-      if (cmd) document.execCommand(cmd, false, null);
+      const cmd = e.target.dataset.cmd;
+      if (!cmd) return;
+      if (cmd === 'removeFormat') {
+        // limpar de forma previsível
+        editor.innerHTML = '';
+        trechos[sectionId] = '';
+        if (sectionId === 'calculos') {
+          limparTabela();
+          recalcTabela();
+        }
+        atualizarFinal();
+        persist();
+      } else {
+        document.execCommand(cmd, false, null);
+      }
     });
 
+    // IA local por aba
     toolbar.querySelector('.btn-ia-local').addEventListener('click', () => openGoogleIAForSection(sectionId, editor));
 
+    // salvar manual por aba
     toolbar.querySelector('.btn-save-local').addEventListener('click', () => {
       if (sectionId === 'qualificacao') gerarQualificacao();
       else if (sectionId === 'contrato') gerarContrato();
@@ -189,14 +246,16 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       alert('Trecho salvo.');
     });
 
+    // salvar e sincronizar ao digitar
     editor.addEventListener('input', () => {
       trechos[sectionId] = editor.innerHTML;
       if (sectionId === 'calculos') recalcTabela();
-      flush();
+      atualizarFinal();
+      persist();
     });
   });
 
-  // ========= Syncs específicos =========
+  // ===== Sincronizações específicas =====
   function sectionEditor(id) {
     const sec = document.getElementById(id);
     return sec ? sec.querySelector('.editor-mini') : null;
@@ -205,28 +264,37 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
   function syncFatosEditor() {
     const editor = sectionEditor('fatos');
     if (!editor) return;
-    editor.innerHTML = fatosSelecionados
-      .map(f => `<p><strong>${f}:</strong> [Descrever fatos com base nos documentos anexados]</p>`)
-      .join('');
+    editor.innerHTML = fatosSelecionados.map(f => `<p><strong>${f}:</strong> [Descrever fatos com base nos documentos anexados]</p>`).join('');
     trechos['fatos'] = editor.innerHTML;
   }
 
   function syncFundamentosEditor() {
     const editor = sectionEditor('fundamentos');
     if (!editor) return;
-    editor.innerHTML = '<ul>' + fundamentosSelecionados.map(x => `<li>${x}</li>`).join('') + '</ul>';
+    // render no editor categorizado por fato
+    const html = fatosSelecionados.map(f => {
+      const itens = Array.from(selecaoPorFato.fundamentos[f] || []);
+      if (!itens.length) return '';
+      return `<h4>${f}</h4><ul>${itens.map(x => `<li>${x}</li>`).join('')}</ul>`;
+    }).filter(Boolean).join('');
+    editor.innerHTML = html || '<p>[Selecione fundamentos]</p>';
     trechos['fundamentos'] = editor.innerHTML;
   }
 
   function syncPedidosEditor() {
     const editor = sectionEditor('pedidos');
     if (!editor) return;
-    editor.innerHTML = '<ol>' + pedidosSelecionados.map(x => `<li>${x}</li>`).join('') + '</ol>';
+    const html = fatosSelecionados.map(f => {
+      const itens = Array.from(selecaoPorFato.pedidos[f] || []);
+      if (!itens.length) return '';
+      return `<h4>${f}</h4><ol>${itens.map(x => `<li>${x}</li>`).join('')}</ol>`;
+    }).filter(Boolean).join('');
+    editor.innerHTML = html || '<p>[Selecione pedidos]</p>';
     trechos['pedidos'] = editor.innerHTML;
     ensurePedidoOnTabela();
   }
 
-  // ========= PRELIMINARES =========
+  // ================== PRELIMINARES (popular e adicionar) ==================
   function popularPreliminares() {
     const sel   = document.getElementById('preliminares-select');
     const btn   = document.getElementById('add-preliminar');
@@ -246,27 +314,26 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       const idx = parseInt(sel.value, 10);
       if (isNaN(idx)) return;
       const item = PRELIMINARES[idx];
-      const bloco = `<p><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
 
-      // cria linha clicável
       const li = document.createElement('li');
       li.textContent = `${item.titulo} — ${item.fundamentoCurto}`;
       li.style.cursor = 'pointer';
       li.title = 'Clique para inserir/remover no editor';
       lista.appendChild(li);
 
-      // insere
-      editor.innerHTML += bloco;
+      const blocoId = `pre_${idx}_${Date.now()}`;
+      const bloco = `<p data-pre-id="${blocoId}"><strong>${item.titulo}.</strong> ${item.modelo}</p>`;
+      editor.insertAdjacentHTML('beforeend', bloco);
       trechos['preliminares'] = editor.innerHTML;
       atualizarFinal();
       persist();
 
-      // toggle
       li.addEventListener('click', () => {
-        if (editor.innerHTML.includes(bloco)) {
-          editor.innerHTML = editor.innerHTML.replace(bloco, '');
+        const el = editor.querySelector(`[data-pre-id="${blocoId}"]`);
+        if (el) {
+          el.remove();
         } else {
-          editor.innerHTML += bloco;
+          editor.insertAdjacentHTML('beforeend', bloco);
         }
         trechos['preliminares'] = editor.innerHTML;
         atualizarFinal();
@@ -277,7 +344,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   }
 
-  // ========= Provas =========
+  // ===== Provas catálogo =====
   function buildProvas() {
     const box = $('#provas-box');
     if (!box) return;
@@ -289,19 +356,23 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       box.appendChild(wrap);
     });
   }
-  const collectProvasSelecionadas = () =>
-    Array.from($('#provas-box')?.querySelectorAll('input[type="checkbox"]:checked') || [])
-      .map(i => i.value);
 
-  // ========= Tabela de Cálculos =========
+  // ===== Tabela de cálculos =====
+  function limparTabela() {
+    const tbody = $('#tabela-calculos tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    $('#total-geral') && ($('#total-geral').textContent = '0,00');
+  }
+
   function ensurePedidoOnTabela() {
     const tbody = $('#tabela-calculos tbody');
     if (!tbody) return;
-    const rowKeys = Array.from(tbody.querySelectorAll('tr')).map(r => r.dataset.key);
 
-    pedidosSelecionados.forEach(p => {
+    const rowKeys = new Set(Array.from(tbody.querySelectorAll('tr')).map(r => r.dataset.key));
+    getPedSelecionadosFlat().forEach(p => {
       const key = 'p_' + p.slice(0, 40);
-      if (!rowKeys.includes(key)) {
+      if (!rowKeys.has(key)) {
         const tr = document.createElement('tr');
         tr.dataset.key = key;
         tr.innerHTML = `
@@ -335,39 +406,38 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     recalcTabela();
   });
 
+  $('#btn-recalcular')?.addEventListener('click', () => recalcTabela());
+
   function recalcTabela() {
     const tbody = $('#tabela-calculos tbody');
     if (!tbody) return;
     let totalGeral = 0;
-
     tbody.querySelectorAll('tr').forEach(tr => {
       const base = parseFloat(tr.children[1].querySelector('input').value || '0');
       const qtd  = parseFloat(tr.children[2].querySelector('input').value || '0');
       const perc = parseFloat(tr.children[3].querySelector('input').value || '0');
-      const total = base * qtd * (1 + perc / 100);
+      const total = base * qtd * (1 + perc/100);
       tr.querySelector('.total').textContent = total.toFixed(2).replace('.', ',');
       totalGeral += total;
     });
-
     $('#total-geral') && ($('#total-geral').textContent = totalGeral.toFixed(2).replace('.', ','));
-
     const vc = $('#valorCausa');
     if (vc && !vc.matches(':focus')) vc.value = totalGeral.toFixed(2);
-
-    const wrap = $('#tabela-wrap');
-    if (wrap) trechos['calculos'] = wrap.outerHTML;
+    trechos['calculos'] = $('#tabela-wrap')?.outerHTML || '';
     trechos['valor'] = `<p><strong>Valor da Causa: R$ ${totalGeral.toFixed(2).replace('.', ',')}</strong></p>`;
     atualizarFinal();
     persist();
   }
 
-  // ========= Builders (Qualificação & Contrato) =========
+  // ===== Builders de texto (Qualificação e Contrato) =====
   function gerarQualificacao() {
     const ed = sectionEditor('qualificacao');
-    const f  = $('#form-qualificacao');
-    if (!ed || !f) return;
+    if (!ed) return;
 
-    const get = name => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+    const f = $('#form-qualificacao');
+    if (!f) return;
+
+    const get = (name) => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
 
     // Reclamante
     const rc = {
@@ -418,10 +488,12 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
 
   function gerarContrato() {
     const ed = sectionEditor('contrato');
-    const f  = $('#form-contrato');
-    if (!ed || !f) return;
+    if (!ed) return;
 
-    const get = name => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+    const f = $('#form-contrato');
+    if (!f) return;
+
+    const get = (name) => f.querySelector(`[name="${name}"]`)?.value?.trim() || '';
     const adm = get('admissao');
     const sai = get('saida');
     const funcao = get('funcao');
@@ -442,7 +514,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     persist();
   }
 
-  // ========= Visualizador Final =========
+  // ===== Visualizador Final =====
   function atualizarFinal() {
     const editorFinal = $('#editor-final');
     if (!editorFinal) return;
@@ -453,14 +525,15 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       .join('<hr>');
     editorFinal.innerHTML = partes || '<p>Nenhum trecho adicionado ainda.</p>';
   }
-  const capitalize = s => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
-  // ========= Ações finais =========
+  function capitalize(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+
+  // ===== Ações finais =====
   $('#btn-gerar-final')?.addEventListener('click', () => {
     const editor = $('#editor-final');
     if (!editor) return;
     const plain = editor.innerText.trim();
-    editor.textContent = plain;
+    editor.textContent = plain; // normaliza texto para copiar
   });
 
   $('#btn-copiar')?.addEventListener('click', () => {
@@ -480,6 +553,34 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     URL.revokeObjectURL(url);
   });
 
+  // Reiniciar tudo (global)
+  $('#btn-reiniciar')?.addEventListener('click', () => {
+    if (!confirm('Deseja realmente reiniciar todo o formulário? Esta ação apagará os dados salvos.')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    // reset estado em memória
+    Object.keys(trechos).forEach(k => delete trechos[k]);
+    fatosSelecionados.splice(0);
+    selecaoPorFato.fundamentos = {};
+    selecaoPorFato.pedidos = {};
+    // reset UI básica
+    $('#form-qualificacao')?.reset();
+    $('#form-contrato')?.reset();
+    $('#fatos-list') && ($('#fatos-list').innerHTML = '');
+    $('#fundamentos-box') && ($('#fundamentos-box').innerHTML = '');
+    $('#pedidos-box') && ($('#pedidos-box').innerHTML = '');
+    $('#preliminares-list') && ($('#preliminares-list').innerHTML = '');
+    $$('#provas-box input[type="checkbox"]').forEach(chk => chk.checked = false);
+    limparTabela();
+    ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'].forEach(id => {
+      const ed = sectionEditor(id);
+      if (ed) ed.innerHTML = '';
+    });
+    atualizarFinal();
+    recalcTabela();
+    alert('Formulário reiniciado.');
+  });
+
+  // ===== Botão "Abrir no Google IA" (prompt base) =====
   $('#btn-google-ia')?.addEventListener('click', () => {
     const texto = $('#editor-final')?.textContent.trim() || '';
     const contexto =
@@ -490,7 +591,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     window.open(url, '_blank');
   });
 
-  // ========= Botões de cada aba (IA / Salvar) =========
+  // ===== Botões "Gerar com IA" gerais =====
   $$('.tab-content .btn-ia').forEach(btn => {
     btn.addEventListener('click', () => {
       const sec = btn.closest('.tab-content')?.id;
@@ -500,12 +601,15 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   });
 
+  // ===== Botões "Salvar Trecho" gerais =====
   $$('.tab-content .btn-save').forEach(btn => {
     btn.addEventListener('click', () => {
       const sec = btn.closest('.tab-content')?.id;
       if (!sec) return;
+
       if (sec === 'qualificacao') gerarQualificacao();
       if (sec === 'contrato') gerarContrato();
+
       const ed = sectionEditor(sec);
       if (!ed) return;
       trechos[sec] = ed.innerHTML;
@@ -515,9 +619,38 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     });
   });
 
-  // ========= Google IA por seção (com orientação base) =========
+  // ===== Botões "Limpar Seção" (opcional: .btn-clear se existir no HTML) =====
+  $$('.tab-content .btn-clear').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const sec = btn.closest('.tab-content')?.id;
+      if (!sec) return;
+
+      // limpar estado específico
+      if (sec === 'fundamentos') {
+        selecaoPorFato.fundamentos = {};
+        $('#fundamentos-box') && ($('#fundamentos-box').innerHTML = '');
+      }
+      if (sec === 'pedidos') {
+        selecaoPorFato.pedidos = {};
+        $('#pedidos-box') && ($('#pedidos-box').innerHTML = '');
+        limparTabela();
+      }
+      if (sec === 'calculos') {
+        limparTabela();
+        recalcTabela();
+      }
+
+      const ed = sectionEditor(sec);
+      if (ed) ed.innerHTML = '';
+      trechos[sec] = '';
+      atualizarFinal();
+      persist();
+    });
+  });
+
+  // ===== Google IA por seção (com prompt base) =====
   function openGoogleIAForSection(sectionId, editorEl) {
-    const secEl  = document.getElementById(sectionId);
+    const secEl = document.getElementById(sectionId);
     if (!secEl) return;
     const titulo = secEl.querySelector('h2')?.textContent || sectionId;
     const inputs = secEl.querySelectorAll('input, textarea, select');
@@ -525,7 +658,7 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       .map(el => `${el.name || el.id}: ${el.value}`)
       .filter(s => !s.endsWith(': '))
       .join(' | ');
-    const texto = editorEl?.innerText?.trim?.() || '';
+    const texto = editorEl.innerText?.trim?.() || '';
 
     const contexto =
       `${ORIENTACAO_IA}\n\n` +
@@ -537,22 +670,37 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
     window.open(url, '_blank');
   }
 
-  // ========= Persistência =========
+  // ===== Persistência =====
+  function collectProvasSelecionadas() {
+    const box = $('#provas-box');
+    if (!box) return [];
+    return Array.from(box.querySelectorAll('input[type="checkbox"]:checked')).map(i => i.value);
+  }
+
+  function serializeSelecaoPorFato(mapSets) {
+    // converte Set -> array para guardar
+    return {
+      fundamentos: Object.fromEntries(Object.entries(mapSets.fundamentos).map(([k, v]) => [k, Array.from(v || [])])),
+      pedidos:     Object.fromEntries(Object.entries(mapSets.pedidos).map(([k, v]) => [k, Array.from(v || [])]))
+    };
+  }
+  function deserializeSelecaoPorFato(obj) {
+    selecaoPorFato.fundamentos = {};
+    selecaoPorFato.pedidos = {};
+    Object.entries(obj?.fundamentos || {}).forEach(([k, arr]) => selecaoPorFato.fundamentos[k] = new Set(arr || []));
+    Object.entries(obj?.pedidos || {}).forEach(([k, arr]) => selecaoPorFato.pedidos[k] = new Set(arr || []));
+  }
+
   function persist() {
     const payload = {
       trechos,
       fatosSelecionados,
-      fundamentosSelecionados,
-      pedidosSelecionados,
+      selecaoPorFato: serializeSelecaoPorFato(selecaoPorFato),
       tabela: $('#tabela-wrap')?.innerHTML || '',
       provas: collectProvasSelecionadas(),
       valorCausa: $('#valorCausa')?.value || ''
     };
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-    } catch (e) {
-      console.warn('Falha ao salvar no localStorage', e);
-    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   }
 
   function restore() {
@@ -561,28 +709,20 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
       if (!raw) return;
       const data = JSON.parse(raw);
 
-      // Fatos selecionados anteriores
+      // fatos
       (data.fatosSelecionados || []).forEach(uiAddFato);
 
-      // Tabela e valor
-      if (data.tabela && $('#tabela-wrap')) $('#tabela-wrap').innerHTML = data.tabela;
-      if ($('#valorCausa')) $('#valorCausa').value = data.valorCausa || '';
+      // seleção categorizada
+      if (data.selecaoPorFato) {
+        deserializeSelecaoPorFato(data.selecaoPorFato);
+      }
 
-      // Reativar inputs da tabela
-      $('#tabela-calculos tbody')?.querySelectorAll('input')
-        .forEach(i => i.addEventListener('input', recalcTabela));
+      // reconstruir UI categorizada e pintar ativos
+      rebuildFundamentosPedidos();
 
-      // Provas marcadas
-      (data.provas || []).forEach(v => {
-        const id = 'pv_' + v.replace(/\W+/g, '_');
-        const el = document.getElementById(id);
-        if (el) el.checked = true;
-      });
-
-      // Trechos
+      // trechos HTML
       Object.assign(trechos, data.trechos || {});
-
-      // Repintar editores já salvos
+      // repintar editores já salvos
       ['qualificacao','preliminares','contrato','fatos','fundamentos','pedidos','calculos','provas','valor'].forEach(id => {
         if (trechos[id]) {
           const ed = sectionEditor(id);
@@ -590,39 +730,35 @@ import { FFP, PRELIMINARES } from './data/fatos-fundamentos-pedidos.js';
         }
       });
 
-      // Reaplicar estado visual de fundamentos/pedidos após rebuild
-      setTimeout(() => {
-        $$('ul#fundamentos-box li').forEach(li => {
-          if ((data.fundamentosSelecionados || []).includes(li.textContent)) {
-            li.classList.add('ativo');
-            if (!fundamentosSelecionados.includes(li.textContent)) fundamentosSelecionados.push(li.textContent);
-          }
-        });
-        $$('ul#pedidos-box li').forEach(li => {
-          if ((data.pedidosSelecionados || []).includes(li.textContent)) {
-            li.classList.add('ativo');
-            if (!pedidosSelecionados.includes(li.textContent)) pedidosSelecionados.push(li.textContent);
-          }
-        });
-        syncFundamentosEditor();
-        syncPedidosEditor();
-      }, 100);
+      // recarregar tabela e valor
+      if (data.tabela && $('#tabela-wrap')) $('#tabela-wrap').innerHTML = data.tabela;
+      if ($('#valorCausa')) $('#valorCausa').value = data.valorCausa || '';
+
+      // religar eventos da tabela
+      $('#tabela-calculos tbody')?.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTabela));
+
+      // provas
+      (data.provas || []).forEach(v => {
+        const id = 'pv_' + v.replace(/\W+/g, '_');
+        const el = document.getElementById(id);
+        if (el) el.checked = true;
+      });
 
       atualizarFinal();
       recalcTabela();
-    } catch (e) {
+    } catch(e) {
       console.warn('Falha ao restaurar', e);
     }
   }
 
-  // ========= Boot =========
+  // ===== Provas e inicialização =====
   buildProvas();
   carregarFFP();
   popularPreliminares();
   restore();
   recalcTabela();
 
-  // ========= Dica CSS (adicione ao style.css) =========
+  // ===== Dica de estilo (adicione ao style.css) =====
   // #fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
 
 })();
