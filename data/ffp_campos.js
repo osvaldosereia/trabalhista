@@ -37,7 +37,7 @@ export const FFP_CAMPOS = {
   { id:"ordens",       label:"Crachás/ordens da tomadora", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Estágio fraudulento": [
+"Contrato de estágio fraudulento": [
   { id:"ies",          label:"Instituição de ensino", type:"text" },
   { id:"tce",          label:"Termo de compromisso de estágio (TCE)", type:"upload" },
   { id:"supervisor",   label:"Supervisor indicado", type:"text" },
