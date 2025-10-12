@@ -1,7 +1,6 @@
 // data/ffp_campos.js
 // Mapeia "fato" -> campos personalizados para coleta de dados adicionais.
-// Estes campos AINDA NÃO são renderizados pelo app.js atual.
-// Próximo passo: adaptar a aba "Fatos" para exibir estes campos ao selecionar cada fato.
+// Próximo passo: a aba "Fatos" já renderiza estes campos ao selecionar cada fato.
 
 export const FFP_CAMPOS = {
 /* ===================== VÍNCULO E REGISTRO ===================== */
@@ -14,7 +13,8 @@ export const FFP_CAMPOS = {
   { id:"subordinacao", label:"Havia subordinação?", type:"checkbox" },
   { id:"habitualidade",label:"Havia habitualidade?", type:"checkbox" },
   { id:"testemunhas",  label:"Testemunhas (nomes)", type:"textarea" },
-  { id:"docs",         label:"Documentos (CTPS, comunicações etc.)", type:"upload" }
+  { id:"docs",         label:"Documentos (CTPS, comunicações etc.)", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Pejotização fraudulenta": [
   { id:"cnpj_pj",      label:"CNPJ da pessoa jurídica", type:"text", required:true },
@@ -24,7 +24,8 @@ export const FFP_CAMPOS = {
   { id:"exclusividade",label:"Exclusividade",     type:"checkbox" },
   { id:"subordinacao", label:"Subordinação",      type:"checkbox" },
   { id:"nf_media",     label:"Nota fiscal média (R$)", type:"number", step:"0.01" },
-  { id:"contratos",    label:"Contratos/Docs",    type:"upload" }
+  { id:"contratos",    label:"Contratos/Docs",    type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Terceirização ilícita": [
   { id:"tomadora",     label:"Empresa tomadora", type:"text", required:true },
@@ -33,7 +34,8 @@ export const FFP_CAMPOS = {
   { id:"periodo_fim",  label:"Fim",    type:"date" },
   { id:"equiparacao",  label:"Equiparação com empregados diretos", type:"checkbox" },
   { id:"cct",          label:"CCT aplicável", type:"upload" },
-  { id:"ordens",       label:"Crachás/ordens da tomadora", type:"upload" }
+  { id:"ordens",       label:"Crachás/ordens da tomadora", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Estágio fraudulento": [
   { id:"ies",          label:"Instituição de ensino", type:"text" },
@@ -43,20 +45,23 @@ export const FFP_CAMPOS = {
   { id:"periodo_ini",  label:"Início", type:"date" },
   { id:"periodo_fim",  label:"Fim",    type:"date" },
   { id:"carga_horaria",label:"Carga horária semanal", type:"number" },
-  { id:"bolsa",        label:"Bolsa/Auxílio (R$)", type:"number", step:"0.01" }
+  { id:"bolsa",        label:"Bolsa/Auxílio (R$)", type:"number", step:"0.01" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Experiência além do limite": [
   { id:"inicio",       label:"Início do contrato de experiência", type:"date", required:true },
   { id:"prorrogacoes", label:"Datas de prorrogação (uma por linha)", type:"textarea" },
   { id:"funcao",       label:"Função", type:"text" },
   { id:"salario",      label:"Salário (R$)", type:"number", step:"0.01" },
-  { id:"documentos",   label:"Comprovantes de prorrogação", type:"upload" }
+  { id:"documentos",   label:"Comprovantes de prorrogação", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Sem controle de ponto": [
   { id:"num_empregados", label:"Nº de empregados (>20)", type:"number" },
   { id:"jornada",        label:"Jornada alegada por dia (ex: 08:00-18:00)", type:"textarea" },
   { id:"intervalos",     label:"Intervalos alegados", type:"textarea" },
-  { id:"escalas",        label:"Escalas/plantões", type:"upload" }
+  { id:"escalas",        label:"Escalas/plantões", type:"upload" },
+  { id:"observacoes",    label:"Observações", type:"textarea" }
 ],
 
 /* ===================== RESCISÃO E VERBAS ===================== */
@@ -65,29 +70,34 @@ export const FFP_CAMPOS = {
   { id:"aviso",         label:"Aviso prévio", type:"select", options:["Trabalhado","Indenizado","Não aplicado"] },
   { id:"saldo_sal",     label:"Saldo salarial (R$)", type:"number", step:"0.01" },
   { id:"guias",         label:"Guias FGTS/SD", type:"upload" },
-  { id:"trct",          label:"TRCT", type:"upload" }
+  { id:"trct",          label:"TRCT", type:"upload" },
+  { id:"observacoes",   label:"Observações", type:"textarea" }
 ],
 "Dispensa discriminatória": [
   { id:"condicao",      label:"Condição protegida alegada", type:"select", options:["Doença","Gestação","Deficiência","Outras"] },
   { id:"eventos",       label:"Eventos/provas", type:"textarea" },
   { id:"reintegracao",  label:"Pedir reintegração", type:"checkbox" },
-  { id:"salario_base",  label:"Salário-base (R$)", type:"number", step:"0.01" }
+  { id:"salario_base",  label:"Salário-base (R$)", type:"number", step:"0.01" },
+  { id:"observacoes",   label:"Observações", type:"textarea" }
 ],
 "Rescisão indireta": [
   { id:"falta_patronal",label:"Falta patronal", type:"select", options:["Atraso salarial","Assédio","Risco grave","Outras"] },
   { id:"datas_eventos", label:"Datas dos eventos (uma por linha)", type:"textarea" },
-  { id:"notificacoes",  label:"Notificações/Provas", type:"upload" }
+  { id:"notificacoes",  label:"Notificações/Provas", type:"upload" },
+  { id:"observacoes",   label:"Observações", type:"textarea" }
 ],
 "Justa causa indevida": [
   { id:"motivo",        label:"Motivo imputado", type:"text" },
   { id:"docs",          label:"Advertências/Comunicados", type:"upload" },
-  { id:"data_punicao",  label:"Data da punição", type:"date" }
+  { id:"data_punicao",  label:"Data da punição", type:"date" },
+  { id:"observacoes",   label:"Observações", type:"textarea" }
 ],
 "Atraso nas verbas rescisórias": [
   { id:"data_limite",   label:"Data limite legal", type:"date" },
   { id:"data_pagto",    label:"Data de pagamento", type:"date" },
   { id:"valores",       label:"Valores pagos (R$)", type:"number", step:"0.01" },
-  { id:"comprovantes",  label:"Comprovantes", type:"upload" }
+  { id:"comprovantes",  label:"Comprovantes", type:"upload" },
+  { id:"observacoes",   label:"Observações", type:"textarea" }
 ],
 
 /* ===================== JORNADA ===================== */
@@ -95,33 +105,39 @@ export const FFP_CAMPOS = {
   { id:"horarios",     label:"Horários de entrada/saída (por dia)", type:"textarea" },
   { id:"banco_horas",  label:"Banco de horas/compensação", type:"select", options:["Sem banco","Banco informal","Banco formal"] },
   { id:"cartoes",      label:"Cartões de ponto", type:"upload" },
-  { id:"adicional",    label:"Adicional aplicável", type:"select", options:["50%","70%","100%","Outros"] }
+  { id:"adicional",    label:"Adicional aplicável", type:"select", options:["50%","70%","100%","Outros"] },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Intervalo intrajornada suprimido": [
   { id:"duracao_fruida",label:"Duração fruída (min)", type:"number" },
   { id:"politica",     label:"Política interna (docs)", type:"upload" },
-  { id:"testemunhas",  label:"Testemunhas", type:"textarea" }
+  { id:"testemunhas",  label:"Testemunhas", type:"textarea" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Domingos/feriados sem folga": [
   { id:"escalas",      label:"Escalas (docs)", type:"upload" },
   { id:"compensacao",  label:"Folgas compensatórias oferecidas?", type:"checkbox" },
-  { id:"datas",        label:"Datas de feriados laborados", type:"textarea" }
+  { id:"datas",        label:"Datas de feriados laborados", type:"textarea" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Sobreaviso/prontidão": [
   { id:"regime",       label:"Regime", type:"select", options:["Sobreaviso","Prontidão"] },
   { id:"meios_contato",label:"Meios de contato", type:"select", options:["Telefone","App corporativo","E-mail","Outros"] },
   { id:"freq_chamados",label:"Frequência de chamados/mês", type:"number" },
-  { id:"logs",         label:"Logs/prints", type:"upload" }
+  { id:"logs",         label:"Logs/prints", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Troca de uniforme/deslocamento interno": [
   { id:"tempo_medio",  label:"Tempo médio diário (min)", type:"number" },
   { id:"obrigatorio",  label:"Obrigatoriedade", type:"checkbox" },
-  { id:"politicas",    label:"Políticas/ordens (docs)", type:"upload" }
+  { id:"politicas",    label:"Políticas/ordens (docs)", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Turnos ininterruptos": [
   { id:"escala",       label:"Escala real (descrever)", type:"textarea" },
   { id:"interrupcoes", label:"Interrupções operacionais", type:"textarea" },
-  { id:"cct",          label:"CCT (docs)", type:"upload" }
+  { id:"cct",          label:"CCT (docs)", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 
 /* ===================== ADICIONAIS E CONDIÇÕES ===================== */
@@ -130,13 +146,15 @@ export const FFP_CAMPOS = {
   { id:"grau",         label:"Grau pretendido", type:"select", options:["Mínimo","Médio","Máximo"] },
   { id:"ppp_ltc",      label:"PPP/LTCAT/Laudos", type:"upload" },
   { id:"epi",          label:"EPI fornecido e eficaz?", type:"checkbox" },
-  { id:"setor",        label:"Setor/Atividade", type:"text" }
+  { id:"setor",        label:"Setor/Atividade", type:"text" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Periculosidade": [
   { id:"risco",        label:"Fator de risco", type:"select", options:["Inflamáveis","Explosivos","Eletricidade","Motocicleta","Outros"] },
   { id:"tempo_exp",    label:"Tempo de exposição (h/dia)", type:"number" },
   { id:"laudos",       label:"PPRA/PCMSO/Laudos", type:"upload" },
-  { id:"epi",          label:"EPI fornecido e eficaz?", type:"checkbox" }
+  { id:"epi",          label:"EPI fornecido e eficaz?", type:"checkbox" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Acúmulo de funções": [
   { id:"func_contratada",label:"Função contratada", type:"text" },
@@ -144,32 +162,37 @@ export const FFP_CAMPOS = {
   { id:"periodo_ini",  label:"Início", type:"date" },
   { id:"periodo_fim",  label:"Fim",    type:"date" },
   { id:"percentual",   label:"Diferença pretendida (%)", type:"number", step:"1" },
-  { id:"provas",       label:"Provas de tarefas", type:"upload" }
+  { id:"provas",       label:"Provas de tarefas", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Desvio de função": [
   { id:"func_efetiva", label:"Função efetiva", type:"text" },
   { id:"sal_cargo",    label:"Salário do cargo exercido (R$)", type:"number", step:"0.01" },
   { id:"organograma",  label:"Organogramas/descrições", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim",    type:"date" }
+  { id:"periodo_fim",  label:"Fim",    type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Equiparação salarial": [
   { id:"paradigma",    label:"Paradigma", type:"text" },
   { id:"mesmo_local",  label:"Mesmo empregador/local?", type:"checkbox" },
   { id:"tempo_dif",    label:"Diferença de tempo < 2 anos?", type:"checkbox" },
   { id:"sal_paradigma",label:"Salário paradigma (R$)", type:"number", step:"0.01" },
-  { id:"prova_comp",   label:"Prova comparativa", type:"upload" }
+  { id:"prova_comp",   label:"Prova comparativa", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Adicional noturno": [
   { id:"jornada_noite",label:"Jornada noturna efetiva", type:"textarea" },
   { id:"pagto_parcial",label:"Houve pagamento parcial?", type:"checkbox" },
-  { id:"holerites",    label:"Holerites", type:"upload" }
+  { id:"holerites",    label:"Holerites", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Supressão de adicional": [
   { id:"qual",         label:"Qual adicional foi suprimido?", type:"select", options:["Insalubridade","Periculosidade","Noturno","Outros"] },
   { id:"data_sup",     label:"Data da supressão", type:"date" },
   { id:"func_amb",     label:"Função/ambiente inalterados?", type:"checkbox" },
-  { id:"docs",         label:"Holerites antes/depois", type:"upload" }
+  { id:"docs",         label:"Holerites antes/depois", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 
 /* ===================== DANOS E SAÚDE ===================== */
@@ -177,12 +200,14 @@ export const FFP_CAMPOS = {
   { id:"condutas",     label:"Condutas (com datas)", type:"textarea" },
   { id:"autores",      label:"Autores", type:"text" },
   { id:"testemunhas",  label:"Testemunhas", type:"textarea" },
-  { id:"docs",         label:"Provas (prints, e-mails)", type:"upload" }
+  { id:"docs",         label:"Provas (prints, e-mails)", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Assédio sexual": [
   { id:"episodios",    label:"Episódios e datas", type:"textarea" },
   { id:"comunicacao",  label:"Comunicação à empresa", type:"upload" },
-  { id:"medidas",      label:"Boletim/medidas", type:"upload" }
+  { id:"medidas",      label:"Boletim/medidas", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Doença ocupacional": [
   { id:"cid",          label:"CID", type:"text" },
@@ -190,7 +215,8 @@ export const FFP_CAMPOS = {
   { id:"cat",          label:"CAT", type:"upload" },
   { id:"beneficios",   label:"Benefícios/afastamentos", type:"upload" },
   { id:"laudos",       label:"Laudos", type:"upload" },
-  { id:"incapacidade", label:"Incapacidade (%)", type:"number", step:"1" }
+  { id:"incapacidade", label:"Incapacidade (%)", type:"number", step:"1" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Acidente típico": [
   { id:"data",         label:"Data do acidente", type:"date" },
@@ -198,18 +224,21 @@ export const FFP_CAMPOS = {
   { id:"cat",          label:"CAT", type:"upload" },
   { id:"beneficio",    label:"Benefício (B91/B94)", type:"select", options:["B91","B94","Outro"] },
   { id:"sequelas",     label:"Sequelas/Incapacidade (%)", type:"number", step:"1" },
-  { id:"despesas",     label:"Despesas médicas", type:"upload" }
+  { id:"despesas",     label:"Despesas médicas", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Ambiente degradante": [
   { id:"riscos",       label:"Riscos ergonômicos/psicossociais", type:"select", options:["Ergonômico","Psicossocial","Ambiente físico","Outros"] },
   { id:"evidencias",   label:"Evidências", type:"upload" },
-  { id:"nr_cipa",      label:"NRs/CIPA aplicáveis", type:"upload" }
+  { id:"nr_cipa",      label:"NRs/CIPA aplicáveis", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Negligência em exame ocupacional": [
   { id:"tipo_exame",   label:"Tipo de exame", type:"select", options:["Admissional","Periódico","Demissional"] },
   { id:"situacao",     label:"Situação", type:"select", options:["Não realizado","Irregular"] },
   { id:"aso_pcms",     label:"ASO/PCMSO", type:"upload" },
-  { id:"dano_mat",     label:"Dano material estimado (R$)", type:"number", step:"0.01" }
+  { id:"dano_mat",     label:"Dano material estimado (R$)", type:"number", step:"0.01" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 
 /* ===================== ESTABILIDADES E GARANTIAS ===================== */
@@ -217,34 +246,40 @@ export const FFP_CAMPOS = {
   { id:"data_concepcao",label:"Data da concepção/ciência", type:"date" },
   { id:"exames",       label:"Exames", type:"upload" },
   { id:"tipo_dispensa",label:"Tipo da dispensa", type:"select", options:["Sem justa causa","Com justa causa","Término de contrato"] },
-  { id:"salario",      label:"Salário mensal (R$)", type:"number", step:"0.01" }
+  { id:"salario",      label:"Salário mensal (R$)", type:"number", step:"0.01" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Estabilidade por acidente/doença": [
   { id:"tipo",         label:"Acidente/Doença", type:"select", options:["Acidente típico","Doença ocupacional"] },
   { id:"beneficio",    label:"Benefício (B91/B93/B94)", type:"select", options:["B91","B93","B94"] },
   { id:"retorno",      label:"Data de retorno", type:"date" },
-  { id:"laudos",       label:"Laudos", type:"upload" }
+  { id:"laudos",       label:"Laudos", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Dirigente sindical": [
   { id:"cargo",        label:"Cargo sindical", type:"text" },
   { id:"mandato_ini",  label:"Início do mandato", type:"date" },
   { id:"mandato_fim",  label:"Fim do mandato", type:"date" },
-  { id:"comunicacao",  label:"Comunicação ao empregador", type:"upload" }
+  { id:"comunicacao",  label:"Comunicação ao empregador", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Readaptado": [
   { id:"laudo",        label:"Laudo de reabilitação", type:"upload" },
   { id:"func_compar",  label:"Função compatível proposta/recusada", type:"textarea" },
-  { id:"data_disp",    label:"Data da dispensa", type:"date" }
+  { id:"data_disp",    label:"Data da dispensa", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Pré-aposentadoria": [
   { id:"cct",          label:"CCT aplicável", type:"upload" },
   { id:"tempo_meses",  label:"Tempo para aposentadoria (meses)", type:"number" },
-  { id:"comunicacao",  label:"Comunicação ao empregador", type:"upload" }
+  { id:"comunicacao",  label:"Comunicação ao empregador", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Doença comum dispensado": [
   { id:"atestados",    label:"Atestados/licenças", type:"upload" },
   { id:"data_disp",    label:"Data da dispensa", type:"date" },
-  { id:"indicios",     label:"Indícios de discriminação", type:"textarea" }
+  { id:"indicios",     label:"Indícios de discriminação", type:"textarea" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 
 /* ===================== FGTS, MULTAS E BENEFÍCIOS ===================== */
@@ -252,34 +287,40 @@ export const FFP_CAMPOS = {
   { id:"periodo_ini",  label:"Início do período", type:"date" },
   { id:"periodo_fim",  label:"Fim do período",    type:"date" },
   { id:"extratos",     label:"Extratos FGTS",     type:"upload" },
-  { id:"salario_base", label:"Salário-base (R$)", type:"number", step:"0.01" }
+  { id:"salario_base", label:"Salário-base (R$)", type:"number", step:"0.01" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "INSS não recolhido": [
   { id:"periodo_ini",  label:"Início", type:"date" },
   { id:"periodo_fim",  label:"Fim",    type:"date" },
   { id:"cnis",         label:"CNIS",   type:"upload" },
-  { id:"salarios",     label:"Salários-de-contribuição", type:"textarea" }
+  { id:"salarios",     label:"Salários-de-contribuição", type:"textarea" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "VT/VA não fornecidos": [
   { id:"cct",          label:"CCT/Política", type:"upload" },
   { id:"valores_mes",  label:"Valores por mês (R$)", type:"textarea" },
-  { id:"distancia",    label:"Distância/rota", type:"textarea" }
+  { id:"distancia",    label:"Distância/rota", type:"textarea" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Multa art. 467": [
   { id:"parcelas",     label:"Parcelas incontroversas (checklist)", type:"textarea" },
   { id:"data_1a",      label:"Data da 1ª audiência", type:"date" },
-  { id:"valores",      label:"Valores (R$)", type:"number", step:"0.01" }
+  { id:"valores",      label:"Valores (R$)", type:"number", step:"0.01" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Multa art. 477": [
   { id:"data_rescisao",label:"Data da rescisão", type:"date" },
   { id:"data_pagto",   label:"Data de pagamento", type:"date" },
   { id:"valores",      label:"Valores pagos (R$)", type:"number", step:"0.01" },
-  { id:"comprovantes", label:"Comprovantes", type:"upload" }
+  { id:"comprovantes", label:"Comprovantes", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Seguro-desemprego": [
   { id:"guias",        label:"Guias", type:"upload" },
   { id:"data_rescisao",label:"Data da rescisão", type:"date" },
-  { id:"parcelas",     label:"Parcelas devidas (estimativa)", type:"number" }
+  { id:"parcelas",     label:"Parcelas devidas (estimativa)", type:"number" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 
 /* ===================== OUTROS Fatos Adicionais recomendados ===================== */
@@ -289,7 +330,8 @@ export const FFP_CAMPOS = {
   { id:"controle",     label:"Controle de jornada", type:"select", options:["Nenhum","App/Planilha","Sistema corporativo"] },
   { id:"reembolso",    label:"Reembolso internet/energia (R$)", type:"number", step:"0.01" },
   { id:"equipamentos", label:"Fornecimento de equipamentos", type:"checkbox" },
-  { id:"docs",         label:"Termos/políticas", type:"upload" }
+  { id:"docs",         label:"Termos/políticas", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Banco de horas inválido": [
   { id:"act_cct",      label:"ACT/CCT", type:"upload" },
@@ -297,7 +339,8 @@ export const FFP_CAMPOS = {
   { id:"saldo",        label:"Saldo estimado (h)", type:"number" },
   { id:"comp_negadas", label:"Compensações negadas", type:"textarea" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Cargo de confiança falso": [
   { id:"gratificacao", label:"Gratificação ≥ 40%?", type:"checkbox" },
@@ -305,7 +348,8 @@ export const FFP_CAMPOS = {
   { id:"controle_ponto",label:"Controle de ponto", type:"checkbox" },
   { id:"organograma",  label:"Organograma", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Salário por fora": [
   { id:"valores",      label:"Valores por mês (R$)", type:"textarea" },
@@ -313,7 +357,8 @@ export const FFP_CAMPOS = {
   { id:"testemunhas",  label:"Testemunhas", type:"textarea" },
   { id:"docs",         label:"Holerites/extratos", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Comissões não pagas / metas abusivas": [
   { id:"politica",     label:"Política de comissionamento", type:"upload" },
@@ -321,45 +366,52 @@ export const FFP_CAMPOS = {
   { id:"vendas",       label:"Vendas realizadas", type:"upload" },
   { id:"estornos",     label:"Estornos (R$)", type:"number", step:"0.01" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Gorjetas não repassadas": [
   { id:"taxa",         label:"Taxa de serviço (%)", type:"number", step:"0.01" },
   { id:"rateio",       label:"Rateio praticado", type:"textarea" },
   { id:"docs",         label:"Comprovantes", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Integração de verbas habituais": [
   { id:"verbas",       label:"Verbas habituais", type:"select", multiple:true, options:["Horas extras","Ad. noturno","Periculosidade","Insalubridade","Comissões","Gorjetas"] },
   { id:"valor_medio",  label:"Valor médio mensal (R$)", type:"number", step:"0.01" },
   { id:"meses",        label:"Meses de incidência", type:"number" },
-  { id:"holerites",    label:"Holerites", type:"upload" }
+  { id:"holerites",    label:"Holerites", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Intervalo interjornada insuficiente": [
   { id:"horarios",     label:"Horários efetivos", type:"textarea" },
   { id:"violacoes",    label:"Dias com violação (uma data por linha)", type:"textarea" },
-  { id:"escalas",      label:"Escalas", type:"upload" }
+  { id:"escalas",      label:"Escalas", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Tempo à disposição": [
   { id:"atividade",    label:"Atividade", type:"select", options:["Uniforme","Revista","Transporte interno","Login/Sistemas","Outros"] },
   { id:"tempo_medio",  label:"Tempo médio diário (min)", type:"number" },
   { id:"obrigatorio",  label:"Obrigatoriedade", type:"checkbox" },
-  { id:"docs",         label:"Provas/ordens", type:"upload" }
+  { id:"docs",         label:"Provas/ordens", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "12x36 inválida": [
   { id:"base_juridica",label:"Base jurídica (ACT/CCT)", type:"upload" },
   { id:"jornadas",     label:"Jornadas reais", type:"textarea" },
   { id:"feriados_dsr", label:"Feriados/DSR compensados?", type:"checkbox" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Adicional de transferência": [
   { id:"mudanca",      label:"Houve mudança de domicílio?", type:"checkbox" },
   { id:"data_ida",     label:"Data de ida", type:"date" },
   { id:"data_retorno", label:"Data de retorno", type:"date" },
   { id:"adicional",    label:"Adicional pago (R$)", type:"number", step:"0.01" },
-  { id:"docs",         label:"Comprovantes", type:"upload" }
+  { id:"docs",         label:"Comprovantes", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Periculosidade de motociclista": [
   { id:"uso_habitual", label:"Uso habitual de motocicleta", type:"checkbox" },
@@ -367,21 +419,24 @@ export const FFP_CAMPOS = {
   { id:"incidentes",   label:"Acidentes/incidentes", type:"textarea" },
   { id:"laudos",       label:"PPP/Laudos", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Insalubridade biológica": [
   { id:"ambiente",     label:"Ambiente/Setor", type:"text" },
   { id:"agente",       label:"Agente biológico", type:"text" },
   { id:"epi_trein",    label:"EPI e treinamentos fornecidos?", type:"checkbox" },
   { id:"laudos",       label:"Laudos/PPP", type:"upload" },
-  { id:"grau",         label:"Grau pretendido", type:"select", options:["Mínimo","Médio","Máximo"] }
+  { id:"grau",         label:"Grau pretendido", type:"select", options:["Mínimo","Médio","Máximo"] },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Redução salarial ilícita": [
   { id:"antes_depois", label:"Antes/Depois (valores, função)", type:"textarea" },
   { id:"anuencia",     label:"Houve anuência?", type:"checkbox" },
   { id:"docs",         label:"Comunicações", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Transferência sem custeio": [
   { id:"origem",       label:"Cidade de origem", type:"text" },
@@ -389,39 +444,45 @@ export const FFP_CAMPOS = {
   { id:"despesas",     label:"Despesas (planilha/valores)", type:"upload" },
   { id:"politica",     label:"Política interna", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "PLR não paga": [
   { id:"acordo_reg",   label:"Acordo/Regulamento", type:"upload" },
   { id:"metas",        label:"Metas atingidas", type:"textarea" },
   { id:"periodos",     label:"Períodos de apuração", type:"textarea" },
-  { id:"valor_esperado",label:"Valor esperado (R$)", type:"number", step:"0.01" }
+  { id:"valor_esperado",label:"Valor esperado (R$)", type:"number", step:"0.01" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Adicional de quebra de caixa": [
   { id:"func_caixa",   label:"Exerceu função de caixa?", type:"checkbox" },
   { id:"valores",      label:"Valores manuseados (R$)", type:"number", step:"0.01" },
   { id:"politica",     label:"Política interna", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Dano existencial": [
   { id:"media_horas",  label:"Média semanal de horas", type:"number" },
   { id:"impactos",     label:"Impossibilidade de convívio/estudo", type:"textarea" },
   { id:"provas",       label:"Provas", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Contribuição assistencial indevida": [
   { id:"sindicato",    label:"Sindicato", type:"text" },
   { id:"cct_act",      label:"CCT/ACT", type:"upload" },
   { id:"oposicao",     label:"Oposição apresentada?", type:"checkbox" },
-  { id:"holerite_desc",label:"Descontos em holerite (docs)", type:"upload" }
+  { id:"holerite_desc",label:"Descontos em holerite (docs)", type:"upload" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
 "Despesas de trabalho não ressarcidas": [
   { id:"tipo",         label:"Tipo de despesa", type:"select", multiple:true, options:["Combustível","Celular","Ferramentas","Internet","Outros"] },
   { id:"valores_mes",  label:"Valores por mês (R$)", type:"textarea" },
   { id:"politica",     label:"Política/Regra de reembolso", type:"upload" },
   { id:"periodo_ini",  label:"Início", type:"date" },
-  { id:"periodo_fim",  label:"Fim", type:"date" }
+  { id:"periodo_fim",  label:"Fim", type:"date" },
+  { id:"observacoes",  label:"Observações", type:"textarea" }
 ]
 };
