@@ -608,14 +608,11 @@ const num = (s) => parseFloat(String(s).replace(',', '.')) || 0;
 
   // ===== Botão "Abrir no Google IA" (prompt base) =====
   $('#btn-google-ia')?.addEventListener('click', () => {
-  const texto = $('#editor-final')?.textContent.trim() || '';
-  const contexto =
-    `${ORIENTACAO_IA}\n\n` +
-    `TAREFA: Redija a PETIÇÃO INICIAL TRABALHISTA completa, pronta para protocolo, a partir do conteúdo a seguir.\n\n` +
-    `CONTEÚDO:\n${texto}`;
+  const contexto = getPromptIA(); // usa o mesmo prompt do "Copiar"
   const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
-  window.open(url, '_blank');
+  window.open(url, '_blank'); // mantém Google modo IA
 });
+
 
 
   // ===== Botões "Gerar com IA" gerais =====
