@@ -72,3 +72,5 @@ ul li.ativo { background: #2563eb; color: white; border-radius: 6px; padding-lef
 #pedidos-box li.ativo {
   background: #eef;
 }
+#fundamentos-box li.ativo, #pedidos-box li.ativo { background:#eef; }
+#fundamentos-box li, #pedidos-box li { cursor:pointer; }
