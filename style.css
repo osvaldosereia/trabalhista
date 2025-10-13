@@ -261,3 +261,30 @@ input[type="checkbox"]{
 @media (min-width:1024px){
   #provas-box{ grid-template-columns: repeat(3, minmax(0,1fr)); }
 }
+/* Evita scroll horizontal global */
+html, body { overflow-x: hidden; }
+
+/* Main mais "fluido" no mobile */
+@media (max-width: 480px){
+  main{ margin:12px 8px 24px; padding:1rem; }
+  form, fieldset{ --min: 160px; } /* grids quebram mais cedo */
+}
+
+/* Garante que blocos não “estourem” */
+.tab-content, fieldset, .editor-area{ width:100%; max-width:100%; overflow-x:auto; }
+
+/* Quebra palavras longas em textos e editores */
+.editor-mini, #editor-final, p, li{ overflow-wrap:anywhere; word-break:break-word; }
+
+/* Fato-bloco: permite quebra e encolhimento do título */
+.fato-bloco{ flex-wrap: wrap; gap: .5rem; }
+.fato-bloco .titulo{ min-width:0; overflow-wrap:anywhere; }
+
+/* Listas de fundamentos/pedidos: margens compactas no mobile */
+@media (max-width: 480px){
+  #fundamentos-box ul, #pedidos-box ul{ padding:.5rem; }
+  #fundamentos-box li, #pedidos-box li{ margin-left:.6rem; }
+}
+
+/* Imagens, tabelas e iframes nunca excedem o container */
+img, table, iframe{ max-width:100%; height:auto; }
