@@ -872,6 +872,7 @@ document.addEventListener('click', (e) => {
     'Editar em Parágrafo isolado':   'Edite este trecho como parágrafo isolado, sem mesclar com adjacentes.',
     'Editar como Citação':           'Formate como citação curta, com aspas e fonte.',
     'Recuo de Citação Longa':        'Aplique recuo e corpo menor para citação longa, com referência completa.',
+    'Recuo amplo à Direita':         'Aplique recuo amplo, formatada com um recuo grande da margem esquerda, posicionando-a à direita da página.',
     'Alinhamento Justificado':       'Aplique alinhamento justificado ao parágrafo.',
     'Alinhamento à Direita':         'Alinhe o parágrafo à direita.',
     'Caixa Alta':                    'Converta este trecho para CAIXA ALTA.',
