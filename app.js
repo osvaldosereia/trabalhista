@@ -778,6 +778,81 @@ const num = (s) => parseFloat(String(s).replace(',', '.')) || 0;
   const url = `https://www.google.com/search?q=${encodeURIComponent(contexto)}&udm=50`;
   window.open(url, '_blank'); // mantém Google modo IA
 });
+// ===== Orientar I.A. – menu e inserção no editor final =====
+(() => {
+  const btn = document.getElementById('btn-orientar-ia');
+  const menu = document.getElementById('ia-menu');
+  const editorFinal = document.getElementById('editor-final');
+  if (!btn || !menu || !editorFinal) return;
+
+  // abre/fecha ao clicar no botão
+  btn.addEventListener('click', () => {
+    if (menu.hasAttribute('hidden')) {
+      const r = btn.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      menu.style.left = r.left + 'px';
+      menu.style.top  = r.bottom + 8 + 'px';
+      menu.removeAttribute('hidden');
+    } else {
+      menu.setAttribute('hidden', '');
+    }
+  });
+
+  // fecha ao clicar fora
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target) && e.target !== btn) {
+      menu.setAttribute('hidden', '');
+    }
+  });
+
+  // inserir no cursor ou ao fim
+  function insertAtCursor(html) {
+    editorFinal.focus();
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      const el = document.createElement('span');
+      el.innerHTML = html;
+      const frag = document.createDocumentFragment();
+      let node, lastNode;
+      while ((node = el.firstChild)) lastNode = frag.appendChild(node);
+      range.insertNode(frag);
+      if (lastNode) {
+        range.setStartAfter(lastNode);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    } else {
+      editorFinal.insertAdjacentHTML('beforeend', html);
+    }
+  }
+
+  const MAP = {
+    'Incluir Jurisprudência':        'Inclua jurisprudência pertinente e referencie tribunal, número do processo e ementa.',
+    'Editar em Parágrafo isolado':   'Edite este trecho como parágrafo isolado, sem mesclar com adjacentes.',
+    'Editar como Citação':           'Formate como citação curta, com aspas e fonte.',
+    'Recuo de Citação Longa':        'Aplique recuo e corpo menor para citação longa, com referência completa.',
+    'Alinhamento Justificado':       'Aplique alinhamento justificado ao parágrafo.',
+    'Alinhamento à Direita':         'Alinhe o parágrafo à direita.',
+    'Caixa Alta':                    'Converta este trecho para CAIXA ALTA.',
+    'Versalete (Small Caps)':        'Aplique versalete (small caps) a título ou nome próprio.',
+    'Negrito':                       'Aplique negrito ao trecho selecionado.',
+    'Itálico':                       'Aplique itálico ao trecho selecionado.',
+    'Sublinhado':                    'Aplique sublinhado ao trecho selecionado.'
+  };
+
+  // clique nos itens do menu
+  menu.addEventListener('click', (e) => {
+    const btnItem = e.target.closest('button[data-insert]');
+    if (!btnItem) return;
+    const label = btnItem.dataset.insert;
+    const instr = MAP[label] || label;
+    insertAtCursor(` [ORIENTAÇÃO-IA: ${instr}] `);
+    menu.setAttribute('hidden', '');
+  });
+})();
 
 
 
