@@ -373,14 +373,11 @@ function renderCamposFato(nomeFato, mountEl){
     wrapper.className = 'editor-area';
     const toolbar = document.createElement('div');
     toolbar.className = 'toolbar';
-    toolbar.innerHTML = `
-      <button data-cmd="bold" title="Negrito"><b>B</b></button>
-      <button data-cmd="italic" title="Itálico"><i>I</i></button>
-      <button data-cmd="insertUnorderedList" title="Lista">• Lista</button>
-      <button data-cmd="removeFormat" title="Limpar editor">🧹 Limpar</button>
-      <button class="btn-ia-local" title="Gerar com Google IA">🌐 IA</button>
-      <button class="btn-save-local" title="Salvar trecho">💾</button>
-    `;
+   toolbar.innerHTML = `
+  <button data-cmd="insertUnorderedList" title="Lista">• Lista</button>
+  <button data-cmd="removeFormat" title="Limpar editor">🧹 Limpar</button>
+`;
+
     const editor = document.createElement('div');
     editor.className = 'editor-mini';
     editor.contentEditable = true;
@@ -409,18 +406,7 @@ function renderCamposFato(nomeFato, mountEl){
       }
     });
 
-    // IA local por aba
-    toolbar.querySelector('.btn-ia-local').addEventListener('click', () => openGoogleIAForSection(sectionId, editor));
-
-    // salvar manual por aba
-    toolbar.querySelector('.btn-save-local').addEventListener('click', () => {
-      if (sectionId === 'qualificacao') gerarQualificacao();
-      else if (sectionId === 'contrato') gerarContrato();
-      trechos[sectionId] = editor.innerHTML;
-      atualizarFinal();
-      persist();
-      alert('Trecho salvo.');
-    });
+   
 
     // salvar e sincronizar ao digitar
     editor.addEventListener('input', () => {
