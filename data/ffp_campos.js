@@ -56,7 +56,7 @@ export const FFP_CAMPOS = {
   { id:"documentos",   label:"Comprovantes de prorrogação", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Sem controle de ponto": [
+"Empregado sem registro de jornada ou controle de ponto": [
   { id:"num_empregados", label:"Nº de empregados (>20)", type:"number" },
   { id:"jornada",        label:"Jornada alegada por dia (ex: 08:00-18:00)", type:"textarea" },
   { id:"intervalos",     label:"Intervalos alegados", type:"textarea" },
@@ -92,7 +92,7 @@ export const FFP_CAMPOS = {
   { id:"data_punicao",  label:"Data da punição", type:"date" },
   { id:"observacoes",   label:"Observações", type:"textarea" }
 ],
-"Atraso nas verbas rescisórias": [
+"Atraso no pagamento das verbas rescisórias": [
   { id:"data_limite",   label:"Data limite legal", type:"date" },
   { id:"data_pagto",    label:"Data de pagamento", type:"date" },
   { id:"valores",       label:"Valores pagos (R$)", type:"number", step:"0.01" },
@@ -101,7 +101,7 @@ export const FFP_CAMPOS = {
 ],
 
 /* ===================== JORNADA ===================== */
-"Horas extras não pagas": [
+"Excesso de jornada e horas extras não pagas": [
   { id:"horarios",     label:"Horários de entrada/saída (por dia)", type:"textarea" },
   { id:"banco_horas",  label:"Banco de horas/compensação", type:"select", options:["Sem banco","Banco informal","Banco formal"] },
   { id:"cartoes",      label:"Cartões de ponto", type:"upload" },
@@ -114,26 +114,26 @@ export const FFP_CAMPOS = {
   { id:"testemunhas",  label:"Testemunhas", type:"textarea" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Domingos/feriados sem folga": [
+"Trabalho em domingos e feriados sem folga compensatória": [
   { id:"escalas",      label:"Escalas (docs)", type:"upload" },
   { id:"compensacao",  label:"Folgas compensatórias oferecidas?", type:"checkbox" },
   { id:"datas",        label:"Datas de feriados laborados", type:"textarea" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Sobreaviso/prontidão": [
+"Sobreaviso ou prontidão não remunerada": [
   { id:"regime",       label:"Regime", type:"select", options:["Sobreaviso","Prontidão"] },
   { id:"meios_contato",label:"Meios de contato", type:"select", options:["Telefone","App corporativo","E-mail","Outros"] },
   { id:"freq_chamados",label:"Frequência de chamados/mês", type:"number" },
   { id:"logs",         label:"Logs/prints", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Troca de uniforme/deslocamento interno": [
+"Troca de uniformes e deslocamento interno sem registro de tempo": [
   { id:"tempo_medio",  label:"Tempo médio diário (min)", type:"number" },
   { id:"obrigatorio",  label:"Obrigatoriedade", type:"checkbox" },
   { id:"politicas",    label:"Políticas/ordens (docs)", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Turnos ininterruptos": [
+"Turnos ininterruptos de revezamento": [
   { id:"escala",       label:"Escala real (descrever)", type:"textarea" },
   { id:"interrupcoes", label:"Interrupções operacionais", type:"textarea" },
   { id:"cct",          label:"CCT (docs)", type:"upload" },
@@ -141,7 +141,7 @@ export const FFP_CAMPOS = {
 ],
 
 /* ===================== ADICIONAIS E CONDIÇÕES ===================== */
-"Insalubridade": [
+"Trabalho em condições insalubres": [
   { id:"agente",       label:"Agente", type:"select", options:["Químico","Físico","Biológico","Outros"] },
   { id:"grau",         label:"Grau pretendido", type:"select", options:["Mínimo","Médio","Máximo"] },
   { id:"ppp_ltc",      label:"PPP/LTCAT/Laudos", type:"upload" },
@@ -149,7 +149,7 @@ export const FFP_CAMPOS = {
   { id:"setor",        label:"Setor/Atividade", type:"text" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Periculosidade": [
+"Trabalho em condições periculosas": [
   { id:"risco",        label:"Fator de risco", type:"select", options:["Inflamáveis","Explosivos","Eletricidade","Motocicleta","Outros"] },
   { id:"tempo_exp",    label:"Tempo de exposição (h/dia)", type:"number" },
   { id:"laudos",       label:"PPRA/PCMSO/Laudos", type:"upload" },
@@ -181,13 +181,13 @@ export const FFP_CAMPOS = {
   { id:"prova_comp",   label:"Prova comparativa", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Adicional noturno": [
+"Adicional noturno não pago": [
   { id:"jornada_noite",label:"Jornada noturna efetiva", type:"textarea" },
   { id:"pagto_parcial",label:"Houve pagamento parcial?", type:"checkbox" },
   { id:"holerites",    label:"Holerites", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Supressão de adicional": [
+"Supressão de adicional de insalubridade ou periculosidade sem mudança de função": [
   { id:"qual",         label:"Qual adicional foi suprimido?", type:"select", options:["Insalubridade","Periculosidade","Noturno","Outros"] },
   { id:"data_sup",     label:"Data da supressão", type:"date" },
   { id:"func_amb",     label:"Função/ambiente inalterados?", type:"checkbox" },
@@ -196,7 +196,7 @@ export const FFP_CAMPOS = {
 ],
 
 /* ===================== DANOS E SAÚDE ===================== */
-"Assédio moral": [
+"Assédio moral no ambiente de trabalho": [
   { id:"condutas",     label:"Condutas (com datas)", type:"textarea" },
   { id:"autores",      label:"Autores", type:"text" },
   { id:"testemunhas",  label:"Testemunhas", type:"textarea" },
@@ -209,7 +209,7 @@ export const FFP_CAMPOS = {
   { id:"medidas",      label:"Boletim/medidas", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Doença ocupacional": [
+"Doença ocupacional com nexo causal": [
   { id:"cid",          label:"CID", type:"text" },
   { id:"nexo",         label:"Nexo", type:"select", options:["Nexo técnico","Concausa","Sem nexo"] },
   { id:"cat",          label:"CAT", type:"upload" },
@@ -218,7 +218,7 @@ export const FFP_CAMPOS = {
   { id:"incapacidade", label:"Incapacidade (%)", type:"number", step:"1" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Acidente típico": [
+"Acidente de trabalho típico": [
   { id:"data",         label:"Data do acidente", type:"date" },
   { id:"dinamica",     label:"Dinâmica", type:"textarea" },
   { id:"cat",          label:"CAT", type:"upload" },
@@ -227,13 +227,13 @@ export const FFP_CAMPOS = {
   { id:"despesas",     label:"Despesas médicas", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Ambiente degradante": [
+"Ambiente de trabalho degradante ou perigoso à saúde mental": [
   { id:"riscos",       label:"Riscos ergonômicos/psicossociais", type:"select", options:["Ergonômico","Psicossocial","Ambiente físico","Outros"] },
   { id:"evidencias",   label:"Evidências", type:"upload" },
   { id:"nr_cipa",      label:"NRs/CIPA aplicáveis", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Negligência em exame ocupacional": [
+"Responsabilidade civil do empregador por negligência médica em exame ocupacional": [
   { id:"tipo_exame",   label:"Tipo de exame", type:"select", options:["Admissional","Periódico","Demissional"] },
   { id:"situacao",     label:"Situação", type:"select", options:["Não realizado","Irregular"] },
   { id:"aso_pcms",     label:"ASO/PCMSO", type:"upload" },
@@ -242,40 +242,40 @@ export const FFP_CAMPOS = {
 ],
 
 /* ===================== ESTABILIDADES E GARANTIAS ===================== */
-"Gestante dispensada": [
+"Gestante dispensada sem estabilidade": [
   { id:"data_concepcao",label:"Data da concepção/ciência", type:"date" },
   { id:"exames",       label:"Exames", type:"upload" },
   { id:"tipo_dispensa",label:"Tipo da dispensa", type:"select", options:["Sem justa causa","Com justa causa","Término de contrato"] },
   { id:"salario",      label:"Salário mensal (R$)", type:"number", step:"0.01" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Estabilidade por acidente/doença": [
+"Acidente de trabalho com estabilidade provisória": [
   { id:"tipo",         label:"Acidente/Doença", type:"select", options:["Acidente típico","Doença ocupacional"] },
   { id:"beneficio",    label:"Benefício (B91/B93/B94)", type:"select", options:["B91","B93","B94"] },
   { id:"retorno",      label:"Data de retorno", type:"date" },
   { id:"laudos",       label:"Laudos", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Dirigente sindical": [
+"Dirigente sindical dispensado indevidamente": [
   { id:"cargo",        label:"Cargo sindical", type:"text" },
   { id:"mandato_ini",  label:"Início do mandato", type:"date" },
   { id:"mandato_fim",  label:"Fim do mandato", type:"date" },
   { id:"comunicacao",  label:"Comunicação ao empregador", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Readaptado": [
+"Empregado acidentado readaptado dispensado": [
   { id:"laudo",        label:"Laudo de reabilitação", type:"upload" },
   { id:"func_compar",  label:"Função compatível proposta/recusada", type:"textarea" },
   { id:"data_disp",    label:"Data da dispensa", type:"date" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Pré-aposentadoria": [
+"Empregado em vias de aposentadoria dispensado": [
   { id:"cct",          label:"CCT aplicável", type:"upload" },
   { id:"tempo_meses",  label:"Tempo para aposentadoria (meses)", type:"number" },
   { id:"comunicacao",  label:"Comunicação ao empregador", type:"upload" },
   { id:"observacoes",  label:"Observações", type:"textarea" }
 ],
-"Doença comum dispensado": [
+"Empregado afastado por doença comum dispensado": [
   { id:"atestados",    label:"Atestados/licenças", type:"upload" },
   { id:"data_disp",    label:"Data da dispensa", type:"date" },
   { id:"indicios",     label:"Indícios de discriminação", type:"textarea" },
