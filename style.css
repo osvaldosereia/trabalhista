@@ -244,3 +244,20 @@ input[type="checkbox"]{
   cursor: pointer;
 }
 #provas-box input[type="checkbox"]{ margin-right: .5rem; }
+/* Provas: layout em colunas */
+#provas-box{
+  display:grid;
+  grid-template-columns: repeat(1, minmax(0,1fr));
+  gap:8px 16px;
+  text-align:left;
+}
+
+/* ≥768px: 2 colunas */
+@media (min-width:768px){
+  #provas-box{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+
+/* ≥1024px: 3 colunas */
+@media (min-width:1024px){
+  #provas-box{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
