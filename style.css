@@ -288,3 +288,48 @@ html, body { overflow-x: hidden; }
 
 /* Imagens, tabelas e iframes nunca excedem o container */
 img, table, iframe{ max-width:100%; height:auto; }
+/* ===== Anti-overflow global ===== */
+html, body { overflow-x: hidden; }
+* { max-width: 100%; }
+
+/* Quebra qualquer palavra longa/sem espaços */
+body, main, .tab-content, .editor-mini, #editor-final,
+label, p, li, h1, h2, h3, h4, h5, h6, button, .tabs, .fato-bloco {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Inputs 100% do container */
+input[type="text"], input[type="email"], input[type="number"],
+input[type="date"], select, textarea {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Select não estoura e mantém seta visível */
+select {
+  white-space: normal;     /* permite quebrar rótulos longos do <option> exibido */
+  text-overflow: clip;
+}
+
+/* Tabs sempre quebram linha e não “esticam” */
+.tabs { flex-wrap: wrap; overflow-x: hidden; }
+.tabs button { min-width: 0; max-width: 100%; white-space: normal; }
+
+/* Blocos e editores nunca passam do container */
+.tab-content, fieldset, .editor-area { width: 100%; max-width: 100%; overflow-x: auto; }
+
+/* Fatos: título pode quebrar e o bloco se adapta */
+.fato-bloco { flex-wrap: wrap; gap: .5rem; }
+.fato-bloco .titulo { min-width: 0; }
+
+/* Listas de fundamentos/pedidos compactas no mobile */
+@media (max-width: 480px){
+  main { margin:12px 8px 24px; padding:1rem; }
+  form, fieldset { --min: 160px; }
+  #fundamentos-box ul, #pedidos-box ul { padding:.5rem; }
+  #fundamentos-box li, #pedidos-box li { margin-left:.6rem; }
+}
+
+/* Mídia e tabelas responsivas */
+img, table, iframe { max-width: 100%; height: auto; }
