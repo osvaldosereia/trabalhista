@@ -336,8 +336,10 @@ img, table, iframe { max-width: 100%; height: auto; }
 
 /* ====== Menu Orientar I.A. ====== */
 .ia-menu{
-  position: absolute;
-  z-index: 10;
+  position: fixed;
+  z-index: 1000;
+  max-height: min(50vh, 360px);
+  overflow: auto;
   margin-top: .5rem;
   background: #fff;
   border: 1px solid var(--border);
