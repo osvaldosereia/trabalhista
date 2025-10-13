@@ -785,25 +785,63 @@ const num = (s) => parseFloat(String(s).replace(',', '.')) || 0;
   const editorFinal = document.getElementById('editor-final');
   if (!btn || !menu || !editorFinal) return;
 
-  // abre/fecha ao clicar no botão
-  btn.addEventListener('click', () => {
-    if (menu.hasAttribute('hidden')) {
-      const r = btn.getBoundingClientRect();
-      menu.style.position = 'fixed';
-      menu.style.left = r.left + 'px';
-      menu.style.top  = r.bottom + 8 + 'px';
-      menu.removeAttribute('hidden');
-    } else {
-      menu.setAttribute('hidden', '');
-    }
-  });
+  // posiciona o menu dentro da viewport
+function placeMenu() {
+  const pad = 8;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
 
-  // fecha ao clicar fora
-  document.addEventListener('click', (e) => {
-    if (!menu.contains(e.target) && e.target !== btn) {
-      menu.setAttribute('hidden', '');
-    }
-  });
+  // mede botão
+  const br = btn.getBoundingClientRect();
+
+  // mostra para medir o menu
+  menu.style.visibility = 'hidden';
+  menu.removeAttribute('hidden');
+  const mr = menu.getBoundingClientRect();
+  const mw = mr.width;
+  const mh = mr.height;
+
+  // tenta abaixo; se não couber, usa acima; se ainda não couber, centraliza vertical
+  let topBelow = br.bottom + pad;
+  let topAbove = br.top - mh - pad;
+
+  let top;
+  if (topBelow + mh <= vh) top = topBelow;
+  else if (topAbove >= 0)  top = topAbove;
+  else top = Math.max(pad, Math.min((vh - mh) / 2, vh - mh - pad));
+
+  // clamp horizontal
+  let left = Math.max(pad, Math.min(br.left, vw - mw - pad));
+
+  menu.style.position = 'fixed';
+  menu.style.left = left + 'px';
+  menu.style.top  = top  + 'px';
+  menu.style.visibility = 'visible';
+}
+
+// abre/fecha ao clicar no botão
+btn.addEventListener('click', () => {
+  if (menu.hasAttribute('hidden')) {
+    placeMenu();
+  } else {
+    menu.setAttribute('hidden', '');
+  }
+});
+
+// fecha ao clicar fora
+document.addEventListener('click', (e) => {
+  if (!menu.contains(e.target) && e.target !== btn) {
+    menu.setAttribute('hidden', '');
+  }
+});
+
+// se a janela rolar/redimensionar com o menu aberto, reposiciona
+['scroll','resize'].forEach(evt => {
+  window.addEventListener(evt, () => {
+    if (!menu.hasAttribute('hidden')) placeMenu();
+  }, { passive: true });
+});
+
 
   // inserir no cursor ou ao fim
   function insertAtCursor(html) {
