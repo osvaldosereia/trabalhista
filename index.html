@@ -1,268 +1,1557 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Editor de Peças Trabalhistas</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-  /* destaque de seleção nas listas */
-  #fundamentos-box li.ativo,
-  #pedidos-box li.ativo { background:#eef; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Expert v10 - Advogado-Mentor Digital</title>
+    
+    <!-- 1. Carregando o Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Configuração do Tailwind e Fontes (Inter) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'inter': ['Inter', 'sans-serif'] },
+                },
+            },
+        }
+    </script>
+    
+    <!-- 3. Estilos CSS personalizados (Expert UI) -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-link.active { background-color: #3b82f6; color: #ffffff; }
+        .content-module { display: none; }
+        #modulo-1 { display: block; }
 
-  header .actions { margin-top:.5rem; }
-  header .actions button { margin-right:.5rem; }
-
-  /* campos dinâmicos por fato — opcional */
-  .fato-bloco .fato-campos-form label { margin:6px 0; display:block; }
-  .fato-bloco .fato-campos-form textarea { width:100%; }
-  .fato-bloco .fato-campos-form input[type="text"],
-  .fato-bloco .fato-campos-form input[type="number"],
-  .fato-bloco .fato-campos-form input[type="date"],
-  .fato-bloco .fato-campos-form select { max-width:520px; }
-</style>
-
+        /* --- ESTILOS DO "SISTEMA EXPERT" v10 --- */
+        .expert-box {
+            background-color: #fefce8; /* Amarelo-claro */
+            border-left: 4px solid #facc15; /* Borda Amarela */
+            padding: 12px; margin-top: 8px; border-radius: 4px;
+        }
+        .expert-box-danger {
+            background-color: #fee2e2; /* Vermelho-claro */
+            border-left: 4px solid #ef4444; /* Borda Vermelha */
+            padding: 12px; margin-top: 8px; border-radius: 4px;
+        }
+        .expert-box-success {
+            background-color: #f0fdf4; /* Verde-claro */
+            border-left: 4px solid #22c55e; /* Borda Verde */
+            padding: 12px; margin-top: 8px; border-radius: 4px;
+        }
+        .expert-box-proactive { /* Nova cor para sugestões proativas */
+            background-color: #eef2ff; /* Azul-claro (Indigo) */
+            border-left: 4px solid #4f46e5; /* Borda Indigo */
+            padding: 12px; margin-top: 16px; border-radius: 4px;
+        }
+        
+        .legal-tip {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem; color: #4b5563; 
+            margin-top: 6px; padding: 8px;
+            background-color: #f3f4f6; border-radius: 4px;
+        }
+        .section-title {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            color: #1f2937; /* text-gray-800 */
+            margin-top: 1.5rem; /* mt-6 */
+            margin-bottom: 0.75rem; /* mb-3 */
+            border-bottom-width: 1px; padding-bottom: 0.5rem; /* border-b pb-2 */
+        }
+        label, .label-group {
+            font-weight: 600; /* Semi-bold */
+            color: #1f2937; /* Cinza-900 */
+            display: block;
+            margin-bottom: 0.25rem; /* mb-1 */
+        }
+        /* v10 - Labels "Expert" */
+        .expert-label {
+            font-weight: 600; color: #1e3a8a; /* Azul-800 */
+            display: block; margin-bottom: 0.25rem;
+        }
+        
+        .input-field {
+            width: 100%; padding: 8px; 
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 6px; /* rounded-md */
+        }
+        .input-field-readonly {
+            background-color: #f3f4f6; /* cinza-100 */
+            font-weight: bold;
+            color: #1e3a8a; /* azul-800 */
+        }
+        .checkbox-label {
+            display: block; margin-top: 5px;
+            font-weight: 400; color: #374151; /* text-gray-700 */
+        }
+        .checkbox-input {
+            margin-right: 8px;
+        }
+        /* Estilo para o resultado do cálculo */
+        .calculation-result {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.0rem; /* Reduzido para mais itens */
+            font-weight: bold;
+            color: #1f2937; /* Cinza-800 */
+            margin-top: 6px;
+            padding: 8px;
+            background-color: #f3f4f6; /* Cinza-100 */
+            border-radius: 4px;
+        }
+        .calculation-total {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #166534; /* Verde Escuro */
+            margin-top: 8px;
+            padding: 12px;
+            background-color: #f0fdf4; /* Verde Claro */
+            border-radius: 4px;
+        }
+        /* v10 - Abas do Módulo 10 */
+        .tab-button {
+            padding: 10px 15px; background-color: #e5e7eb; /* cinza-200 */
+            border: none; cursor: pointer; font-weight: 600;
+        }
+        .tab-button.active {
+            background-color: #ffffff;
+            border-bottom: 2px solid #3b82f6; /* azul-500 */
+        }
+        .tab-content {
+            display: none; padding: 20px; border: 1px solid #e5e7eb;
+            border-top: none; background-color: #ffffff;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100">
 
-  <header>
-    <h1>🧠 Editor de Peças Trabalhistas</h1>
-    <p>Monte petições iniciais completas com blocos inteligentes e IA integrada</p>
-    <div class="actions">
-      <button id="btn-reiniciar" type="button">🔄 Reiniciar</button>
+    <!-- Container principal (Layout Flex) -->
+    <div class="flex h-screen">
+
+        <!-- ====================================================== -->
+        <!-- COLUNA ESQUERDA (Sidebar de Navegação dos Módulos)      -->
+        <!-- ====================================================== -->
+        <aside class="w-72 bg-gray-800 text-gray-200 p-5 shadow-lg overflow-y-auto">
+            <h1 class="text-2xl font-semibold text-white mb-6">Sistema Expert v10</h1>
+            
+            <nav id="sidebar-nav">
+                <a href="#" class="sidebar-link active flex items-center py-2.5 px-4 rounded-lg" data-target="modulo-1">Módulo 1: Qualificação (Art. 840)</a>
+                <a href="#" class="sidebar-link flex items-center py-2.5 px-4 rounded-lg mt-2" data-target="modulo-2">Módulo 2: Contrato (VMR)</a>
+                <a href="#" class="sidebar-link flex items-center py-2.5 px-4 rounded-lg mt-2" data-target="modulo-3">Módulo 3: Jornada (HE)</a>
+                <a href="#" class="sidebar-link flex items-center py-2.5 px-4 rounded-lg mt-2" data-target="modulo-4">Módulo 4: Adicionais (Perícia)</a>
+                <a href="#" class="sidebar-link flex items-center py-2.5 px-4 rounded-lg mt-2" data-target="modulo-5">Módulo 5: Acidente/Doença</a>
+                <a href="#" class="sidebar-link flex items-center py-2.5 px-4 rounded-lg mt-2" data-target="modulo-6">Módulo 6: Danos Morais</a>
+                <a href="#" class="sidebar-link flex items-center py-2.5 px-4 rounded-lg mt-2" data-target="modulo-7">Módulo 7: Rescisão (Verbas)</a>
+                <a href="#" class="sidebar-link flex items-center py-2.5 px-4 rounded-lg mt-2" data-target="modulo-8">Módulo 8: Teses Específicas</a>
+                <a href="#" class="sidebar-link flex items-center py-2.5 px-4 rounded-lg mt-2" data-target="modulo-9">Módulo 9: Provas e Advogado</a>
+
+                <!-- Módulo Final: Geração do Prompt -->
+                <div class="border-t border-gray-700 mt-6 pt-6">
+                    <a href="#" id="link-gerar-prompt" class="sidebar-link flex items-center py-3 px-4 rounded-lg bg-blue-600 text-white font-bold" data-target="modulo-10">Módulo 10: Pacote PJe</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- ====================================================== -->
+        <!-- COLUNA DIREITA (Área de Conteúdo dos Módulos)           -->
+        <!-- ====================================================== -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            
+            <!-- MÓDULO 1: PRELIMINARES (v10 - REVISÃO PROCESSUAL COMPLETA) -->
+            <div id="modulo-1" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 1: Qualificação Processual (Art. 840 CLT c/c 319 CPC)</h2>
+                
+                <div class="expert-box">
+                    <strong>Instrução Sênior (Art. 840, §1º):</strong> A petição inicial exige a qualificação completa. A falta de dados corretos pode levar à inépcia ou a problemas na citação. Preencha *todos* os campos.
+                </div>
+
+                <h3 class="section-title">Dados Preliminares da Ação</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="comarca" class="expert-label">Comarca (Foro) (Tese: Art. 651, CLT)</label>
+                        <input type="text" id="comarca" value="Cuiabá/MT" class="input-field">
+                        <p class="legal-tip">Fundamento: A competência é definida pelo local da prestação de serviços, e não pelo da sede da empresa.</p>
+                    </div>
+                    <div>
+                        <label for="data-ajuizamento" class="expert-label">Data do Ajuizamento (Hoje)</label>
+                        <input type="date" id="data-ajuizamento" class="input-field">
+                        <p class="legal-tip">Usado para cálculo prescricional (Art. 7º, XXIX, CF).</p>
+                    </div>
+                </div>
+                <!-- ... (Campos de Prescrição) ... -->
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label for="prescricao-quinquenal">Marco Prescricional (Quinquenal):</label>
+                        <input type="text" id="prescricao-quinquenal" class="input-field input-field-readonly" readonly>
+                    </div>
+                    <div>
+                        <label for="prescricao-bienal">Status Prescrição Bienal:</label>
+                        <input type="text" id="prescricao-bienal" class="input-field input-field-readonly" readonly>
+                    </div>
+                </div>
+                <div class="expert-box-danger" id="aviso-prescricao" style="display: none;">
+                    <strong>ALERTA MÁXIMO (PRESCRIÇÃO BIENAL):</strong> O prazo de 2 anos da demissão está a estourar ou já estourou. AJUIZAR IMEDIATAMENTE.
+                </div>
+
+                <h3 class="section-title">Reclamante (Cliente)</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label for="cli-nome" class="expert-label">Nome Completo:</label>
+                        <input type="text" id="cli-nome" class="input-field">
+                    </div>
+                    <div>
+                        <label for="cli-nacionalidade" class="expert-label">Nacionalidade:</label>
+                        <input type="text" id="cli-nacionalidade" value="Brasileiro(a)" class="input-field">
+                    </div>
+                     <div>
+                        <label for="cli-estado-civil" class="expert-label">Estado Civil:</label>
+                        <input type="text" id="cli-estado-civil" placeholder="Solteiro(a), Casado(a)..." class="input-field">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mt-3">
+                    <div>
+                        <label for="cli-profissao" class="expert-label">Profissão (Função):</label>
+                        <input type="text" id="cli-profissao" placeholder="Ex: Auxiliar Administrativo" class="input-field">
+                    </div>
+                    <div>
+                        <label for="cli-nascimento" class="expert-label">Data de Nascimento:</label>
+                        <input type="date" id="cli-nascimento" class="input-field">
+                    </div>
+                    <div>
+                        <label for="cli-mae" class="expert-label">Nome da Mãe:</label>
+                        <input type="text" id="cli-mae" class="input-field">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 mt-3">
+                    <div>
+                        <label for="cli-cpf" class="expert-label">CPF:</label>
+                        <input type="text" id="cli-cpf" class="input-field">
+                    </div>
+                    <div>
+                        <label for="cli-rg" class="expert-label">RG (com Órgão Emissor):</label>
+                        <input type="text" id="cli-rg" placeholder="Ex: 123456 SSP/MT" class="input-field">
+                    </div>
+                    <div>
+                        <label for="cli-pis" class="expert-label">PIS/PASEP:</label>
+                        <input type="text" id="cli-pis" class="input-field">
+                    </div>
+                </div>
+                 <div class="grid grid-cols-2 gap-4 mt-3">
+                    <div>
+                        <label for="cli-ctps" class="expert-label">CTPS (Número e Série):</label>
+                        <input type="text" id="cli-ctps" placeholder="Ex: 12345 / 001-MT" class="input-field">
+                    </div>
+                    <div>
+                        <label for="cli-email" class="expert-label">Email (Art. 319, II, CPC):</label>
+                        <input type="email" id="cli-email" placeholder="cliente@email.com" class="input-field">
+                    </div>
+                </div>
+                <label for="cli-endereco" class="expert-label mt-3">Endereço Completo (c/ CEP):</label>
+                <input type="text" id="cli-endereco" class="input-field">
+                <p class="legal-tip">Tese (Justiça Gratuita): O Reclamante declara-se pobre (Declaração anexa) e aufere salário inferior a 40% do teto do INSS (Art. 790, §3º). Requerer J.G.</p>
+                
+                <h3 class="section-title">Reclamada (Empresa)</h3>
+                <label for="rda-nome" class="expert-label">Razão Social:</label>
+                <input type="text" id="rda-nome" class="input-field">
+                <label for="rda-cnpj" class="expert-label mt-3">CNPJ:</label>
+                <input type="text" id="rda-cnpj" class="input-field">
+                <label for="rda-endereco" class="expert-label mt-3">Endereço Completo (c/ CEP):</label>
+                <input type="text" id="rda-endereco" class="input-field">
+                <p class="legal-tip">Dica Sênior: Verifique o CNPJ e o endereço no site da Receita Federal. Endereço errado impede a citação.</p>
+            </div>
+
+            <!-- MÓDULO 2: CONTRATO (v10) -->
+            <div id="modulo-2" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 2: Dados do Contrato e Remuneração (VMR)</h2>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label for="data-admissao" class="expert-label">Data de Admissão (Real):</label>
+                        <input type="date" id="data-admissao" class="input-field">
+                    </div>
+                    <div>
+                        <label for="data-demissao" class="expert-label">Data de Demissão (Último dia):</label>
+                        <input type="date" id="data-demissao" class="input-field">
+                    </div>
+                    <div>
+                        <label for="data-reforma" class="expert-label">Data Reforma (Art. 71):</label>
+                        <input type="date" id="data-reforma" value="2017-11-11" class="input-field input-field-readonly" readonly>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Tese: Anotação da CTPS (Multas)</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="data-ctps" class="expert-label">Data de Anotação na CTPS:</label>
+                        <input type="date" id="data-ctps" class="input-field">
+                        <p class="legal-tip">Deixe em branco se NUNCA foi anotado.</p>
+                    </div>
+                    <div>
+                        <label for="prazo-ctps" class="expert-label">Prazo de Anotação (5 dias úteis):</label>
+                        <input type="text" id="prazo-ctps" class="input-field input-field-readonly" readonly>
+                    </div>
+                </div>
+                <div id="tese-multa-29" class="expert-box-proactive" style="display: none;">
+                    <strong>TESE ACESSÓRIA (Multa Art. 29, §3º):</strong> A anotação foi feita fora do prazo. Pedir multa de 1 salário mínimo.
+                </div>
+                <div id="tese-dano-ctps" class="expert-box-proactive" style="display: none;">
+                    <strong>TESE ACESSÓRIA (Dano Moral):</strong> A falta de anotação na CTPS (se nunca foi feita) gera dano moral *in re ipsa* (Tese do TST).
+                    <label class="checkbox-label"><input type="checkbox" id="pedir-dano-ctps" class="checkbox-input"> Incluir Pedido de Dano Moral por falta de anotação (Recomendado)</label>
+                </div>
+
+
+                <h3 class="section-title">Motor de Cálculo (VMR)</h3>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label for="salario-fixo" class="expert-label">Salário Fixo (Registado):</label>
+                        <input type="number" id="salario-fixo" placeholder="2000.00" class="input-field">
+                    </div>
+                    <div>
+                        <label for="salario-fora" class="expert-label">Média Salário "Por Fora" (Tese)</label>
+                        <input type="number" id="salario-fora" placeholder="500.00" value="0" class="input-field">
+                    </div>
+                    <div>
+                        <label for="salario-minimo" class="expert-label">Salário Mínimo (Insal.):</label>
+                        <input type="number" id="salario-minimo" placeholder="1412.00" value="1412.00" class="input-field">
+                    </div>
+                </div>
+                <div class="expert-box">
+                    <strong>Tese (Art. 457, §1º):</strong> O valor "Por Fora" deve ser integrado à VMR (Variável Mestra de Remuneração) para cálculo de *todas* as verbas (Férias, 13º, FGTS, HE). O sistema fará isso.
+                </div>
+                
+                <h3 class="section-title">Mapeamento de Regime (Estratégia)</h3>
+                <label for="regime-trabalho" class="expert-label">Qual o enquadramento do regime de trabalho?</label>
+                <select id="regime-trabalho" class="input-field">
+                    <option value="padrao">Padrão (CLT com controlo)</option>
+                    <option value="pj">Fraude (PJ - Art. 9º CLT)</option>
+                    <option value="art62-i">Externo (Art. 62, I - Descaracterizado)</option>
+                    <option value="art62-ii">Gerente (Art. 62, II - Descaracterizado)</option>
+                </select>
+
+                <!-- SUB-MÓDULOS DE FRAUDE (v10) -->
+                <div id="sub-modulo-pj" class="expert-box-danger mt-4" style="display: none;">
+                    <h4 class="font-bold text-lg">Tese de Fraude (PJ - Art. 9º CLT)</h4>
+                    <p>Guia: Para provar o vínculo (Art. 3º), marque os requisitos presentes (Ônus do Reclamante - Art. 818, I).</p>
+                    <label class="checkbox-label"><input type="checkbox" id="pj-pessoalidade" class="checkbox-input"> **Pessoalidade:** (FATO) Não podia mandar outro no lugar.</label>
+                    <label class="checkbox-label"><input type="checkbox" id="pj-subordinacao" class="checkbox-input"> **Subordinação:** (FATO) Recebia ordens diretas, tinha chefe, usava uniforme/email.</label>
+                    <label class="checkbox-label"><input type="checkbox" id="pj-onerosidade" class="checkbox-input"> **Onerosidade:** (FATO) Recebia salário fixo, não por nota.</label>
+                    <label class="checkbox-label"><input type="checkbox" id="pj-habitualidade" class="checkbox-input"> **Não-Eventualidade:** (FATO) Trabalhava em dias e horários fixos.</label>
+                </div>
+                <div id="sub-modulo-art62-ii" class="expert-box-danger mt-4" style="display: none;">
+                    <h4 class="font-bold text-lg">Tese de Descaracterização (Cargo de Confiança - Art. 62, II)</h4>
+                    <p>Guia (Defesa da Reclamada): A empresa alegará Cargo de Confiança. Para afastar, basta que UM dos requisitos abaixo falhe (Ônus da Reclamada - Súmula 287).</p>
+                    <label class="checkbox-label"><input type="checkbox" id="art62ii-poderes" class="checkbox-input"> **FATO:** **NÃO TINHA** reais poderes de mando e gestão (Ex: Não podia admitir/demitir/advertir)</label>
+                    <label class="checkbox-label"><input type="checkbox" id="art62ii-salario" class="checkbox-input"> **FATO:** **NÃO RECEBIA** gratificação de 40% (ou salário destacado)</label>
+                    <p class="legal-tip">Instrução ao Prompt: Fundamentar a descaracterização do Art. 62, II e pedir Horas Extras.</p>
+                </div>
+                <div id="sub-modulo-art62-i" class="expert-box-danger mt-4" style="display: none;">
+                   <h4 class="font-bold text-lg">Tese de Descaracterização (Trabalho Externo - Art. 62, I)</h4>
+                    <p>Guia (Defesa da Reclamada): A empresa alegará trabalho externo incompatível com controlo. Provar que o controlo era POSSÍVEL (Ônus do Reclamante - Art. 818, I).</p>
+                    <label class="checkbox-label"><input type="checkbox" id="art62i-controle-gps" class="checkbox-input"> **FATO:** Havia controlo de rota (GPS, App, Telemóvel da empresa)</label>
+                    <label class="checkbox-label"><input type="checkbox" id="art62i-reuniao" class="checkbox-input"> **FATO:** Havia obrigação de comparecer à sede (reuniões matinais/vespertinas)</label>
+                    <label class="checkbox-label"><input type="checkbox" id="art62i-metas" class="checkbox-input"> **FATO:** Havia controlo de metas de visitação/relatórios</label>
+                    <p class="legal-tip">Instrução ao Prompt: Afastar a exceção do Art. 62, I e pedir Horas Extras (Súmula 338, I).</p>
+                </div>
+            </div>
+
+            <!-- MÓDULO 3: JORNADA (v10 - Tese Proativa de Dano Existencial) -->
+            <div id="modulo-3" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 3: Jornada de Trabalho (Horas Extras)</h2>
+                
+                <h3 class="section-title">Estratégia de Prova (Súmula 338, TST)</h3>
+                <label for="qtde-funcs" class="expert-label">A empresa tem +20 funcionários? (Ônus da Prova)</label>
+                <select id="qtde-funcs" class="input-field">
+                    <option value="sim">Sim (Mais de 20)</option>
+                    <option value="nao">Não (Menos de 20)</option>
+                </select>
+                <p class="expert-box">
+                    <strong>Ponto de Sucesso (Súmula 338, I, TST):</strong> Se "Sim" (Art. 74, §2º, CLT), a Reclamada é OBRIGADA a juntar os controlos de ponto. Se não o fizer, a jornada que você narrar abaixo será presumida como verdadeira (inversão do ónus da prova).
+                </p>
+                <h3 class="section-title">Parâmetros de Cálculo</h3>
+                <!-- ... (Campos de Parâmetros) ... -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label for="divisor-he" class="expert-label">Divisor de Horas:</label>
+                        <select id="divisor-he" class="input-field">
+                            <option value="220">220 (44h/semana)</option>
+                            <option value="180">180 (36h/semana)</option>
+                            <option value="200">200 (40h/semana)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="adicional-he-50" class="expert-label">Adicional HE (dias úteis):</label>
+                        <input type="number" id="adicional-he-50" value="50" class="input-field">
+                    </div>
+                     <div>
+                        <label for="adicional-he-100" class="expert-label">Adicional HE (Dom/Feriado):</label>
+                        <input type="number" id="adicional-he-100" value="100" class="input-field">
+                    </div>
+                </div>
+                <h3 class="section-title">Jornada Média (Segunda a Sexta)</h3>
+                <div class="grid grid-cols-4 gap-4">
+                    <div>
+                        <label for="jornada-entrada-seg" class="expert-label">Entrada (Seg-Sex):</label>
+                        <input type="time" id="jornada-entrada-seg" value="08:00" class="input-field">
+                    </div>
+                    <div>
+                        <label for="jornada-saida-seg" class="expert-label">Saída (Seg-Sex):</label>
+                        <input type="time" id="jornada-saida-seg" value="18:00" class="input-field">
+                    </div>
+                    <div>
+                        <label for="jornada-intervalo" class="expert-label">Intervalo (Minutos)</label>
+                        <input type="number" id="jornada-intervalo" placeholder="30" value="30" class="input-field">
+                    </div>
+                    <div>
+                        <label for="dias-uteis-mes" class="expert-label">Média Dias Úteis/Mês:</label>
+                        <input type="number" id="dias-uteis-mes" value="22" class="input-field">
+                    </div>
+                </div>
+                <!-- v10 - Tese Acessória Proativa -->
+                <div id="tese-dano-existencial" class="expert-box-proactive" style="display: none;">
+                    <strong>ALERTA SÊNIOR (Tese Acessória):</strong> A jornada informada é exaustiva (mais de 2h extras/dia). Isso pode gerar Dano Existencial (violação do direito ao lazer/convívio social - Art. 6º, CF).
+                    <label class="checkbox-label mt-2"><input type="checkbox" id="pedir-dano-existencial" class="checkbox-input"> **Incluir Pedido de Dano Existencial (Recomendado)**</label>
+                </div>
+                
+                <h3 class="section-title">Jornada (Fim de Semana - HE 100%)</h3>
+                <!-- ... (Campos de FDS) ... -->
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label for="fds-horas-dia" class="expert-label">Horas Trab. (Dom/Feriado):</label>
+                        <input type="number" id="fds-horas-dia" value="0" class="input-field">
+                    </div>
+                    <div>
+                        <label for="fds-dias-mes" class="expert-label">Média Dias (Dom/Feriado)/Mês:</label>
+                        <input type="number" id="fds-dias-mes" value="0" class="input-field">
+                    </div>
+                    <div>
+                        <label for="dsr-dias-mes" class="expert-label">Média DSRs (Dom/Feriados)/Mês:</label>
+                        <input type="number" id="dsr-dias-mes" value="8" class="input-field">
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÓDULO 4: ADICIONAIS (v10) -->
+            <div id="modulo-4" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 4: Adicionais (Perícia Obrigatória)</h2>
+                <div class="expert-box">
+                    <strong>Atenção (Não Cumulatividade - Art. 193, §2º):</strong> O Reclamante deverá optar pelo adicional mais vantajoso. O sistema pedirá ambos.
+                    <br><strong>Súmula 264, TST:</strong> O adicional (Insal. ou Peric.) integrará a base de cálculo das Horas Extras. O Motor de Cálculo v10 fará isso automaticamente.
+                </div>
+                <h3 class="section-title">Tese: Insalubridade (Art. 192, CLT / NR-15)</h3>
+                <label for="grau-insalubridade" class="expert-label">Grau de Insalubridade (NR-15):</label>
+                <select id="grau-insalubridade" class="input-field">
+                    <option value="0">Nenhum</option>
+                    <option value="10">Mínimo (10% s/ Sal. Mínimo)</option>
+                    <option value="20">Médio (20% s/ Sal. Mínimo)</option>
+                    <option value="40">Máximo (40% s/ Sal. Mínimo)</option>
+                </select>
+                <label for="insal-agente" class="expert-label mt-3">Agente Insalubre (FATO):</label>
+                <input type="text" id="insal-agente" class="input-field" placeholder="Ex: Ruído excessivo, Câmara Fria, Agentes Químicos (solventes)...">
+                
+                <h3 class="section-title">Tese: Periculosidade (Art. 193, CLT / NR-16)</h3>
+                <label for="tem-periculosidade" class="expert-label">Havia Periculosidade (NR-16)?</label>
+                <select id="tem-periculosidade" class="input-field">
+                    <option value="nao">Não</option>
+                    <option value="sim">Sim (30% s/ Salário Base)</option>
+                </select>
+                <label for="peric-agente" class="expert-label mt-3">Agente Perigoso (FATO):</label>
+                <input type="text" id="peric-agente" class="input-field" placeholder="Ex: Risco Elétrico, Inflamáveis (frentista), Risco de Roubo (vigilante), Motocicleta...">
+            </div>
+            
+            <!-- MÓDULO 5: ACIDENTE (v10 - Antecipação da Defesa) -->
+            <div id="modulo-5" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 5: Acidente de Trabalho ou Doença Ocupacional</h2>
+                <div class="expert-box-danger">
+                    <strong>ADVOGADO: Esta é a tese de maior valor.</strong> A falha em provar o (1) Facto, (2) Dano, (3) Nexo Causal e (4) Culpa da Reclamada leva à improcedência.
+                </div>
+                <label for="tipo-acidente" class="expert-label mt-4">Tipo de Ocorrência:</label>
+                <select id="tipo-acidente" class="input-field">
+                    <option value="nenhum">Nenhum</option>
+                    <option value="tipico">Acidente Típico (Ex: Queda, corte, batida)</option>
+                    <option value="trajeto">Acidente de Trajeto (Casa-Trabalho-Casa)</option>
+                    <option value="doenca-ler">Doença Ocupacional (LER/DORT)</option>
+                    <option value="doenca-mental">Doença Psicossomática (Ex: Burnout)</option>
+                </select>
+                <h3 class="section-title">Factos (Nexo Causal e Culpa da Reclamada)</h3>
+                <label for="narrativa-acidente" class="expert-label">Descrição do Acidente ou da Causa da Doença (Obrigatório):</label>
+                <textarea id="narrativa-acidente" rows="4" class="input-field" placeholder="Ex: Ao levantar peso excessivo (30kg) sem ajuda e sem treinamento (culpa/negligência), sentiu uma fisgada na coluna (facto/nexo)..."></textarea>
+                <p class="legal-tip">Instrução: Na narrativa, já inclua a CULPA da empresa (Ex: falta de EPI, falta de treinamento, metas abusivas, ergonomia inadequada).</p>
+                <label for="data-acidente" class="expert-label mt-4">Data do Acidente ou Diagnóstico:</label>
+                <input type="date" id="data-acidente" class="input-field">
+                <label for="emissao-cat" class="expert-label">A empresa emitiu a CAT?</label>
+                <select id="emissao-cat" class="input-field mt-1"><option value="nao">Não (Omissão da Reclamada)</option><option value="sim">Sim</option></select>
+                <label for="afastamento-inss" class="expert-label">Houve afastamento pelo INSS (>15 dias)?</label>
+                <select id="afastamento-inss" class="input-field mt-1"><option value="nao">Não</option><option value="sim-b31">Sim (Recebeu B-31 - Comum)</option><option value="sim-b91">Sim (Recebeu B-91 - Acidentário)</option></select>
+                
+                <!-- v10 - Antecipação da Defesa -->
+                <h3 class="section-title">Estratégia Sênior (Antecipação da Defesa - Culpa)</h3>
+                <div class="expert-box">
+                    <strong>Guia (Defesa da Reclamada):</strong> A empresa alegará "Culpa Exclusiva da Vítima" (Art. 818, II). Descaracterize:
+                    <label class="checkbox-label mt-2"><input type="checkbox" id="culpa-treinamento" class="checkbox-input"> **FATO:** Cliente NÃO recebeu treinamento adequado para a função.</label>
+                    <label class="checkbox-label"><input type="checkbox" id="culpa-epi" class="checkbox-input"> **FATO:** Empresa NÃO forneceu ou NÃO fiscalizou o uso de EPIs.</label>
+                    <label class="checkbox-label"><input type="checkbox" id="culpa-ambiente" class="checkbox-input"> **FATO:** O ambiente de trabalho era inseguro (piso molhado, falta de ergonomia).</label>
+                </div>
+
+                <h3 class="section-title">Pedidos (Estabilidade e Danos)</h3>
+                <label class="checkbox-label"><input type="checkbox" id="estabilidade-118" class="checkbox-input expert-label"> **Tese: Estabilidade (Art. 118, Lei 8.213/91):** Foi demitido nos 12 meses após a alta?
+                </label>
+                <p class="legal-tip">Tese (Súmula 378, TST): Mesmo sem B-91, se for provado na perícia que a doença era ocupacional, o direito à estabilidade é reconhecido.</p>
+                
+                <label class="checkbox-label mt-3"><input type="checkbox" id="dano-estetico" class="checkbox-input expert-label"> **Tese: Dano Estético (Súmula 387, STJ):** O acidente deixou cicatriz ou deformidade?</label>
+                <label for="dano-estetico-valor" class="mt-2 ml-7">Valor Estimado (Dano Estético):</label>
+                <input type="number" id="dano-estetico-valor" class="input-field ml-7" placeholder="10000.00" value="0">
+                
+                <label class="checkbox-label mt-3"><input type="checkbox" id="dano-emergente" class="checkbox-input expert-label"> **Tese: Danos Emergentes (Art. 949, CC):** Houve gastos com remédios, fisioterapia, etc.?</label>
+                <label for="dano-emergente-valor" class="mt-2 ml-7">Valor Gasto (Comprovado):</label>
+                <input type="number" id="dano-emergente-valor" class="input-field ml-7" placeholder="1500.00" value="0">
+                <p class="legal-tip">Instrução: Juntar todos os recibos e notas fiscais.</p>
+
+                <h3 class="section-title">Cálculo de Pensão (Dano Material - Art. 950, CC)</h3>
+                <label class="checkbox-label"><input type="checkbox" id="dano-material-acidente" class="checkbox-input expert-label"> **Tese: Pedir Pensão (Perda/Redução da Capacidade)?**</label>
+                <div class="grid grid-cols-2 gap-4 mt-2 ml-7">
+                    <div>
+                        <label for="percentual-incapacidade" class="expert-label">Incapacidade (% do Laudo):</label>
+                        <input type="number" id="percentual-incapacidade" class="input-field" placeholder="Ex: 25" value="0">
+                    </div>
+                    <div>
+                        <label for="expectativa-vida" class="expert-label">Expectativa de Vida (IBGE):</label>
+                        <input type="number" id="expectativa-vida" class="input-field" placeholder="Ex: 80" value="80">
+                    </div>
+                </div>
+                <p class="legal-tip">Instrução: O sistema calculará a pensão (parcela única) com base na VMR, % de incapacidade e expectativa de vida restante do cliente (Art. 950, CC).</p>
+            </div>
+
+            <!-- MÓDULO 6: DANO MORAL (v10 - Teses Proativas) -->
+            <div id="modulo-6" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 6: Danos Morais (Teses Estratégicas)</h2>
+                <label for="tipo-dano" class="expert-label">Qual a origem principal do Dano Moral?</label>
+                <select id="tipo-dano" class="input-field">
+                    <option value="nenhum">Nenhum</option>
+                    <option value="moral">Assédio Moral (Humilhação, perseguição)</option>
+                    <option value="sexual">Assédio Sexual</option>
+                    <option value="existencial" class="font-bold">Dano Existencial (Detectado no Mód. 3?)</option>
+                    <option value="acidente">Dano Moral (Decorrente de Acidente/Doença - *Cumulável com Mód. 5*)</option>
+                    <option value="mora-salarial">Mora Salarial Contumaz (Atrasos reiterados - Dano in re ipsa)</option>
+                    <option value="ctps-anotacao" class="font-bold">Falta de Anotação da CTPS (Detectado no Mód. 2?)</option>
+                </select>
+                <h3 class="section-title">Narrativa dos Factos (Obrigatório)</h3>
+                <label for="narrativa-dano" class="expert-label">Descreva o facto (Quem? O quê? Quando? Onde?):</label>
+                <textarea id="narrativa-dano" rows="4" class="input-field" placeholder="Ex: O Gerente Sr. João, diariamente, na frente dos colegas, chamava o Reclamante de 'incompetente'..."></textarea>
+                <label for="agressor-dano" class="expert-label mt-4">Nome do principal Agressor (Cargo):</label>
+                <input type="text" id="agressor-dano" class="input-field">
+                
+                <h3 class="section-title">Cálculo (Estratégia Art. 223-G, CLT)</h3>
+                <div class="expert-box">
+                    <strong>Guia (Tarifação):</strong> A Reforma (Lei 13.467/17) tarifou o Dano Moral. Fundamente a gravidade da ofensa para justificar o valor.
+                </div>
+                <label for="gravidade-dano" class="expert-label">Classificação da Ofensa (Sugestão):</label>
+                <select id="gravidade-dano" class="input-field">
+                    <option value="0">Nenhuma</option>
+                    <option value="3">Leve (Até 3x o último salário)</option>
+                    <option value="5">Média (Até 5x o último salário)</option>
+                    <option value="20">Grave (Até 20x o último salário)</option>
+                    <option value="50">Gravíssima (Até 50x o último salário)</option>
+                </select>
+                <label for="dano-moral-calculado" class="expert-label mt-4">Valor Líquido (Estimado):</label>
+                <input type="text" id="dano-moral-calculado" class="input-field input-field-readonly" readonly>
+            </div>
+            
+            <!-- MÓDULO 7: RESCISÃO (v10) -->
+            <div id="modulo-7" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 7: Verbas Rescisórias e Multas</h2>
+
+                <label for="tipo-saida" class="expert-label">Modalidade da Extinção:</label>
+                <select id="tipo-saida" class="input-field">
+                    <option value="sjc">Demissão Sem Justa Causa (Não paga)</option>
+                    <option value="jc">Demissão Por Justa Causa (Reversão)</option>
+                    <option value="pedido">Pedido de Demissão (Viciado?)</option>
+                    <option value="indireta">Rescisão Indireta (Art. 483, CLT)</option>
+                </select>
+                
+                <div class="expert-box">
+                    <strong>Motor de Cálculo v10:</strong> O sistema calculará automaticamente o Aviso Prévio Proporcional (Lei 12.506/11) e a projeção em 13º e Férias.
+                </div>
+
+                <h3 class="section-title">Checklist de Verbas Incontroversas (Para Cálculo)</h3>
+                <label for="saldo-salario-dias" class="expert-label mt-2">Saldo de Salário (Dias):</label>
+                <input type="number" id="saldo-salario-dias" class="input-field" placeholder="Ex: 15" value="0">
+                <label class="checkbox-label"><input type="checkbox" id="verba-ferias-venc" class="checkbox-input expert-label"> Tese: Havia Férias Vencidas (+ 1/3) não pagas?</label>
+                <label class="checkbox-label"><input type="checkbox" id="verba-ferias-duplas" class="checkbox-input expert-label"> Tese: Havia Férias pagas fora do prazo (Art. 137, CLT)? (Pedir em dobro)</label>
+
+                <h3 class="section-title">Estratégia (Rescisão Indireta)</h3>
+                <span class="label-group expert-label">Se for Rescisão Indireta, qual a falta grave do empregador (Art. 483)?</span>
+                <label class="checkbox-label"><input type="checkbox" id="indireta-fgts" class="checkbox-input"> **Tese (Alínea 'd'):** Não recolhimento do FGTS (Falta grave - Tese TST)</label>
+                <label class="checkbox-label"><input type="checkbox" id="indireta-salario" class="checkbox-input"> **Tese (Alínea 'd'):** Atraso salarial habitual</label>
+                <label class="checkbox-label"><input type="checkbox" id="indireta-assedio" class="checkbox-input"> **Tese (Alínea 'b'/'e'):** Assédio Moral / Rigor Excessivo</label>
+
+                <h3 class="section-title">Multas (CLT)</h3>
+                <label class="checkbox-label"><input type="checkbox" id="multa-477" class="checkbox-input expert-label"> **Tese: Pedir Multa do Art. 477, §8º** (Atraso de 10 dias no pagamento)</label>
+                <label class="checkbox-label"><input type="checkbox" id="multa-467" class="checkbox-input expert-label"> **Tese: Pedir Multa do Art. 467** (50% sobre incontroversas em audiência)</label>
+            </div>
+
+            <!-- MÓDULO 8: TESES ESP. (v10) -->
+            <div id="modulo-8" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 8: Teses Específicas e Outras Verbas</h2>
+
+                <h3 class="section-title">Tese: Equiparação Salarial (Art. 461, CLT)</h3>
+                <div class="expert-box">
+                    <strong>Estratégia (Art. 461):</strong> Provar (1) Identidade de Função, (2) Mesmo Empregador, (3) Mesma Localidade, (4) Menos de 2 anos de diferença NA FUNÇÃO (Ônus do Reclamante).
+                </div>
+                <label for="equipar-paradigma" class="expert-label mt-4">Nome do Paradigma (Colega que ganhava mais):</label>
+                <input type="text" id="equipar-paradigma" class="input-field" placeholder="Ex: João da Silva">
+                <label for="equipar-funcao" class="expert-label mt-3">Função IDÊNTICA exercida:</label>
+                <input type="text" id="equipar-funcao" class="input-field" placeholder="Ex: Analista de Vendas Sénior">
+                <label for="equipar-data-paradigma" class="expert-label mt-3">Data de Início do Paradigma *NA FUNÇÃO*:</label>
+                <input type="date" id="equipar-data-paradigma" class="input-field">
+                <label for="equipar-valor-dif" class="expert-label mt-3">Diferença Salarial Média (R$):</label>
+                <input type="number" id="equipar-valor-dif" class="input-field" placeholder="300.00" value="0">
+                
+                <h3 class="section-title">Tese: FGTS (Diferenças e Multa 40%)</h3>
+                <div class="expert-box">
+                    <strong>Motor de Cálculo v10:</strong> O sistema calculará o FGTS (8%) sobre todas as verbas salariais pleiteadas (HE, Adicionais, 13º, Aviso) e a Multa de 40% sobre tudo.
+                </div>
+                <label class="checkbox-label"><input type="checkbox" id="verba-multa-40" class="checkbox-input expert-label"> **Pedir Multa de 40% do FGTS** (Se SJC ou Indireta)</label>
+                <label for="fgts-valor-nao-depositado" class="expert-label mt-4">Valor de FGTS *Não Depositado* (do Extrato Analítico):</label>
+                <input type="number" id="fgts-valor-nao-depositado" class="input-field" placeholder="5000.00" value="0">
+                <p class="legal-tip">Instrução: Informe o valor que consta como "a recolher" no extrato da Caixa.</p>
+                
+                <h3 class="section-title">Tese: Vale-Transporte (Indenização - Lei 7.418/85)</h3>
+                <label class="checkbox-label"><input type="checkbox" id="tese-vt" class="checkbox-input expert-label"> **Pedir Indenização de Vale-Transporte?** (Empresa não fornecia)</label>
+                <div class="grid grid-cols-3 gap-4 mt-2 ml-7">
+                    <div>
+                        <label for="vt-dias-mes" class="expert-label">Dias trabalhados/mês (média):</label>
+                        <input type="number" id="vt-dias-mes" class="input-field" placeholder="22" value="0">
+                    </div>
+                    <div>
+                        <label for="vt-conducoes-dia" class="expert-label">Conduções por dia:</label>
+                        <input type="number" id="vt-conducoes-dia" class="input-field" placeholder="2" value="0">
+                    </div>
+                    <div>
+                        <label for="vt-valor-passagem" class="expert-label">Valor da Passagem (R$):</label>
+                        <input type="number" id="vt-valor-passagem" class="input-field" placeholder="4.50" value="0">
+                    </div>
+                </div>
+                <p class="legal-tip">Instrução: O sistema calculará o valor total devido e instruirá a IA a pedir a indenização, autorizando o desconto do percentual de 6% do salário-base.</p>
+
+                <h3 class="section-title">Tese: Multas Normativas (CCT/ACT)</h3>
+                <label class="checkbox-label"><input type="checkbox" id="tese-cct" class="checkbox-input expert-label"> **Pedir Multas CCT/ACT?** (Juntar a norma)</label>
+                <div class="grid grid-cols-3 gap-4 mt-2 ml-7">
+                     <div>
+                        <label for="cct-clausula-descumprida" class="expert-label">Cláusula(s) Descumpida(s):</label>
+                        <input type="text" id="cct-clausula-descumprida" class="input-field" placeholder="5ª (Piso) e 12ª (Cesta)">
+                    </div>
+                    <div>
+                        <label for="cct-valor-multa" class="expert-label">Valor da Multa (R$ ou %):</label>
+                        <input type="number" id="cct-valor-multa" class="input-field" placeholder="200.00" value="0">
+                    </div>
+                    <div>
+                        <label for="cct-tipo-multa" class="expert-label">Tipo de Multa:</label>
+                        <select id="cct-tipo-multa" class="input-field">
+                            <option value="evento">Por evento (única)</option>
+                            <option value="mes">Por mês de descumprimento</option>
+                            <option value="percentual-piso">% do Piso Salarial</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MÓDULO 9: PROVAS (v10 - Dados do Advogado) -->
+            <div id="modulo-9" class="content-module bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 9: Provas, Requerimentos e Advogado</h2>
+                <div class="expert-box">
+                    <strong>Estratégia (Ónus da Prova - Art. 818, CLT):** Factos constitutivos (HE, Assédio) são ónus do Reclamante. Factos impeditivos/modificativos (Pagamento, Cargo de Confiança) são da Reclamada.
+                </div>
+                
+                <h3 class="section-title">Testemunhas (Estratégia)</h3>
+                <label for="test-1-nome" class="expert-label mt-2">Testemunha 1 (Nome):</label>
+                <input type="text" id="test-1-nome" class="input-field">
+                <label for="test-1-fatos" class="expert-label mt-2">Quais factos esta testemunha provará?</label>
+                <input type="text" id="test-1-fatos" class="input-field" placeholder="Ex: Jornada real, o assédio moral">
+                
+                <label for="test-2-nome" class="expert-label mt-4">Testemunha 2 (Nome):</label>
+                <input type="text" id="test-2-nome" class="input-field">
+                <label for="test-2-fatos" class="expert-label mt-2">Quais factos esta testemunha provará?</label>
+                <input type="text" id="test-2-fatos" class="input-field" placeholder="Ex: Equiparação salarial, o acidente">
+
+                <h3 class="section-title">Requerimentos Finais (Para o Prompt)</h3>
+                <label class="checkbox-label"><input type="checkbox" id="req-citacao" class="checkbox-input" checked> Citação da Reclamada</label>
+                <label class="checkbox-label"><input type="checkbox" id="req-provas" class="checkbox-input" checked> Protesto por todos os meios de prova (Art. 319, VI, CPC)</label>
+                <label class="checkbox-label"><input type="checkbox" id="req-pericia-tecnica" class="checkbox-input"> Pedido de Perícia Técnica (Se Mód. 4 - Adicionais)</label>
+                <label class="checkbox-label"><input type="checkbox" id="req-pericia-medica" class="checkbox-input"> Pedido de Perícia Médica (Se Mód. 5 - Acidente/Doença)</label>
+                <label class="checkbox-label"><input type="checkbox" id="req-juntada" class="checkbox-input" checked> Pedido de Juntada de Documentos (Art. 396, CPC)</label>
+
+                <!-- v10 - Dados do Advogado -->
+                <h3 class="section-title">Dados do Advogado (Para Fechamento da Peça)</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="adv-nome" class="expert-label">Nome do Advogado:</label>
+                        <input type="text" id="adv-nome" class="input-field" placeholder="Dr(a). Nome Sobrenome">
+                    </div>
+                    <div>
+                        <label for="adv-oab" class="expert-label">OAB (com UF):</label>
+                        <input type="text" id="adv-oab" class="input-field" placeholder="Ex: OAB/MT 12.345">
+                    </div>
+                </div>
+                <label for="adv-email" class="expert-label mt-3">Email do Advogado (Art. 319, II):</label>
+                <input type="email" id="adv-email" class="input-field" placeholder="advogado@email.com">
+                <label for="adv-endereco" class="expert-label mt-3">Endereço do Escritório (Completo):</label>
+                <input type="text" id="adv-endereco" class="input-field" placeholder="Rua X, nº 1, Sala 2, Cidade/UF, CEP...">
+            </div>
+
+            <!-- MÓDULO 10: PROMPT (v10 - Sistema de Abas) -->
+            <div id="modulo-10" class="content-module">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Módulo 10: Pacote de Saída PJe (v10)</h2>
+                
+                <!-- Abas -->
+                <div class="flex border-b">
+                    <button class="tab-button active" data-tab="tab-dashboard">Dashboard de Cálculo</button>
+                    <button class="tab-button" data-tab="tab-prompt">Prompt Mestre (IA)</button>
+                    <button class="tab-button" data-tab="tab-minuta">Minuta da Petição (IA)</button>
+                    <button class="tab-button" data-tab="tab-checklist">Checklist PJe</button>
+                </div>
+
+                <!-- Conteúdo das Abas -->
+
+                <!-- v10: Aba 1 - Dashboard de Cálculo -->
+                <div id="tab-dashboard" class="tab-content active">
+                    <h3 class="section-title">Resumo da Liquidação (v10)</h3>
+                    <div class="grid grid-cols-2 gap-x-4" id="calculation-summary">
+                        <p class="calculation-result" id="calc-vmr">VMR (Base HE): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-meses">Meses Contrato: 0</p>
+                        <p class="calculation-result" id="calc-he">HE (Principal): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-he-reflexos">HE (Reflexos): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-intervalo">Intervalo (Principal): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-intervalo-reflexos">Intervalo (Reflexos): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-adicionais">Adicionais (Principal): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-adicionais-reflexos">Adicionais (Reflexos): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-rescisorias">Verbas Rescisórias: R$ 0.00</p>
+                        <p class="calculation-result" id="calc-multas-477-467">Multas 477/467: R$ 0.00</p>
+                        <p class="calculation-result" id="calc-fgts-total">FGTS Total (Difs + Multa 40%): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-equiparacao">Equiparação (Principal): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-equiparacao-reflexos">Equiparação (Reflexos): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-vt">Vale-Transporte: R$ 0.00</p>
+                        <p class="calculation-result" id="calc-multa-cct">Multas CCT: R$ 0.00</p>
+                        <p class="calculation-result" id="calc-dano-moral">Dano Moral: R$ 0.00</p>
+                        <p class="calculation-result" id="calc-dano-material">Dano Material (Pensão): R$ 0.00</p>
+                        <p class="calculation-result" id="calc-dano-emergente">Dano Emergente (Gastos): R$ 0.00</p>
+                    </div>
+                    <p class="calculation-total mt-4" id="calc-valor-total-causa">VALOR TOTAL DA CAUSA: R$ 0.00</p>
+                    <p class="calculation-total" id="calc-rito-processual" style="background-color: #eff6ff; color: #1e3a8a;">RITO PROCESSUAL: (A Calcular)</p>
+                </div>
+                
+                <!-- v10: Aba 2 - Prompt Mestre -->
+                <div id="tab-prompt" class="tab-content">
+                    <textarea id="prompt-final" readonly class="w-full h-96 p-3 border border-gray-300 rounded-md bg-gray-50 font-mono text-sm"></textarea>
+                    <button id="btn-copiar" class="mt-4 px-6 py-3 bg-green-600 text-white font-bold rounded-lg shadow-md hover:bg-green-700 transition duration-200">
+                        Copiar Prompt para Área de Transferência
+                    </button>
+                </div>
+                
+                <!-- v10: Aba 3 - Minuta da Petição -->
+                <div id="tab-minuta" class="tab-content">
+                    <h3 class="section-title">Minuta da Petição (Gerada pela IA)</h3>
+                    <div id="minuta-output" class="w-full h-96 p-3 border border-gray-300 rounded-md bg-gray-50 overflow-y-auto" contenteditable="true">
+                        Clique em "Gerar Minuta" no Prompt para que a IA escreva a petição aqui...
+                    </div>
+                </div>
+                
+                <!-- v10: Aba 4 - Checklist PJe -->
+                <div id="tab-checklist" class="tab-content">
+                    <h3 class="section-title">Checklist de Documentos para Anexar no PJe</h3>
+                    <div id="checklist-pje" class="space-y-3">
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Procuração Ad Judicia</label>
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Declaração de Hipossuficiência</label>
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Documentos Pessoais (RG, CPF)</label>
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Comprovativo de Residência</label>
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> CTPS (Física ou Digital)</label>
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> TRCT (Termo de Rescisão)</label>
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Contracheques (Holerites)</label>
+                        <label class="checkbox-label"><input type="checkbox" class="checkbox-input"> Extrato Analítico do FGTS</label>
+                        <label classs="checkbox-label" id="check-pericia-medica" style="display: none;"><input type="checkbox" class="checkbox-input"> Laudos e Atestados Médicos (Mód. 5)</label>
+                        <label classs="checkbox-label" id="check-provas-dano" style="display: none;"><input type="checkbox" class="checkbox-input"> Provas de Assédio (Prints, E-mails) (Mód. 6)</label>
+                        <label classs="checkbox-label" id="check-norma-coletiva" style="display: none;"><input type="checkbox" class="checkbox-input"> Norma Coletiva (CCT/ACT) (Mód. 8)</label>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-  </header>
-
-  <nav class="tabs">
-    <button data-tab="qualificacao" class="active">1️⃣ Qualificação</button>
-    <button data-tab="preliminares">2️⃣ Preliminares</button>
-    <button data-tab="contrato">3️⃣ Contrato</button>
-    <button data-tab="fatos">4️⃣ Fatos</button>
-    <button data-tab="fundamentos">5️⃣ Fundamentos</button>
-    <button data-tab="pedidos">6️⃣ Pedidos</button>
-    <button data-tab="calculos">7️⃣ Cálculos</button>
-    <button data-tab="provas">8️⃣ Provas</button>
-    <button data-tab="valor">9️⃣ Valor da Causa</button>
-    <button data-tab="final">🔟 Visualizador Final</button>
-  </nav>
-
-  <main>
-
-    <!-- QUALIFICAÇÃO -->
-    <section id="qualificacao" class="tab-content active">
-      <h2>Qualificação das Partes</h2>
-      <p>Preencha os dados do reclamante e da reclamada. Use “Salvar Trecho” para enviar ao visualizador.</p>
-
-      <form id="form-qualificacao">
-        <fieldset>
-          <legend>Reclamante</legend>
-          <label>Nome <input type="text" name="reclamante_nome"></label>
-          <label>CPF <input type="text" name="reclamante_cpf"></label>
-          <label>RG <input type="text" name="reclamante_rg"></label>
-          <label>CTPS <input type="text" name="reclamante_ctps"></label>
-          <label>Série <input type="text" name="reclamante_ctps_serie"></label>
-          <label>Profissão <input type="text" name="reclamante_profissao"></label>
-          <label>Endereço <input type="text" name="reclamante_endereco"></label>
-          <label>Bairro <input type="text" name="reclamante_bairro"></label>
-          <label>Cidade <input type="text" name="reclamante_cidade"></label>
-          <label>UF <input type="text" name="reclamante_uf" maxlength="2"></label>
-          <label>CEP <input type="text" name="reclamante_cep"></label>
-          <label>Telefone <input type="text" name="reclamante_fone"></label>
-          <label>E-mail <input type="email" name="reclamante_email"></label>
-        </fieldset>
-
-        <fieldset>
-          <legend>Reclamada</legend>
-          <label>Razão Social <input type="text" name="reclamada_nome"></label>
-          <label>CNPJ <input type="text" name="reclamada_cnpj"></label>
-          <label>Endereço <input type="text" name="reclamada_endereco"></label>
-          <label>Bairro <input type="text" name="reclamada_bairro"></label>
-          <label>Cidade <input type="text" name="reclamada_cidade"></label>
-          <label>UF <input type="text" name="reclamada_uf" maxlength="2"></label>
-          <label>CEP <input type="text" name="reclamada_cep"></label>
-          <label>Telefone <input type="text" name="reclamada_fone"></label>
-          <label>E-mail <input type="email" name="reclamada_email"></label>
-        </fieldset>
-      </form>
-
-      <div class="actions">
-        <button class="btn-ia"  type="button">Gerar com IA</button>
-        <button class="btn-save" type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- PRELIMINARES -->
-    <section id="preliminares" class="tab-content">
-      <h2>Preliminares</h2>
-      <p>Selecione modelos prontos ou edite o texto.</p>
-
-      <div class="preliminares-ui">
-        <label for="preliminares-select">Escolha uma preliminar:</label>
-        <select id="preliminares-select">
-          <option value="">Selecione…</option>
-        </select>
-        <button id="add-preliminar" type="button">Adicionar Preliminar</button>
-        <ul id="preliminares-list"></ul>
-      </div>
-
-      <div class="actions">
-        <button class="btn-ia"  type="button">Gerar com IA</button>
-        <button class="btn-save" type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- CONTRATO -->
-    <section id="contrato" class="tab-content">
-      <h2>Contrato de Trabalho</h2>
-      <p>Descreva os dados contratuais.</p>
-      <form id="form-contrato">
-        <label>Data de admissão <input type="date" name="admissao"></label>
-        <label>Data de saída <input type="date" name="saida"></label>
-        <label>Função <input type="text" name="funcao"></label>
-        <label>Salário mensal (R$) <input type="number" name="salario" step="0.01"></label>
-        <label>Tipo de contrato
-          <select name="tipo_contrato">
-            <option value="">Selecione…</option>
-            <option value="indeterminado">Prazo indeterminado</option>
-            <option value="determinado">Prazo determinado</option>
-            <option value="experiencia">Experiência</option>
-            <option value="intermitente">Intermitente</option>
-            <option value="aprendiz">Aprendiz</option>
-          </select>
-        </label>
-        <label>Jornada (ex.: 44h semanais, 220h/mês) <input type="text" name="jornada"></label>
-        <label>Local de trabalho <input type="text" name="local_trabalho"></label>
-      </form>
-      <div class="actions">
-        <button class="btn-ia"  type="button">Gerar com IA</button>
-        <button class="btn-save" type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- FATOS -->
-    <section id="fatos" class="tab-content">
-      <h2>Fatos</h2>
-      <p>Selecione/descreva os acontecimentos. É possível adicionar vários.</p>
-
-      <label for="select-fato">Escolha um fato:</label>
-      <select id="select-fato">
-        <option value="">Selecione um fato</option>
-      </select>
-      <button id="add-fato" type="button">Adicionar Fato</button>
-
-      <div id="fatos-list"></div>
-
-      <div class="actions">
-        <button class="btn-ia"  type="button">Gerar com IA</button>
-        <button class="btn-save" type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- FUNDAMENTOS -->
-    <section id="fundamentos" class="tab-content">
-      <h2>Fundamentos Jurídicos</h2>
-      <p>Carregados com base nos fatos. Clique para incluir/remover.</p>
-      <div id="fundamentos-box"></div>
-      <div class="actions">
-        <button class="btn-ia"  type="button">Gerar com IA</button>
-        <button class="btn-save" type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- PEDIDOS -->
-    <section id="pedidos" class="tab-content">
-      <h2>Pedidos</h2>
-      <p>Correspondentes aos fatos/fundamentos. Clique para incluir/remover.</p>
-      <div id="pedidos-box"></div>
-      <div class="actions">
-        <button class="btn-ia"  type="button">Gerar com IA</button>
-        <button class="btn-save" type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- CÁLCULOS -->
-    <section id="calculos" class="tab-content">
-      <h2>Cálculos e Tabelas</h2>
-      <p>A tabela é gerada com base nos pedidos e valores informados (editável).</p>
-      <div id="tabela-wrap">
-        <table id="tabela-calculos">
-          <thead>
-            <tr><th>Item</th><th>Base (R$)</th><th>Qtd</th><th>%</th><th>Total (R$)</th></tr>
-          </thead>
-          <tbody></tbody>
-          <tfoot>
-            <tr><td colspan="4" style="text-align:right"><strong>Total Geral</strong></td><td id="total-geral">0,00</td></tr>
-          </tfoot>
-        </table>
-      </div>
-      <div class="actions">
-        <button id="btn-add-linha"   type="button">+ Linha</button>
-        <button id="btn-recalcular"  type="button">Recalcular</button>
-        <button class="btn-save"     type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- PROVAS -->
-    <section id="provas" class="tab-content">
-      <h2>Provas e Documentos</h2>
-      <p>Selecione as provas que acompanharão a inicial.</p>
-      <div id="provas-box"></div>
-      <div class="actions">
-        <button class="btn-save" type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- VALOR -->
-    <section id="valor" class="tab-content">
-      <h2>Valor da Causa</h2>
-      <p>Calculado automaticamente com base na tabela (editável).</p>
-      <input type="number" id="valorCausa" placeholder="Valor total em R$" step="0.01">
-      <div class="actions">
-        <button class="btn-save" type="button">Salvar Trecho</button>
-      </div>
-      <div class="viewer"></div>
-    </section>
-
-    <!-- FINAL -->
-    <section id="final" class="tab-content">
-      <h2>Visualizador Final / Prompt Completo</h2>
-      <p>Revise todo o texto gerado. Edite, copie ou exporte.</p>
-      <div id="editor-final" contenteditable="true" class="editor"></div>
-      <div class="actions">
-  <button id="btn-copiar"       type="button">Copiar Prompt</button>
-  <button id="btn-google-ia"    type="button">🌐 Abrir no Google IA</button>
-  <button id="btn-orientar-ia"  type="button">Orientar I.A.</button>
-</div>
-<!-- menu flutuante das orientações -->
-<div id="ia-menu" class="ia-menu" hidden>
-  <button data-insert="Incluir Jurisprudência">Incluir Jurisprudência</button>
-  <button data-insert="Editar em Parágrafo isolado">Editar em Parágrafo isolado</button>
-  <button data-insert="Editar como Citação">Editar como Citação</button>
-  <button data-insert="Recuo de Citação Longa">Recuo de Citação Longa</button>
-  <button data-insert="Recuo amplo à Direita">Recuo Amplo à Direita</button>
-  <button data-insert="Alinhamento Justificado">Alinhamento Justificado</button>
-  <button data-insert="Alinhamento à Direita">Alinhamento à Direita</button>
-  <button data-insert="Caixa Alta">Caixa Alta</button>
-  <button data-insert="Versalete (Small Caps)">Versalete (Small Caps)</button>
-  <button data-insert="Negrito">Negrito</button>
-  <button data-insert="Itálico">Itálico</button>
-  <button data-insert="Sublinhado">Sublinhado</button>
-</div>
 
 
-    </section>
+    <!-- ====================================================== -->
+    <!-- JAVASCRIPT ("Cérebro" da Aplicação) - v10                -->
+    <!-- ====================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
 
-  </main>
+            // --- LÓGICA 1: NAVEGAÇÃO PELA SIDEBAR (Stepper) ---
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const contentModules = document.querySelectorAll('.content-module');
 
-  <script type="module" src="app.js"></script>
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault(); 
+                    const targetId = link.dataset.target; 
+
+                    contentModules.forEach(module => module.style.display = 'none');
+                    sidebarLinks.forEach(s_link => s_link.classList.remove('active'));
+
+                    document.getElementById(targetId).style.display = 'block';
+                    link.classList.add('active');
+
+                    if (targetId === 'modulo-10') {
+                        // Ativa a primeira aba (Dashboard) e gera o prompt
+                        switchTab('tab-dashboard'); 
+                        gerarPromptMestre(); 
+                    }
+                });
+            });
+            
+            // --- LÓGICA 1.B: NAVEGAÇÃO INTERNA (Abas do Módulo 10) ---
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            function switchTab(targetTabId) {
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                tabButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+                
+                document.getElementById(targetTabId).classList.add('active');
+                document.querySelector(`.tab-button[data-tab="${targetTabId}"]`).classList.add('active');
+            }
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    switchTab(button.dataset.tab);
+                });
+            });
+
+            // --- LÓGICA 1.C: NAVEGAÇÃO INTERNA (Sub-Módulos) ---
+            const regimeTrabalhoSelect = document.getElementById('regime-trabalho');
+            regimeTrabalhoSelect.addEventListener('change', () => {
+                const selecao = regimeTrabalhoSelect.value;
+                document.getElementById('sub-modulo-pj').style.display = (selecao === 'pj') ? 'block' : 'none';
+                document.getElementById('sub-modulo-art62-ii').style.display = (selecao === 'art62-ii') ? 'block' : 'none';
+                document.getElementById('sub-modulo-art62-i').style.display = (selecao === 'art62-i') ? 'block' : 'none';
+            });
+            
+            // --- LÓGICA 1.D: PROATIVIDADE (Teses Acessórias) ---
+            const dataAdmissaoInput = document.getElementById('data-admissao');
+            const dataCtpsInput = document.getElementById('data-ctps');
+            const teseMulta29 = document.getElementById('tese-multa-29');
+            const teseDanoCtps = document.getElementById('tese-dano-ctps');
+            
+            dataCtpsInput.addEventListener('change', () => {
+                const admissao = new Date(dataAdmissaoInput.value);
+                const anotacao = new Date(dataCtpsInput.value);
+                
+                if (!dataCtpsInput.value) { // Nunca anotou
+                    teseMulta29.style.display = 'none';
+                    teseDanoCtps.style.display = 'block';
+                    return;
+                }
+                
+                teseDanoCtps.style.display = 'none';
+                const diffTime = anotacao.getTime() - admissao.getTime();
+                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+                
+                if (diffDays > 5) { // Prazo do Art. 29
+                    teseMulta29.style.display = 'block';
+                } else {
+                    teseMulta29.style.display = 'none';
+                }
+            });
+            
+            const saidaSegInput = document.getElementById('jornada-saida-seg');
+            const teseDanoExistencial = document.getElementById('tese-dano-existencial');
+            saidaSegInput.addEventListener('change', () => {
+                const entrada = document.getElementById('jornada-entrada-seg').value;
+                const saida = saidaSegInput.value;
+                if (!entrada || !saida) return;
+                
+                const [hEnt] = entrada.split(':').map(Number);
+                const [hSai] = saida.split(':').map(Number);
+                
+                if ((hSai - hEnt) >= 10) { // Se trabalhou 10h ou mais
+                    teseDanoExistencial.style.display = 'block';
+                } else {
+                    teseDanoExistencial.style.display = 'none';
+                }
+            });
+            
+            
+            // --- LÓGICA 1.E: ATUALIZAÇÃO AUTOMÁTICA DE CÁLCULOS ---
+            const dataAjuizamentoInput = document.getElementById('data-ajuizamento');
+            dataAjuizamentoInput.valueAsDate = new Date(); // Padrão para hoje
+            dataAjuizamentoInput.addEventListener('change', atualizarCalculosPreliminares);
+            
+            const dataDemissaoInput = document.getElementById('data-demissao');
+            dataDemissaoInput.addEventListener('change', atualizarCalculosPreliminares);
+
+            const gravidadeDanoSelect = document.getElementById('gravidade-dano');
+            gravidadeDanoSelect.addEventListener('change', () => {
+                const salarioFixo = parseFloat(document.getElementById('salario-fixo').value) || 0;
+                const multiplicador = parseFloat(gravidadeDanoSelect.value) || 0;
+                const valorCalculado = salarioFixo * multiplicador;
+                document.getElementById('dano-moral-calculado').value = `R$ ${valorCalculado.toFixed(2)}`;
+            });
+
+            
+            function atualizarCalculosPreliminares() {
+                const dataAjuizamento = new Date(dataAjuizamentoInput.value);
+                
+                const dataPrescricao = new Date(dataAjuizamento);
+                dataPrescricao.setFullYear(dataPrescricao.getFullYear() - 5);
+                document.getElementById('prescricao-quinquenal').value = dataPrescricao.toLocaleDateString('pt-BR');
+
+                const dataDemissao = new Date(dataDemissaoInput.value);
+                if (!dataDemissaoInput.value) {
+                    document.getElementById('prescricao-bienal').value = "Aguardando data demissão";
+                    return;
+                }
+                
+                const dataLimiteBienal = new Date(dataDemissao);
+                dataLimiteBienal.setFullYear(dataLimiteBienal.getFullYear() + 2);
+                const diffDias = (dataLimiteBienal.getTime() - dataAjuizamento.getTime()) / (1000 * 3600 * 24);
+
+                if (diffDias < 0) {
+                    document.getElementById('prescricao-bienal').value = "PRESCRITO";
+                    document.getElementById('aviso-prescricao').style.display = 'block';
+                } else if (diffDias <= 30) {
+                    document.getElementById('prescricao-bienal').value = `FALTAM ${Math.ceil(diffDias)} DIAS!`;
+                    document.getElementById('aviso-prescricao').style.display = 'block';
+                } else {
+                    document.getElementById('prescricao-bienal').value = "OK (No prazo)";
+                    document.getElementById('aviso-prescricao').style.display = 'none';
+                }
+            }
+            
+            // --- LÓGICA 2: FUNÇÃO DE GERAR O PROMPT MESTRE (v10) ---
+            
+            // Objeto global para armazenar os cálculos
+            const calculos = {};
+            
+            // --- MOTOR DE CÁLCULO v10 (v8 do contexto anterior) ---
+            // (As funções de cálculo são idênticas à v8 do contexto anterior,
+            // pois elas já eram o "Advogado Liquidante")
+
+            function calcularDuracao() {
+                const dataAdmissao = document.getElementById('data-admissao').value;
+                const dataDemissao = document.getElementById('data-demissao').value;
+                const dataReforma = new Date(document.getElementById('data-reforma').value);
+                
+                if (!dataAdmissao || !dataDemissao) {
+                    calculos.mesesTrabalhados = 0;
+                    calculos.anosCompletos = 0;
+                    calculos.diasAvisoProporcional = 0;
+                    calculos.avos13Projetados = 0;
+                    calculos.avosFeriasProporcionais = 0;
+                    calculos.mesesPreReforma = 0;
+                    calculos.mesesPosReforma = 0;
+                    return;
+                };
+                
+                const inicio = new Date(dataAdmissao);
+                const fim = new Date(dataDemissao);
+                
+                let mesesTotal = (fim.getFullYear() - inicio.getFullYear()) * 12 + (fim.getMonth() - inicio.getMonth());
+                if (fim.getDate() >= inicio.getDate()) mesesTotal += 1; // Corrigido para >=
+                
+                calculos.mesesTrabalhados = Math.max(1, mesesTotal);
+                calculos.anosCompletos = Math.floor(calculos.mesesTrabalhados / 12);
+                
+                // Cálculo de Aviso Prévio Proporcional (Lei 12.506/11)
+                calculos.diasAvisoProporcional = Math.min(90, 30 + (calculos.anosCompletos * 3));
+                const dataProj = new Date(fim.getTime() + calculos.diasAvisoProporcional * 24 * 60 * 60 * 1000);
+                calculos.avos13Projetados = dataProj.getMonth() + 1;
+                
+                // Cálculo de Férias Proporcionais (avos)
+                let avosFerias = (dataProj.getMonth() - inicio.getMonth()) + 1;
+                if (dataProj.getDate() < 15) avosFerias -= 1;
+                if (avosFerias <= 0) avosFerias += 12;
+                calculos.avosFeriasProporcionais = avosFerias % 12;
+                if (calculos.avosFeriasProporcionais === 0 && calculos.mesesTrabalhados >= 12) calculos.avosFeriasProporcionais = 12;
+
+                
+                // Lógica Intertemporal (para Intervalo)
+                let mesesPre = 0;
+                let mesesPos = 0;
+                
+                if (fim < dataReforma) { // Totalmente Pré-Reforma
+                    mesesPre = calculos.mesesTrabalhados;
+                } else if (inicio > dataReforma) { // Totalmente Pós-Reforma
+                    mesesPos = calculos.mesesTrabalhados;
+                } else { // Híbrido
+                    mesesPre = (dataReforma.getFullYear() - inicio.getFullYear()) * 12 + (dataReforma.getMonth() - inicio.getMonth());
+                    mesesPos = calculos.mesesTrabalhados - mesesPre;
+                }
+                
+                calculos.mesesPreReforma = mesesPre;
+                calculos.mesesPosReforma = mesesPos;
+            }
+            
+            function calcularVMR() {
+                const salarioFixo = parseFloat(document.getElementById('salario-fixo').value) || 0;
+                const salarioFora = parseFloat(document.getElementById('salario-fora').value) || 0;
+                calculos.vmrBase = salarioFixo + salarioFora; // Base para Rescisórias e Periculosidade
+            }
+            
+            function calcularAdicionais() {
+                const salarioMinimo = parseFloat(document.getElementById('salario-minimo').value) || 1412;
+                const grauInsalubridade = parseFloat(document.getElementById('grau-insalubridade').value) || 0;
+                const temPericulosidade = document.getElementById('tem-periculosidade').value === 'sim';
+
+                calculos.adicionalInsalubridade = salarioMinimo * (grauInsalubridade / 100);
+                calculos.adicionalPericulosidade = calculos.vmrBase * 0.30;
+                
+                calculos.adicionalAtivo = 0;
+                if (temPericulosidade && calculos.adicionalPericulosidade > calculos.adicionalInsalubridade) {
+                    calculos.adicionalAtivo = calculos.adicionalPericulosidade;
+                } else if (grauInsalubridade > 0) {
+                    calculos.adicionalAtivo = calculos.adicionalInsalubridade;
+                }
+                
+                calculos.totalAdicionais = calculos.adicionalAtivo * calculos.mesesTrabalhados;
+                // VMR para Horas Extras (Súmula 264, TST)
+                calculos.vmrHE = calculos.vmrBase + calculos.adicionalAtivo;
+            }
+            
+            function calcularReflexos(valorBaseMensal, meses, incluiAviso = true) {
+                if (valorBaseMensal <= 0 || meses <= 0) return { total: 0, dsr: 0, avos: 0, baseFgts: 0 };
+                
+                const diasUteisMes = parseFloat(document.getElementById('dias-uteis-mes').value) || 22;
+                const dsrDiasMes = parseFloat(document.getElementById('dsr-dias-mes').value) || 8;
+                
+                const reflexoDSR = (valorBaseMensal / diasUteisMes) * dsrDiasMes;
+                const baseComDSR = valorBaseMensal + reflexoDSR;
+                
+                const reflexo13 = (baseComDSR / 12) * meses;
+                const reflexoFerias = ((baseComDSR / 12) * meses) * 1.333;
+                const reflexoAviso = incluiAviso ? (calculos.vmrBase + baseComDSR) / 30 * calculos.diasAvisoProporcional : 0; // Corrigido para aviso proporcional
+                
+                const totalReflexos = (reflexoDSR * meses) + reflexo13 + reflexoFerias + reflexoAviso;
+                // Base FGTS = Principal + DSR + 13º. (Não incide sobre Férias e Aviso Indenizado)
+                const baseFgtsReflexos = (valorBaseMensal * meses) + (reflexoDSR * meses) + reflexo13;
+
+                return { total: totalReflexos, dsr: reflexoDSR * meses, avos: reflexo13 + reflexoFerias + reflexoAviso, baseFgts: baseFgtsReflexos };
+            }
+
+            function calcularHorasExtras() {
+                const divisor = parseFloat(document.getElementById('divisor-he').value) || 220;
+                const adicionalHE50 = parseFloat(document.getElementById('adicional-he-50').value) || 50;
+                const adicionalHE100 = parseFloat(document.getElementById('adicional-he-100').value) || 100;
+                
+                const valorHoraNormal = calculos.vmrHE / divisor;
+                const valorHE50 = valorHoraNormal * (1 + (adicionalHE50 / 100));
+                const valorHE100 = valorHoraNormal * (1 + (adicionalHE100 / 100));
+                
+                const entrada = document.getElementById('jornada-entrada-seg').value;
+                const saida = document.getElementById('jornada-saida-seg').value;
+                const intervaloMin = parseFloat(document.getElementById('jornada-intervalo').value) || 0;
+                const diasUteisMes = parseFloat(document.getElementById('dias-uteis-mes').value) || 22;
+                
+                let horasDiarias = 0;
+                if (entrada && saida) {
+                    const [hEnt, mEnt] = entrada.split(':').map(Number);
+                    const [hSai, mSai] = saida.split(':').map(Number);
+                    const minutosTrabalhados = (hSai * 60 + mSai) - (hEnt * 60 + mEnt);
+                    horasDiarias = (minutosTrabalhados - intervaloMin) / 60;
+                }
+                
+                const horasExtrasDiarias = Math.max(0, horasDiarias - (divisor / 30)); 
+                const he50BaseMensal = horasExtrasDiarias * valorHE50 * diasUteisMes;
+                calculos.totalHE50 = he50BaseMensal * calculos.mesesTrabalhados;
+                
+                const horasFds = parseFloat(document.getElementById('fds-horas-dia').value) || 0;
+                const diasFds = parseFloat(document.getElementById('fds-dias-mes').value) || 0;
+                const he100BaseMensal = horasFds * valorHE100 * diasFds;
+                calculos.totalHE100 = he100BaseMensal * calculos.mesesTrabalhados;
+                
+                const horasIntervaloSuprimidas = Math.max(0, (60 - intervaloMin) / 60);
+                const valorIntervaloHora = valorHoraNormal * 1.5; // Sempre 50%
+                
+                const valorIntervaloPreBaseMensal = (1 * valorIntervaloHora) * diasUteisMes;
+                calculos.totalIntervaloPre = valorIntervaloPreBaseMensal * calculos.mesesPreReforma;
+                const reflexosIntervalo = calcularReflexos(valorIntervaloPreBaseMensal, calculos.mesesPreReforma);
+                calculos.totalReflexosIntervalo = reflexosIntervalo.total;
+                
+                const valorIntervaloPosBaseMensal = (horasIntervaloSuprimidas * valorIntervaloHora) * diasUteisMes;
+                calculos.totalIntervaloPos = valorIntervaloPosBaseMensal * calculos.mesesPosReforma;
+                
+                const reflexosHE = calcularReflexos(he50BaseMensal + he100BaseMensal, calculos.mesesTrabalhados);
+                calculos.totalReflexosHE = reflexosHE.total;
+                
+                const reflexosAdicionais = calcularReflexos(calculos.adicionalAtivo, calculos.mesesTrabalhados);
+                calculos.totalReflexosAdicionais = reflexosAdicionais.total;
+                
+                // Base para FGTS (Pleiteado)
+                calculos.baseFgtsPleiteado = (reflexosHE.baseFgts || 0) + (reflexosAdicionais.baseFgts || 0) + (reflexosIntervalo.baseFgts || 0);
+            }
+
+            function calcularRescisorias() {
+                const tipoSaida = document.getElementById('tipo-saida').value;
+                if (tipoSaida === 'pedido' || tipoSaida === 'jc') {
+                    calculos.saldoSalario = (calculos.vmrBase / 30) * (parseFloat(document.getElementById('saldo-salario-dias').value) || 0);
+                    calculos.totalRescisorias = calculos.saldoSalario; // Simplificado
+                    calculos.totalMultas477467 = 0;
+                    calculos.avisoPrevio = 0;
+                    calculos.decimoTerceiro = 0;
+                    calculos.feriasVenc = 0;
+                    calculos.feriasProp = 0;
+                    calculos.feriasDobro = 0;
+                    return;
+                }
+
+                const saldoDias = parseFloat(document.getElementById('saldo-salario-dias').value) || 0;
+                calculos.saldoSalario = (calculos.vmrBase / 30) * saldoDias;
+                calculos.avisoPrevio = (calculos.vmrBase / 30) * calculos.diasAvisoProporcional;
+                calculos.decimoTerceiro = (calculos.vmrBase / 12) * calculos.avos13Projetados;
+                calculos.feriasProp = ((calculos.vmrBase / 12) * calculos.avosFeriasProporcionais) * 1.333;
+                calculos.feriasVenc = (document.getElementById('verba-ferias-venc').checked) ? calculos.vmrBase * 1.333 : 0;
+                calculos.feriasDobro = (document.getElementById('verba-ferias-duplas').checked) ? calculos.vmrBase * 2.666 : 0; // Dobra (Art. 137)
+
+                const incontroversas = calculos.saldoSalario + calculos.avisoPrevio + calculos.decimoTerceiro + calculos.feriasProp + calculos.feriasVenc + calculos.feriasDobro;
+                
+                calculos.multa467 = (document.getElementById('multa-467').checked) ? incontroversas * 0.5 : 0;
+                calculos.multa477 = (document.getElementById('multa-477').checked) ? calculos.vmrBase : 0;
+                
+                calculos.totalRescisorias = incontroversas;
+                calculos.totalMultas477467 = calculos.multa467 + calculos.multa477;
+            }
+
+            function calcularTesesEspecificas() {
+                // Equiparação Salarial
+                const difSalarial = parseFloat(document.getElementById('equipar-valor-dif').value) || 0;
+                calculos.totalEquiparacao = difSalarial * calculos.mesesTrabalhados;
+                const reflexosEquiparacao = calcularReflexos(difSalarial, calculos.mesesTrabalhados);
+                calculos.totalReflexosEquiparacao = reflexosEquiparacao.total;
+                calculos.baseFgtsPleiteado += (reflexosEquiparacao.baseFgts || 0); // Adiciona à base FGTS
+
+                // Vale-Transporte
+                const vtDiasMes = parseFloat(document.getElementById('vt-dias-mes').value) || 0;
+                const vtConducoesDia = parseFloat(document.getElementById('vt-conducoes-dia').value) || 0;
+                const vtValorPassagem = parseFloat(document.getElementById('vt-valor-passagem').value) || 0;
+                const totalVtMensal = vtDiasMes * vtConducoesDia * vtValorPassagem;
+                const descontoVtMensal = calculos.vmrBase * 0.06;
+                const vtDevidoMensal = Math.max(0, totalVtMensal - descontoVtMensal);
+                calculos.totalVT = (document.getElementById('tese-vt').checked) ? (vtDevidoMensal * calculos.mesesTrabalhados) : 0;
+
+                // Multa CCT
+                const valorMultaCCT = parseFloat(document.getElementById('cct-valor-multa').value) || 0;
+                const tipoMultaCCT = document.getElementById('cct-tipo-multa').value;
+                if (document.getElementById('tese-cct').checked) {
+                    if (tipoMultaCCT === 'mes') {
+                        calculos.totalMultaCCT = valorMultaCCT * calculos.mesesTrabalhados;
+                    } else { // 'evento' ou 'percentual'
+                        calculos.totalMultaCCT = valorMultaCCT; // Simplificado
+                    }
+                } else {
+                    calculos.totalMultaCCT = 0;
+                }
+            }
+            
+            function calcularFGTS() {
+                const fgtsNaoDepositado = parseFloat(document.getElementById('fgts-valor-nao-depositado').value) || 0;
+                
+                // 1. FGTS sobre verbas pleiteadas (HE, Adicionais, Reflexos Salariais)
+                const fgtsPleiteado = (calculos.baseFgtsPleiteado || 0) * 0.08;
+                
+                // 2. FGTS sobre rescisórias (13º)
+                const fgtsRescisorias = (calculos.decimoTerceiro || 0) * 0.08;
+                
+                // 3. FGTS do contrato (estimativa do que deveria ter sido depositado)
+                const fgtsContrato = (calculos.vmrBase * 0.08) * calculos.mesesTrabalhados;
+                
+                // Base da Multa de 40% (Súm. TST e Lei) - NÃO incide sobre Aviso Indenizado, Férias Indenizadas
+                const baseMulta40 = fgtsNaoDepositado + fgtsPleiteado + (calculos.decimoTerceiro * 0.08) + fgtsContrato;
+                
+                calculos.multa40FGTS = (document.getElementById('verba-multa-40').checked) ? baseMulta40 * 0.40 : 0;
+                
+                calculos.totalFGTS = fgtsNaoDepositado + fgtsPleiteado + fgtsRescisorias + calculos.multa40FGTS;
+            }
+            
+            function calcularDanos() {
+                // Dano Moral (M6)
+                const multiplicador = parseFloat(document.getElementById('gravidade-dano').value) || 0;
+                calculos.totalDanoMoral = (calculos.vmrBase || 0) * multiplicador;
+                
+                // Dano Material (Pensão M5)
+                const percIncap = parseFloat(document.getElementById('percentual-incapacidade').value) || 0;
+                const expVida = parseFloat(document.getElementById('expectativa-vida').value) || 80;
+                const dataNascimento = document.getElementById('cli-nascimento').value;
+                let idadeAtual = 30; // Default
+                if (dataNascimento) {
+                    idadeAtual = new Date().getFullYear() - new Date(dataNascimento).getFullYear();
+                }
+                const anosRestantes = Math.max(0, expVida - idadeAtual);
+                const pensaoAnual = (calculos.vmrBase * (percIncap / 100)) * 13.33; // 12 sal + 13º + 1/3 Férias
+                
+                calculos.totalDanoMaterial = (document.getElementById('dano-material-acidente').checked) ? (pensaoAnual * anosRestantes) : 0;
+                
+                // Dano Estético (M5)
+                calculos.totalDanoEstetico = parseFloat(document.getElementById('dano-estetico-valor').value) || 0;
+                
+                // Danos Emergentes (M5)
+                calculos.totalDanoEmergente = parseFloat(document.getElementById('dano-emergente-valor').value) || 0;
+
+                // v10 - Danos Acessórios
+                if (document.getElementById('pedir-dano-ctps') && document.getElementById('pedir-dano-ctps').checked) {
+                    calculos.totalDanoMoral += (calculos.vmrBase * 3); // Adiciona tese de Dano Leve (3x)
+                }
+                if (document.getElementById('pedir-dano-existencial') && document.getElementById('pedir-dano-existencial').checked) {
+                    calculos.totalDanoMoral += (calculos.vmrBase * 5); // Adiciona tese de Dano Médio (5x)
+                }
+            }
+            
+            function calcularValorTotal() {
+                calculos.valorTotalCausa = 
+                    (calculos.totalHE50 || 0) + (calculos.totalHE100 || 0) +
+                    (calculos.totalReflexosHE || 0) +
+                    (calculos.totalIntervaloPre || 0) + (calculos.totalIntervaloPos || 0) +
+                    (calculos.totalReflexosIntervalo || 0) +
+                    (calculos.totalAdicionais || 0) +
+                    (calculos.totalReflexosAdicionais || 0) +
+                    (calculos.totalRescisorias || 0) +
+                    (calculos.totalMultas477467 || 0) +
+                    (calculos.totalFGTS || 0) +
+                    (calculos.totalDanoMoral || 0) +
+                    (calculos.totalDanoMaterial || 0) +
+                    (calculos.totalDanoEstetico || 0) +
+                    (calculos.totalDanoEmergente || 0) +
+                    (calculos.totalEquiparacao || 0) +
+                    (calculos.totalReflexosEquiparacao || 0) +
+                    (calculos.totalVT || 0) +
+                    (calculos.totalMultaCCT || 0);
+                    
+                const salarioMinimo = parseFloat(document.getElementById('salario-minimo').value) || 1412;
+                if (calculos.valorTotalCausa <= (salarioMinimo * 40)) {
+                    calculos.rito = "SUMARÍSSIMO (Abaixo de 40 Salários Mínimos)";
+                } else {
+                    calculos.rito = "ORDINÁRIO (Acima de 40 Salários Mínimos)";
+                }
+            }
+
+            // --- FUNÇÃO MESTRA ---
+            function gerarPromptMestre() {
+                console.log("Gerando prompt v10... (Motor de Liquidação + Advogado-Mentor Ativado)"); 
+                
+                // --- ORDEM DE CÁLCULO (CRÍTICA) ---
+                calcularDuracao();
+                calcularVMR(); 
+                calcularAdicionais(); 
+                calcularTesesEspecificas(); // Precisa da VMR e Meses
+                calcularHorasExtras(); // Precisa da VMR_HE (dos adicionais)
+                calcularRescisorias(); // Precisa da VMR_Base e duração
+                calcularDanos(); // Precisa da VMR_Base e duração
+                calcularFGTS(); // Precisa de TUDO antes
+                calcularValorTotal(); // Último passo
+
+                // --- ATUALIZA O DASHBOARD DE CÁLCULO (Aba 1) ---
+                document.getElementById('calc-vmr').innerText = `VMR (Base HE): R$ ${calculos.vmrHE.toFixed(2)}`;
+                document.getElementById('calc-meses').innerText = `Meses Contrato: ${calculos.mesesTrabalhados}`;
+                document.getElementById('calc-he').innerText = `HE (Principal): R$ ${(calculos.totalHE50 + calculos.totalHE100).toFixed(2)}`;
+                document.getElementById('calc-he-reflexos').innerText = `HE (Reflexos): R$ ${calculos.totalReflexosHE.toFixed(2)}`;
+                document.getElementById('calc-intervalo').innerText = `Intervalo (Principal): R$ ${(calculos.totalIntervaloPre + calculos.totalIntervaloPos).toFixed(2)}`;
+                document.getElementById('calc-intervalo-reflexos').innerText = `Intervalo (Reflexos): R$ ${calculos.totalReflexosIntervalo.toFixed(2)}`;
+                document.getElementById('calc-adicionais').innerText = `Adicionais (Principal): R$ ${calculos.totalAdicionais.toFixed(2)}`;
+                document.getElementById('calc-adicionais-reflexos').innerText = `Adicionais (Reflexos): R$ ${calculos.totalReflexosAdicionais.toFixed(2)}`;
+                document.getElementById('calc-rescisorias').innerText = `Verbas Rescisórias: R$ ${calculos.totalRescisorias.toFixed(2)}`;
+                document.getElementById('calc-multas-477-467').innerText = `Multas 477/467: R$ ${calculos.totalMultas477467.toFixed(2)}`;
+                document.getElementById('calc-fgts-total').innerText = `FGTS Total (Difs+Multa 40%): R$ ${calculos.totalFGTS.toFixed(2)}`;
+                document.getElementById('calc-equiparacao').innerText = `Equiparação (Principal): R$ ${calculos.totalEquiparacao.toFixed(2)}`;
+                document.getElementById('calc-equiparacao-reflexos').innerText = `Equiparação (Reflexos): R$ ${calculos.totalReflexosEquiparacao.toFixed(2)}`;
+                document.getElementById('calc-vt').innerText = `Vale-Transporte: R$ ${calculos.totalVT.toFixed(2)}`;
+                document.getElementById('calc-multa-cct').innerText = `Multas CCT: R$ ${calculos.totalMultaCCT.toFixed(2)}`;
+                document.getElementById('calc-dano-moral').innerText = `Dano Moral: R$ ${calculos.totalDanoMoral.toFixed(2)}`;
+                document.getElementById('calc-dano-material').innerText = `Dano Material (Pensão): R$ ${calculos.totalDanoMaterial.toFixed(2)}`;
+                document.getElementById('calc-dano-emergente').innerText = `Dano Emergente (Gastos): R$ ${calculos.totalDanoEmergente.toFixed(2)}`;
+
+                document.getElementById('calc-valor-total-causa').innerText = `VALOR TOTAL DA CAUSA: R$ ${calculos.valorTotalCausa.toFixed(2)}`;
+                document.getElementById('calc-rito-processual').innerText = `RITO PROCESSUAL: ${calculos.rito}`;
+
+                // --- COLETA DE DADOS (v10 - COMPLETA) ---
+                const comarca = document.getElementById('comarca').value;
+                const cliNome = document.getElementById('cli-nome').value;
+                const cliNacionalidade = document.getElementById('cli-nacionalidade').value;
+                const cliEstadoCivil = document.getElementById('cli-estado-civil').value;
+                const cliProfissao = document.getElementById('cli-profissao').value;
+                const cliNascimento = document.getElementById('cli-nascimento').value;
+                const cliMae = document.getElementById('cli-mae').value;
+                const cliCpf = document.getElementById('cli-cpf').value;
+                const cliRg = document.getElementById('cli-rg').value;
+                const cliPis = document.getElementById('cli-pis').value;
+                const cliCtps = document.getElementById('cli-ctps').value;
+                const cliEmail = document.getElementById('cli-email').value;
+                const cliEndereco = document.getElementById('cli-endereco').value;
+                
+                const rdaNome = document.getElementById('rda-nome').value;
+                const rdaCnpj = document.getElementById('rda-cnpj').value;
+                const rdaEndereco = document.getElementById('rda-endereco').value;
+                
+                const perfilFraude = document.getElementById('regime-trabalho').value;
+                const salarioFora = parseFloat(document.getElementById('salario-fora').value) || 0;
+                const dataAdmissao = document.getElementById('data-admissao').value;
+                const dataDemissao = document.getElementById('data-demissao').value;
+                const dataCtps = document.getElementById('data-ctps').value;
+                
+                const qtdeFuncs = document.getElementById('qtde-funcs').value;
+                const entradaSeg = document.getElementById('jornada-entrada-seg').value;
+                const saidaSeg = document.getElementById('jornada-saida-seg').value;
+                const intervaloMin = document.getElementById('jornada-intervalo').value;
+                const jornadaFds = document.getElementById('fds-dias-mes').value > 0;
+                const pedirDanoExistencial = document.getElementById('pedir-dano-existencial').checked;
+                
+                const grauInsalubridade = parseFloat(document.getElementById('grau-insalubridade').value) || 0;
+                const temPericulosidade = document.getElementById('tem-periculosidade').value === 'sim';
+                
+                const tipoAcidente = document.getElementById('tipo-acidente').value;
+                const narrativaAcidente = document.getElementById('narrativa-acidente').value;
+                const estabilidade118 = document.getElementById('estabilidade-118').checked;
+                const danoMaterialAcidente = document.getElementById('dano-material-acidente').checked;
+                const danoEstetico = document.getElementById('dano-estetico').checked;
+                const culpaTreinamento = document.getElementById('culpa-treinamento').checked;
+                const culpaEpi = document.getElementById('culpa-epi').checked;
+                const culpaAmbiente = document.getElementById('culpa-ambiente').checked;
+                
+                const tipoDano = document.getElementById('tipo-dano').value;
+                const narrativaDano = document.getElementById('narrativa-dano').value;
+                const gravidadeDano = document.getElementById('gravidade-dano').options[document.getElementById('gravidade-dano').selectedIndex].text;
+                
+                const tipoSaida = document.getElementById('tipo-saida').value;
+                const indiretaFgts = document.getElementById('indireta-fgts').checked;
+                const indiretaSalario = document.getElementById('indireta-salario').checked;
+                const indiretaAssedio = document.getElementById('indireta-assedio').checked;
+                
+                const equiparParadigma = document.getElementById('equipar-paradigma').value;
+                const teseVt = document.getElementById('tese-vt').checked;
+                const teseCct = document.getElementById('tese-cct').checked;
+                
+                const test1Nome = document.getElementById('test-1-nome').value;
+                const test1Fatos = document.getElementById('test-1-fatos').value;
+                
+                const advNome = document.getElementById('adv-nome').value;
+                const advOab = document.getElementById('adv-oab').value;
+                const advEmail = document.getElementById('adv-email').value;
+                const advEndereco = document.getElementById('adv-endereco').value;
+
+
+                // --- MOTOR DE LÓGICA (Geração de Texto de Factos/Fundamentos) ---
+                let promptPedidos = "";
+
+                let fatosContrato = `Admissão em ${dataAdmissao} (anotada em ${dataCtps || 'NUNCA'}) e demissão em ${dataDemissao} (${calculos.mesesTrabalhados} meses).`;
+                if (perfilFraude === 'pj') {
+                    fatosContrato = `Contratado como PJ em ${dataAdmissao} para fraudar a CLT (Art. 9º), mas presentes todos os requisitos do Art. 3º (pessoalidade, subordinação, onerosidade, não-eventualidade). Demitido em ${dataDemissao}.`;
+                }
+
+                if (calculos.totalHE50 > 0 || calculos.totalHE100 > 0 || calculos.totalIntervaloPre > 0 || calculos.totalIntervaloPos > 0) {
+                    let pedidoJornada = "### PEDIDO 1: JORNADA DE TRABALHO (Horas Extras e Intervalo)\n";
+                    let estrategiaJornada = "";
+                    if (qtdeFuncs === 'sim') { estrategiaJornada = `A Reclamada possui mais de 20 funcionários (Art. 74, §2º, CLT), cabendo a ela o ónus de provar a jornada (Súmula 338, I, TST).`; }
+                    
+                    pedidoJornada += `- **Facto (Narrativa):** O Reclamante laborava de ${entradaSeg} às ${saidaSeg}, com apenas ${intervaloMin} minutos de intervalo.\n`;
+                    if (jornadaFds) { pedidoJornada += `- **Facto (FDS):** Além disso, laborava em domingos e feriados sem folga compensatória.\n`; }
+                    pedidoJornada += `- **Estratégia de Prova (Instrução):** ${estrategiaJornada}\n`;
+                    pedidoJornada += `- **Fundamentos (Intervalo - Instrução Intertemporal):** O contrato é HÍBRIDO (${calculos.mesesPreReforma}m pré / ${calculos.mesesPosReforma}m pós). Para o período *antes* de 11/11/2017, calcular 1h cheia (Súmula 437) com reflexos. Para o período *após*, calcular apenas os ${60 - intervaloMin} minutos suprimidos (Art. 71, §4º, CLT) sem reflexos.\n`;
+                    pedidoJornada += `- **Valor (HE Principal):** R$ ${(calculos.totalHE50 + calculos.totalHE100).toFixed(2)}\n`;
+                    pedidoJornada += `- **Valor (HE Reflexos):** R$ ${calculos.totalReflexosHE.toFixed(2)}\n`;
+                    pedidoJornada += `- **Valor (Intervalo Principal):** R$ ${(calculos.totalIntervaloPre + calculos.totalIntervaloPos).toFixed(2)}\n`;
+                    pedidoJornada += `- **Valor (Intervalo Reflexos Pré-Reforma):** R$ ${calculos.totalReflexosIntervalo.toFixed(2)}\n\n`;
+                    promptPedidos += pedidoJornada;
+                }
+
+                if (calculos.totalAdicionais > 0) {
+                    let pedidoAdicionais = "### PEDIDO 2: ADICIONAIS (Insalubridade/Periculosidade)\n";
+                    pedidoAdicionais += `- **Instrução:** Requerer a realização de Perícia Técnica (Art. 195, CLT).\n`;
+                    if (grauInsalubridade > 0) {
+                        pedidoAdicionais += `- **Pedido (Insalubridade):** Sim. Grau ${grauInsalubridade}%. Fundamento: Art. 192, CLT.\n`;
+                    }
+                    if (temPericulosidade) {
+                        pedidoAdicionais += `- **Pedido (Periculosidade):** Sim. 30%. Fundamento: Art. 193, CLT (Súmula 191, TST).\n`;
+                    }
+                    pedidoAdicionais += `- **Valor (Principal):** R$ ${calculos.totalAdicionais.toFixed(2)}\n`;
+                    pedidoAdicionais += `- **Valor (Reflexos):** R$ ${calculos.totalReflexosAdicionais.toFixed(2)}\n\n`;
+                    promptPedidos += pedidoAdicionais;
+                }
+
+                if (tipoAcidente !== 'nenhum') {
+                    let pedidoAcidente = "### PEDIDO 3: ACIDENTE DE TRABALHO / DOENÇA OCUPACIONAL\n";
+                    pedidoAcidente += `- **Tipo:** ${tipoAcidente}\n`;
+                    pedidoAcidente += `- **Facto (Nexo/Culpa):** ${narrativaAcidente}\n`;
+                    pedidoAcidente += `- **Estratégia (Culpa Reclamada):** Fundamentar a culpa da empresa na ${!culpaTreinamento ? 'falta de treinamento' : ''}, ${!culpaEpi ? 'não fornecimento/fiscalização de EPIs' : ''}, ${culpaAmbiente ? 'ambiente inseguro' : ''}.\n`;
+                    pedidoAcidente += `- **Instrução Perícia:** Requerer Perícia Médica (Dano, Nexo, Culpa).\n`;
+                    if (estabilidade118) { pedidoAcidente += `- **Pedido (Estabilidade):** Sim. Fundamento: Art. 118, Lei 8.213/91 e Súmula 378, TST.\n`; }
+                    if (calculos.totalDanoMaterial > 0) { pedidoAcidente += `- **Pedido (Dano Material):** Sim. Fundamento: Art. 950, CC. Valor: R$ ${calculos.totalDanoMaterial.toFixed(2)}.\n`; }
+                    if (calculos.totalDanoEstetico > 0) { pedidoAcidente += `- **Pedido (Dano Estético):** Sim. Fundamento: Súmula 387, STJ. Valor: R$ ${calculos.totalDanoEstetico.toFixed(2)}.\n`; }
+                    if (calculos.totalDanoEmergente > 0) { pedidoAcidente += `- **Pedido (Dano Emergente):** Sim. Fundamento: Art. 949, CC. Valor: R$ ${calculos.totalDanoEmergente.toFixed(2)}.\n`; }
+                    pedidoAcidente += "\n";
+                    promptPedidos += pedidoAcidente;
+                }
+                
+                let pedidoDanoMoralTxt = "";
+                if (tipoDano !== 'nenhum') {
+                    pedidoDanoMoralTxt += `- **Tipo (Principal):** ${tipoDano}\n`;
+                    pedidoDanoMoralTxt += `- **Facto (Narrativa):** ${narrativaDano}\n`;
+                }
+                if (pedirDanoExistencial) {
+                     pedidoDanoMoralTxt += `- **Tese Cumulada (Dano Existencial):** A jornada exaustiva (Mód. 3) violou o direito ao lazer (Art. 6º, CF).\n`;
+                }
+                if (document.getElementById('pedir-dano-ctps') && document.getElementById('pedir-dano-ctps').checked) {
+                     pedidoDanoMoralTxt += `- **Tese Cumulada (Falta de CTPS):** A ausência de anotação da CTPS gerou dano moral *in re ipsa*.\n`;
+                }
+                if (pedidoDanoMoralTxt) {
+                    let pedidoDanoMoral = "### PEDIDO 4: DANO MORAL\n";
+                    pedidoDanoMoral += pedidoDanoMoralTxt;
+                    pedidoDanoMoral += `- **Instrução (Tarifação):** Enquadrar a ofensa como ${gravidadeDano} (Art. 223-G, §1º).\n`;
+                    pedidoDanoMoral += `- **Valor (Estimado):** R$ ${calculos.totalDanoMoral.toFixed(2)}\n\n`;
+                    promptPedidos += pedidoDanoMoral;
+                }
+                
+                let pedidoRescisao = "### PEDIDO 5: VERBAS RESCISÓRIAS E MULTAS\n";
+                pedidoRescisao += `- **Modalidade:** ${tipoSaida}\n`;
+                if (tipoSaida === 'indireta') {
+                    let motivosIndireta = [];
+                    if (indiretaFgts) motivosIndireta.push("Não recolhimento FGTS (Alínea 'd')");
+                    if (indiretaSalario) motivosIndireta.push("Atraso salarial (Alínea 'd')");
+                    if (indiretaAssedio) motivosIndireta.push("Assédio Moral (Alínea 'b'/'e')");
+                    pedidoRescisao += `- **Tese (Rescisão Indireta):** Fundamentar a rescisão indireta (Art. 483, CLT) nos seguintes pontos: ${motivosIndireta.join('; ')}.\n`;
+                }
+                pedidoRescisao += `- **Valor (Verbas Incontroversas):** R$ ${calculos.totalRescisorias.toFixed(2)}\n`;
+                pedidoRescisao += `- **Valor (Multas 477/467):** R$ ${calculos.totalMultas477467.toFixed(2)}\n\n`;
+                promptPedidos += pedidoRescisao;
+
+                let pedidoFGTS = "### PEDIDO 6: FGTS (Diferenças e Multa 40%)\n";
+                pedidoFGTS += `- **Valor (FGTS Total - Difs + Pleiteado + Multa 40%):** R$ ${calculos.totalFGTS.toFixed(2)}\n\n`;
+                promptPedidos += pedidoFGTS;
+                
+                if (calculos.totalEquiparacao > 0) {
+                    let pedidoTeses = "### PEDIDO 7: EQUIPARAÇÃO SALARIAL (Art. 461, CLT)\n";
+                    pedidoTeses += `- **Tese:** Pedir diferenças salariais. Paradigma: ${equiparParadigma}.\n`;
+                    pedidoTeses += `- **Valor (Principal):** R$ ${calculos.totalEquiparacao.toFixed(2)}\n`;
+                    pedidoTeses += `- **Valor (Reflexos):** R$ ${calculos.totalReflexosEquiparacao.toFixed(2)}\n\n`;
+                    promptPedidos += pedidoTeses;
+                }
+
+                if (calculos.totalVT > 0) {
+                    let pedidoVT = "### PEDIDO 8: VALE-TRANSPORTE (Indenização)\n";
+                    pedidoVT += `- **Tese:** Pedir indenização substitutiva do VT não fornecido (Lei 7.418/85), autorizando desconto de 6%.\n`;
+                    pedidoVT += `- **Valor (Principal):** R$ ${calculos.totalVT.toFixed(2)}\n\n`;
+                    promptPedidos += pedidoVT;
+                }
+                
+                if (calculos.totalMultaCCT > 0) {
+                    let pedidoCCT = "### PEDIDO 9: MULTAS CCT\n";
+                    pedidoCCT += `- **Tese:** Descumprimento da(s) cláusula(s) ${document.getElementById('cct-clausula-descumprida').value}.\n`;
+                    pedidoCCT += `- **Valor (Principal):** R$ ${calculos.totalMultaCCT.toFixed(2)}\n\n`;
+                    promptPedidos += pedidoCCT;
+                }
+
+
+                // --- MONTAGEM DO PROMPT v10 ---
+                
+                const promptTexto = `[INÍCIO DO PROMPT MESTRE]
+
+# COMANDO DE PERSONA
+Assuma a persona de um Advogado Trabalhista Sénior, Pós-Graduado em Direito e Processo do Trabalho, focado em Reclamantes. Seja técnico, assertivo e use a jurisprudência e leis fornecidas para fundamentar CADA pedido.
+
+# COMANDO DE TAREFA
+Redija uma Petição Inicial de Reclamatória Trabalhista completa, baseada *estritamente* nos dados estruturados abaixo. A petição deve ser organizada (Factos, Fundamentos, Pedidos) e já incluir os valores líquidos estimados. Otimize a petição para o Rito Processual sugerido.
+
+---
+
+# DADOS ESTRUTURADOS DO CASO (v10)
+
+## 1. DADOS PRELIMINARES
+- **Rito Processual:** ${calculos.rito}
+- **Valor da Causa (Líquido):** R$ ${calculos.valorTotalCausa.toFixed(2)}
+- **Comarca (Foro):** ${comarca}
+- **Prescrição Quinquenal (Marco):** ${document.getElementById('prescricao-quinquenal').value}
+- **Justiça Gratuita:** Sim (Art. 790, §3º/4º, CLT)
+- **Honorários Sucumbenciais:** Sim (15% - Art. 791-A, CLT)
+
+## 2. QUALIFICAÇÃO DAS PARTES
+### RECLAMANTE
+- **Nome:** ${cliNome}
+- **Nacionalidade:** ${cliNacionalidade}
+- **Estado Civil:** ${cliEstadoCivil}
+- **Profissão:** ${cliProfissao}
+- **Data de Nascimento:** ${cliNascimento}
+- **Nome da Mãe:** ${cliMae}
+- **CPF:** ${cliCpf}
+- **RG:** ${cliRg}
+- **PIS:** ${cliPis}
+- **CTPS:** ${cliCtps}
+- **Email:** ${cliEmail}
+- **Endereço:** ${cliEndereco}
+
+### RECLAMADA(S)
+- **Razão Social:** ${rdaNome}
+- **CNPJ:** ${rdaCnpj}
+- **Endereço:** ${rdaEndereco}
+
+## 3. FACTOS E CÁLCULO DO CONTRATO
+- **Narrativa Fática:** ${fatosContrato}
+- **Enquadramento:** ${perfilFraude}
+- **Remuneração (VMR Base Rescisória):** R$ ${calculos.vmrBase.toFixed(2)}
+- **Remuneração (Base HE - Súmula 264):** R$ ${calculos.vmrHE.toFixed(2)} (VMR Base + Adicional)
+- **Instrução:** O valor "Por Fora" (R$ ${salarioFora}) deve ser integrado para todos os fins (Art. 457, §1º, CLT).
+
+## 4. DADOS DO ADVOGADO (Para fechamento)
+- **Nome:** ${advNome}
+- **OAB:** ${advOab}
+- **Email:** ${advEmail}
+- **Endereço:** ${advEndereco}
+
+## 5. PROVAS (Estratégia)
+- **Testemunha 1:** ${test1Nome} (Provará: ${test1Fatos})
+- **Instrução Probatória:** Protestar por todos os meios, incluindo depoimento pessoal, oitiva das testemunhas acima, e perícias (médica e técnica, se aplicável).
+
+## 6. CHECKLIST DE PEDIDOS (Fundamentar todos abaixo com os valores)
+${promptPedidos}
+
+[FIM DO PROMPT MESTRE]
+`;
+                // Insere o prompt gerado na <textarea>
+                document.getElementById('prompt-final').value = promptTexto;
+
+                // v10 - Atualiza o Checklist PJe
+                document.getElementById('check-pericia-medica').style.display = (tipoAcidente !== 'nenhum') ? 'block' : 'none';
+                document.getElementById('check-pericia-tecnica').style.display = (grauInsalubridade > 0 || temPericulosidade) ? 'block' : 'none';
+                document.getElementById('check-provas-dano').style.display = (tipoDano !== 'nenhum') ? 'block' : 'none';
+                document.getElementById('check-norma-coletiva').style.display = (teseCct) ? 'block' : 'none';
+            }
+
+
+            // --- LÓGICA 3: BOTÃO DE COPIAR ---
+            const btnCopiar = document.getElementById('btn-copiar');
+            const promptFinalTextarea = document.getElementById('prompt-final');
+
+            btnCopiar.addEventListener('click', () => {
+                promptFinalTextarea.select();
+                promptFinalTextarea.setSelectionRange(0, 99999); 
+                try {
+                    document.execCommand('copy');
+                    btnCopiar.innerText = '✅ Copiado!';
+                    setTimeout(() => { btnCopiar.innerText = 'Copiar Prompt para Área de Transferência'; }, 2000);
+                } catch (err) {
+                    console.error('Falha ao copiar: ', err);
+                }
+            });
+            
+            // Inicializa os cálculos preliminares ao carregar
+            atualizarCalculosPreliminares();
+
+        });
+    </script>
+
 </body>
 </html>
-```
+
